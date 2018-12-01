@@ -13,3 +13,6 @@
 [submodule "yxhuvud-crystal"]
 	path = yxhuvud-crystal
 	url = https://github.com/yxhuvud/aoc18
+[submodule "bowald-rust"]
+	path = bowald-rust
+	url = https://github.com/bowald/advent_of_code_2018.git
