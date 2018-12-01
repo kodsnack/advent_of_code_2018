@@ -1,6 +1,9 @@
 [submodule "tomasaschan-haskell"]
 	path = tomasaschan-haskell
 	url = git@github.com:tomasaschan/advent-of-code-2018
+[submodule "meck-haskell"]
+	path = meck-haskell
+	url = https://github.com/meck/AoC2018.git
 [submodule "albert-arvidsson-elixir"]
 	path = albert-arvidsson-elixir
 	url = git@github.com:scmx/advent-of-code-2018-elixir
