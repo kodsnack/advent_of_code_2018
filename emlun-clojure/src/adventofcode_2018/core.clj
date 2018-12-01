@@ -1,5 +1,4 @@
 (ns adventofcode-2018.core
-  (:gen-class)
   (:require clojure.string)
 )
 
