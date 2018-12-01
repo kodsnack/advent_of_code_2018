@@ -1,8 +1,7 @@
 (ns adventofcode-2018.day01)
 
 (defn get-diffs [lines]
-  (map read-string lines)
-)
+  (map read-string lines))
 
 (defn first-recurrence [coll]
   (loop [history #{}
