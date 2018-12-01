@@ -1,0 +1,27 @@
+[submodule "tomasaschan-haskell"]
+	path = tomasaschan-haskell
+	url = git@github.com:tomasaschan/advent-of-code-2018
+[submodule "meck-haskell"]
+	path = meck-haskell
+	url = https://github.com/meck/AoC2018.git
+[submodule "albert-arvidsson-elixir"]
+	path = albert-arvidsson-elixir
+	url = git@github.com:scmx/advent-of-code-2018-elixir
+[submodule "fronkan-python"]
+	path = fronkan-python
+	url = git@github.com:Fronkan/advent_of_code_2018.git
+[submodule "yxhuvud-crystal"]
+	path = yxhuvud-crystal
+	url = https://github.com/yxhuvud/aoc18
+[submodule "bowald-rust"]
+	path = bowald-rust
+	url = https://github.com/bowald/advent_of_code_2018.git
+[submodule "k0nserv-rust"]
+	path = k0nserv-rust
+	url = git@github.com:k0nserv/advent-of-rust-2018.git
+[submodule "littleandi-csharp"]
+	path = littleandi-csharp
+	url = https://github.com/LittleAndi/advent-of-code-2018.git
+[submodule "yoanndupont-ada"]
+	path = yoanndupont-ada
+	url = https://github.com/YoannDupont/advent_of_code_2018.git
