@@ -13,35 +13,27 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(makeInts(data, "\n"), findDup(data, "\n"))
+	fmt.Println(findDup(data, "\n"))
 }
 
-func makeInts(str, sep string) int {
-	strArr := strings.Split(str, sep)
-	sum := 0
-	for _, i := range strArr {
-		i = strings.TrimSpace(i)
-		n, _ := strconv.Atoi(i)
-		sum += n
-	}
-	return sum
-}
-
-func findDup(str, sep string) int {
+func findDup(str, sep string) (part1, sum int) {
 	s := strings.Split(str, sep)
 	m := make(map[int]int)
-	sum := 0
+	foundPart1 := false
 	m[0] = 1
 	for i := 0; ; i++ {
-		x := strings.TrimSpace(s[i])
-		n, _ := strconv.Atoi(x)
+		n, _ := strconv.Atoi(strings.TrimSpace(s[i]))
 		sum += n
 		m[sum]++
 		if m[sum] == 2 {
-			return sum
+			return
 		}
 		if i+1 == len(s) {
 			i = -1
+			if !foundPart1 {
+				part1 = sum
+				foundPart1 = true
+			}
 		}
 	}
 }
