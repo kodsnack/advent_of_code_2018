@@ -32,12 +32,14 @@
 (defn run-day [day file]
   (try
     (do
-      (def dayspace (day-namespace day))
-      (require dayspace)
-      (def input (if (= "-" file) *in* file))
-      (def lines (clojure.string/split-lines (slurp input)))
-      (def run (resolve (symbol (str dayspace) "run")))
-      (assoc (run lines) :day day)
+      (let [dayspace (day-namespace day)
+            input (if (= "-" file) *in* file)
+            lines (clojure.string/split-lines (slurp input))
+            ]
+        (require dayspace)
+        (let [run (resolve (symbol (str dayspace) "run"))]
+          (assoc (run lines) :day day))
+      )
     )
     (catch java.io.FileNotFoundException e nil)
   )
