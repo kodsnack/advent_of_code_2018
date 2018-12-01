@@ -12,12 +12,9 @@
         present
         (recur (conj history present) future)))))
 
-(defn run
-  [input-lines & args]
+(defn run [input-lines & args]
   (let [ diffs (get-diffs input-lines) ]
-    {
-     :A (reduce + diffs)
-     :B (first-recurrence (reductions + 0 (cycle diffs)))
+    { :A (reduce + diffs)
+      :B (first-recurrence (reductions + 0 (cycle diffs)))
     }
-  )
-)
+  ))

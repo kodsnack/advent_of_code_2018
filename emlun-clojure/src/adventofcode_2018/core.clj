@@ -1,6 +1,5 @@
 (ns adventofcode-2018.core
-  (:require clojure.string)
-)
+  (:require clojure.string))
 
 (defn pad
   ([day] (pad day "0"))
@@ -25,9 +24,7 @@
     [
       (str "A: " (:A result))
       (str "B: " (:B result))
-    ]
-  )
-)
+    ]))
 
 (defn run-day [day file]
   (try
@@ -41,9 +38,7 @@
           (assoc (run lines) :day day))
       )
     )
-    (catch java.io.FileNotFoundException e nil)
-  )
-)
+    (catch java.io.FileNotFoundException e nil)))
 
 (defn run-day-with-file [day]
   (run-day day (day-file day)))
@@ -62,11 +57,8 @@
         ])
       ))
       (clojure.string/join "\n\n\n")
-      println
-    )
-  )
+      println))
+
   ([day] (-main day (day-file day)))
   ([day file & args]
-    (println (format-day-results (run-day day file)))
-  )
-)
+    (println (format-day-results (run-day day file)))))
