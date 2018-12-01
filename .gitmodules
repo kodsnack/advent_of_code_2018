@@ -13,6 +13,9 @@
 [submodule "yxhuvud-crystal"]
 	path = yxhuvud-crystal
 	url = https://github.com/yxhuvud/aoc18
+[submodule "k0nserv-rust"]
+	path = k0nserv-rust
+	url = git@github.com:k0nserv/advent-of-rust-2018.git
 [submodule "littleandi-csharp"]
 	path = littleandi-csharp
 	url = https://github.com/LittleAndi/advent-of-code-2018.git
