@@ -21,15 +21,12 @@ class Solver(PuzzleSolver):
         """Solution for part two."""
         freq = 0
         freqs = {0: True}
-        found = False
-        while not found:
+        while True:
             for x in self.lines():
-                freq += int(x) 
+                freq += int(x)
                 if freq in freqs:
-                    found = True
-                    break
+                    return freq
                 freqs[freq] = True
-        return freq
 
     def solve(self):
         return (self.solve_part_one(), self.solve_part_two())
