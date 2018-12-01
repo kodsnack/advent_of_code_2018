@@ -7,7 +7,9 @@
   ([day padding]
     (if (number? day)
       (recur (str day) padding)
-      (if (< 1 (count day)) day (str padding day)))))
+      (if (= 1 (count day))
+        (str padding day)
+        day))))
 
 (defn day-namespace [day] (symbol (str "adventofcode-2018.day" (pad day))))
 
