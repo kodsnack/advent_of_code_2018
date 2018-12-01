@@ -11,10 +11,8 @@ def parse_input():
     return input
 
 def day_1a(input):
-    sum=0
-    for line in input:
-        sum += line
-    print(sum)
+    result = sum(input)
+    print(result)
 
 
 def day_1b(input):
