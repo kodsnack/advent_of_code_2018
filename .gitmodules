@@ -16,3 +16,9 @@
 [submodule "bowald-rust"]
 	path = bowald-rust
 	url = https://github.com/bowald/advent_of_code_2018.git
+[submodule "k0nserv-rust"]
+	path = k0nserv-rust
+	url = git@github.com:k0nserv/advent-of-rust-2018.git
+[submodule "littleandi-csharp"]
+	path = littleandi-csharp
+	url = https://github.com/LittleAndi/advent-of-code-2018.git
