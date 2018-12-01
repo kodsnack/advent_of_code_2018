@@ -10,7 +10,7 @@
 )
 
 (def solutions {
-  1  { :A nil, :B nil }
+  1  { :A 416, :B 56752 }
   2  { :A nil, :B nil }
   3  { :A nil, :B nil }
   4  { :A nil, :B nil }
