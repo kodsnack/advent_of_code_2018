@@ -1,4 +1,4 @@
-(ns adventofcode-2018.core
+(ns adventofcode.2018.core
   (:require clojure.string))
 
 (defn pad
@@ -11,7 +11,7 @@
         day))))
 
 (defn day-namespace [day]
-  (symbol (str "adventofcode-2018.day" (pad day))))
+  (symbol (str "adventofcode.2018.day" (pad day))))
 
 (defn day-file [day]
   (str "resources/day" (pad day) ".in"))

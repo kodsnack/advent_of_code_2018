@@ -1,4 +1,4 @@
-(ns adventofcode-2018.day01)
+(ns adventofcode.2018.day01)
 
 (defn get-diffs [lines]
   (map read-string lines))
