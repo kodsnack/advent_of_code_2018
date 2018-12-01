@@ -29,7 +29,7 @@
   (let [ diffs (get-diffs input-lines) ]
     {
      :A (reduce + diffs)
-     :B (first-recurrence (reductions + (cycle diffs)))
+     :B (first-recurrence (reductions + 0 (cycle diffs)))
     }
   )
 )
