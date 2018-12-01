@@ -31,9 +31,11 @@ while not(found):
         cur_state += int(c)
       if line[0] =='-':
         cur_state-= int(c)
+        
+      
 
       if cur_state in states:
         print(cur_state)
         found = True
         break
-      states.add('First duplicated state: ' + str(cur_state))
+      states.add(cur_state)
