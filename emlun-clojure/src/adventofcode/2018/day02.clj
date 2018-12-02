@@ -1,35 +1,25 @@
 (ns adventofcode.2018.day02)
 
-(defn get-counts [lines]
-  (map
-    (fn [line]
-      (reduce
-        (fn [counts c]
-          (assoc counts c (inc (get counts c 0)))
-        )
-        {}
-        line)
+(defn char-counts [line]
+  (reduce
+    (fn [counts c]
+      (assoc counts c (inc (get counts c 0)))
     )
-    lines))
+    {}
+    line))
 
 (defn solve-a [lines]
-  ((fn [{div2 2, div3 3}] (* div2 div3))
-    (reduce
-      (fn [result next]
-        { 2 (+ (result 2) (next 2))
-          3 (+ (result 3) (next 3))
-        }
-      )
-      { 2 0, 3 0 }
-      (map
-        (fn [counts]
-          {
-            2 (if (some #(= 2 (second %)) counts) 1 0)
-            3 (if (some #(= 3 (second %)) counts) 1 0)
-          }
-        )
-        (get-counts lines)))
-))
+  (->> lines
+    (map char-counts)
+    (map (fn [counts]
+      {
+        2 (if (some #(= 2 (second %)) counts) 1 0)
+        3 (if (some #(= 3 (second %)) counts) 1 0)
+      }))
+    (concat [+ { 2 0, 3 0 }])
+    (apply merge-with)
+    ((fn [{div2 2, div3 3}] (* div2 div3)))
+  ))
 
 (defn without-char [i word]
   (let [[head tail] (split-at i word)]
