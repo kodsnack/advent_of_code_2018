@@ -20,10 +20,10 @@
     (apply *)
   ))
 
-(defn without-char [i word]
-  (let [[head tail] (split-at i word)]
+(defn without-index [i coll]
+  (let [[head tail] (split-at i coll)]
     (str (apply str head) (apply str (rest tail)))
-    ))
+  ))
 
 (defn nonunique [coll]
   (->> coll
@@ -39,7 +39,7 @@
             (fn [line]
               (reduce
                 (fn [result i]
-                  (assoc result i (without-char i line))
+                  (assoc result i (without-index i line))
                 )
                 {}
                 (take (count line) (iterate inc 0))
