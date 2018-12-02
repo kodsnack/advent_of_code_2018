@@ -1,6 +1,6 @@
-(ns adventofcode-2018.core-test
+(ns adventofcode.2018.core-test
   (:require [clojure.test :refer :all]
-            [adventofcode-2018.core :refer :all]))
+            [adventofcode.2018.core :refer :all]))
 
 (defn matches [match matchee]
   (every?
@@ -11,7 +11,7 @@
 
 (def solutions {
   1  { :A 416, :B 56752 }
-  2  { :A nil, :B nil }
+  2  { :A 7657, :B "ivjhcadokeltwgsfsmqwrbnuy" }
   3  { :A nil, :B nil }
   4  { :A nil, :B nil }
   5  { :A nil, :B nil }

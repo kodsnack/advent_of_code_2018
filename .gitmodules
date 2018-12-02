@@ -25,3 +25,15 @@
 [submodule "yoanndupont-ada"]
 	path = yoanndupont-ada
 	url = https://github.com/YoannDupont/advent_of_code_2018.git
+[submodule "knyl-kotlin"]
+	path = knyl-kotlin
+	url = https://github.com/knyl/aoc2018
+[submodule "ehammarstrom-cpp"]
+	path = ehammarstrom-cpp
+	url = git@github.com:eHammarstrom/adventofcode.git
+[submodule "alex-ross-swift"]
+	path = alex-ross-swift
+	url = git@github.com:alex-ross/adventofcode-2018-swift.git
+[submodule "jassob-haskell"]
+	path = jassob-haskell
+	url = git@github.com:Jassob/aoc-2018

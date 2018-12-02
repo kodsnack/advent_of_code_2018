@@ -11,23 +11,19 @@ def parse_input():
     return input
 
 def day_1a(input):
-    result = sum(input)
-    print(result)
-
+    return sum(input)
 
 def day_1b(input):
-    sum = 0
-    frequencies = {}
+    freq = 0
+    frequencies = {freq:True}
     while (True):
         for line in input:
-            sum += line
-            freq = str(sum)
+            freq += line
             if not freq in frequencies:
                 frequencies[freq] = True
             else:
-                print(freq)
-                exit()
+                return freq
 
 
-day_1a(parse_input())
-day_1b(parse_input())
+print(day_1a(parse_input()))
+print(day_1b(parse_input()))

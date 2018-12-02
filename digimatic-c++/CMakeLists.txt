@@ -7,3 +7,4 @@ set (CMAKE_XCODE_ATTRIBUTE_COMPILER_INDEX_STORE_ENABLE NO)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(Day01)
+add_subdirectory(Day02)

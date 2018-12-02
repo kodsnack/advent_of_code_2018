@@ -4,6 +4,7 @@ module Template -- DayN
 
 import           Control.Arrow
 import           Data.List
+import           Data.Monoid
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import           Data.Maybe

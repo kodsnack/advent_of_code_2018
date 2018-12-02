@@ -1,3 +1,4 @@
+project(Day01)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
