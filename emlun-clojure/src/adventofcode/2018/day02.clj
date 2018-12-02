@@ -1,7 +1,5 @@
 (ns adventofcode.2018.day02)
 
-(def lines (adventofcode.2018.core/day-lines 2))
-
 (defn get-counts [lines]
   (map
     (fn [line]
@@ -13,19 +11,6 @@
         line)
     )
     lines))
-
-(defn count-filter
-  "([pred] [pred coll])
-  Shortcut for (count (filter pred coll))."
-  {
-   :test (fn []
-           (assert (= 2 (count-filter #(= 5 %) [1 2 5 3 5 7])))
-           (assert (= [1 2] (map (count-filter #(= 5 %)) [[1 5] [5 2 5]])))
-           )
-  }
-  [ pred coll ]
-    (reduce (fn [count next] (+ count (if (pred next) 1 0))) 0 coll)
-)
 
 (def solution-a ((fn [{div2 2, div3 3}] (* div2 div3))
   (reduce
@@ -72,8 +57,6 @@
 
 (mapcat #(nonunique (second %)) all-withouts)
 
-(def double-withouts (filter (fn [word] (< 1 (count-filter #(= word %) all-withouts))) all-withouts))
-
 (defn nonunique [coll]
   (loop [
          seen #{}
@@ -92,24 +75,6 @@
       )
     )
     ))
-
-
-(def search (reduce
-  (fn [result word]
-    (assoc
-      (assoc result :seen (conj (:seen result) word)
-      )
-      :found
-        (if (contains? (:seen result) word)
-          (conj (:found result) word)
-          (:found result)
-        )
-    )
-  )
-  {:seen #{} :found []}
-  all-withouts
-))
-
 
 (defn first-recurrence [coll]
   (loop [history #{}
