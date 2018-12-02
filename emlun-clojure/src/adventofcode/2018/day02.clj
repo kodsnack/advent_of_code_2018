@@ -3,7 +3,7 @@
 (defn counts [coll]
   (reduce
     (fn [counts c]
-      (assoc counts c (inc (get counts c 0)))
+      (update counts c #(inc (or % 0)))
     )
     {}
     coll))
