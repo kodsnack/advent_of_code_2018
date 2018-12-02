@@ -12,13 +12,11 @@
   (->> lines
     (map char-counts)
     (map (fn [counts]
-      {
-        2 (if (some #(= 2 (second %)) counts) 1 0)
-        3 (if (some #(= 3 (second %)) counts) 1 0)
-      }))
-    (concat [{ 2 0, 3 0 }])
-    (apply merge-with +)
-    (vals)
+      [
+        (if (some #(= 2 (second %)) counts) 1 0)
+        (if (some #(= 3 (second %)) counts) 1 0)
+      ]))
+    (reduce (fn [[a1 b1] [a2 b2]] [(+ a1 a2) (+ b1 b2)]))
     (apply *)
   ))
 
