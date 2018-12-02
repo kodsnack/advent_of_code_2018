@@ -36,28 +36,6 @@
     (str (apply str head) (apply str (rest tail)))
     ))
 
-(def withouts-per-line
-  (map
-    (fn [line]
-      (reduce
-        (fn [result i]
-          (assoc result i (without-char i line))
-        )
-        {}
-        (take-while #(< % (count line)) (iterate inc 0))
-      )
-    )
-    lines))
-
-(def all-withouts (reduce
-                    (fn [result withouts]
-                      (merge-with #(flatten (vector %1 %2)) result withouts)
-                    )
-                    {}
-                    withouts-per-line))
-
-(mapcat #(nonunique (second %)) all-withouts)
-
 (defn nonunique [coll]
   (loop [
          seen #{}
@@ -77,18 +55,31 @@
     )
     ))
 
-(defn first-recurrence [coll]
-  (loop [history #{}
-         [present & future] coll
-         ]
-    (if-not (nil? present)
-      (if (contains? history present)
-        present
-        (recur (conj history present) future)))))
+(defn solve-b [lines]
+  (let [
+        withouts-per-line
+          (map
+            (fn [line]
+              (reduce
+                (fn [result i]
+                  (assoc result i (without-char i line))
+                )
+                {}
+                (take-while #(< % (count line)) (iterate inc 0))
+              )
+            )
+            lines)
+        all-withouts (reduce
+                       (fn [result withouts]
+                         (merge-with #(flatten (vector %1 %2)) result withouts))
+                       {}
+                       withouts-per-line)
+        ]
+    (first (mapcat #(nonunique (second %)) all-withouts))
+  ))
 
 (defn run [input-lines & args]
-  (let [ diffs (get-diffs input-lines) ]
-    { :A (reduce + diffs)
-      :B (first-recurrence (reductions + 0 (cycle diffs)))
-    }
-  ))
+  { :A (solve-a input-lines)
+    :B (solve-b input-lines)
+  }
+)
