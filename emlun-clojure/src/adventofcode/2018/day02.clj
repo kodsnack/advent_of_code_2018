@@ -39,15 +39,15 @@
   ))
 
 (defn solve-b [lines]
-  (let [
-        withouts-per-line (map without-each lines)
-        all-withouts (reduce
-                       (fn [result withouts]
-                         (merge-with #(flatten (vector %1 %2)) result withouts))
-                       {}
-                       withouts-per-line)
-        ]
-    (first (mapcat #(nonunique (second %)) all-withouts))
+  (->>
+    (map without-each lines)
+    (reduce
+      (fn [result withouts]
+        (merge-with #(flatten (vector %1 %2)) result withouts))
+      {}
+    )
+    (mapcat #(nonunique (second %)))
+    (first)
   ))
 
 (defn run [input-lines & args]
