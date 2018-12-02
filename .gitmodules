@@ -37,3 +37,6 @@
 [submodule "jassob-haskell"]
 	path = jassob-haskell
 	url = git@github.com:Jassob/aoc-2018
+[submodule "dbgeek-go"]
+	path = dbgeek-go
+	url = git@github.com:dbgeek/aoc_2018.git
