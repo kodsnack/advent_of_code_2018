@@ -16,9 +16,10 @@
         2 (if (some #(= 2 (second %)) counts) 1 0)
         3 (if (some #(= 3 (second %)) counts) 1 0)
       }))
-    (concat [+ { 2 0, 3 0 }])
-    (apply merge-with)
-    ((fn [{div2 2, div3 3}] (* div2 div3)))
+    (concat [{ 2 0, 3 0 }])
+    (apply merge-with +)
+    (vals)
+    (apply *)
   ))
 
 (defn without-char [i word]
