@@ -31,3 +31,6 @@
 [submodule "ehammarstrom-cpp"]
 	path = ehammarstrom-cpp
 	url = git@github.com:eHammarstrom/adventofcode.git
+[submodule "alex-ross-swift"]
+	path = alex-ross-swift
+	url = git@github.com:alex-ross/adventofcode-2018-swift.git
