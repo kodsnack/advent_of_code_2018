@@ -12,22 +12,23 @@
     )
     lines))
 
-(def solution-a ((fn [{div2 2, div3 3}] (* div2 div3))
-  (reduce
-    (fn [result next]
-      { 2 (+ (result 2) (next 2))
-        3 (+ (result 3) (next 3))
-      }
-    )
-    { 2 0, 3 0 }
-    (map
-      (fn [counts]
-        {
-          2 (if (some #(= 2 (second %)) counts) 1 0)
-          3 (if (some #(= 3 (second %)) counts) 1 0)
+(defn solve-a [lines]
+  ((fn [{div2 2, div3 3}] (* div2 div3))
+    (reduce
+      (fn [result next]
+        { 2 (+ (result 2) (next 2))
+          3 (+ (result 3) (next 3))
         }
       )
-      (get-counts lines)))
+      { 2 0, 3 0 }
+      (map
+        (fn [counts]
+          {
+            2 (if (some #(= 2 (second %)) counts) 1 0)
+            3 (if (some #(= 3 (second %)) counts) 1 0)
+          }
+        )
+        (get-counts lines)))
 ))
 
 (defn without-char [i word]
