@@ -1,15 +1,17 @@
-(ns adventofcode-2018.core
-  (:require clojure.string)
-)
+(ns adventofcode.2018.core
+  (:require clojure.string))
 
 (defn pad
   ([day] (pad day "0"))
   ([day padding]
     (if (number? day)
       (recur (str day) padding)
-      (if (< 1 (count day)) day (str padding day)))))
+      (if (= 1 (count day))
+        (str padding day)
+        day))))
 
-(defn day-namespace [day] (symbol (str "adventofcode-2018.day" (pad day))))
+(defn day-namespace [day]
+  (symbol (str "adventofcode.2018.day" (pad day))))
 
 (defn day-file [day]
   (str "resources/day" (pad day) ".in"))
@@ -22,23 +24,26 @@
     [
       (str "A: " (:A result))
       (str "B: " (:B result))
-    ]
-  )
-)
+    ]))
+
+(defn day-lines
+  ([day] (day-lines day (day-file day)))
+  ([day file]
+    (let [input (if (= "-" file) *in* file)]
+      (clojure.string/split-lines (slurp input)))))
 
 (defn run-day [day file]
   (try
     (do
-      (def dayspace (day-namespace day))
-      (require dayspace)
-      (def input (if (= "-" file) *in* file))
-      (def lines (clojure.string/split-lines (slurp input)))
-      (def run (resolve (symbol (str dayspace) "run")))
-      (assoc (run lines) :day day)
+      (let [lines (day-lines day file)
+            dayspace (day-namespace day)
+            ]
+        (require dayspace)
+        (let [run (resolve (symbol (str dayspace) "run"))]
+          (assoc (run lines) :day day))
+      )
     )
-    (catch java.io.FileNotFoundException e nil)
-  )
-)
+    (catch java.io.FileNotFoundException e nil)))
 
 (defn run-day-with-file [day]
   (run-day day (day-file day)))
@@ -57,11 +62,8 @@
         ])
       ))
       (clojure.string/join "\n\n\n")
-      println
-    )
-  )
+      println))
+
   ([day] (-main day (day-file day)))
   ([day file & args]
-    (println (format-day-results (run-day day file)))
-  )
-)
+    (println (format-day-results (run-day day file)))))
