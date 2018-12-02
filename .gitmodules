@@ -28,3 +28,6 @@
 [submodule "knyl-kotlin"]
 	path = knyl-kotlin
 	url = https://github.com/knyl/aoc2018
+[submodule "ehammarstrom-cpp"]
+	path = ehammarstrom-cpp
+	url = git@github.com:eHammarstrom/adventofcode.git
