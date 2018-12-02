@@ -25,6 +25,6 @@
 [submodule "yoanndupont-ada"]
 	path = yoanndupont-ada
 	url = https://github.com/YoannDupont/advent_of_code_2018.git
-[submodule "aoc2018"]
-	path = aoc2018
+[submodule "knyl-kotlin"]
+	path = knyl-kotlin
 	url = https://github.com/knyl/aoc2018
