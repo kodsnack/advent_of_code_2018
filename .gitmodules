@@ -34,3 +34,6 @@
 [submodule "alex-ross-swift"]
 	path = alex-ross-swift
 	url = git@github.com:alex-ross/adventofcode-2018-swift.git
+[submodule "jassob-haskell"]
+	path = jassob-haskell
+	url = git@github.com:Jassob/aoc-2018
