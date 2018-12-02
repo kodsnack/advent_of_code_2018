@@ -26,12 +26,17 @@
       (str "B: " (:B result))
     ]))
 
+(defn day-lines
+  ([day] (day-lines day (day-file day)))
+  ([day file]
+    (let [input (if (= "-" file) *in* file)]
+      (clojure.string/split-lines (slurp input)))))
+
 (defn run-day [day file]
   (try
     (do
-      (let [dayspace (day-namespace day)
-            input (if (= "-" file) *in* file)
-            lines (clojure.string/split-lines (slurp input))
+      (let [lines (day-lines day file)
+            dayspace (day-namespace day)
             ]
         (require dayspace)
         (let [run (resolve (symbol (str dayspace) "run"))]
