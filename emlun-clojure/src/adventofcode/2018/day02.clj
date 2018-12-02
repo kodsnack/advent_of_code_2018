@@ -33,11 +33,8 @@
   ))
 
 (defn without-each [coll]
-  (reduce
-    (fn [result i]
-      (assoc result i (without-index i coll))
-    )
-    {}
+  (map
+    #(without-index % coll)
     (take (count coll) (iterate inc 0))
   ))
 
