@@ -42,7 +42,7 @@
                   (assoc result i (without-char i line))
                 )
                 {}
-                (take-while #(< % (count line)) (iterate inc 0))
+                (take (count line) (iterate inc 0))
               )
             )
             lines)
