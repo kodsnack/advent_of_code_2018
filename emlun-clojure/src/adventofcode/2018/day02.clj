@@ -10,11 +10,11 @@
 
 (defn solve-a [lines]
   (->> lines
-    (map (comp vals counts))
+    (map (comp set vals counts))
     (map (fn [counts]
       [
-        (if (some #(= 2 %) counts) 1 0)
-        (if (some #(= 3 %) counts) 1 0)
+        (if (contains? counts 2) 1 0)
+        (if (contains? counts 3) 1 0)
       ]))
     (reduce #(map + %1 %2))
     (apply *)
