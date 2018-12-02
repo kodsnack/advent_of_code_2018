@@ -38,12 +38,16 @@
     (take (count coll) (iterate inc 0))
   ))
 
+(defn only [coll]
+  { :pre [(= 1 (count coll))] }
+  (first coll))
+
 (defn solve-b [lines]
   (->> lines
     (map without-each)
     (apply map vector)
     (mapcat nonunique)
-    (first)
+    (only)
   ))
 
 (defn run [input-lines & args]
