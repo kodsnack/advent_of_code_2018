@@ -26,23 +26,11 @@
     ))
 
 (defn nonunique [coll]
-  (loop [
-         seen #{}
-         [next & remaining] coll
-         nonunique #{}
-         ]
-    (if (nil? next)
-      nonunique
-      (recur
-        (conj seen next)
-        remaining
-        (if (contains? seen next)
-          (conj nonunique next)
-          nonunique
-        )
-      )
-    )
-    ))
+  (->> coll
+    (counts)
+    (filter #(< 1 (second %)))
+    (map first)
+  ))
 
 (defn solve-b [lines]
   (let [
