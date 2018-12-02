@@ -1,6 +1,4 @@
-module Template -- DayN
-  ( solve
-  ) where
+module Template ( solve ) where
 
 import           Control.Arrow
 import           Data.List
