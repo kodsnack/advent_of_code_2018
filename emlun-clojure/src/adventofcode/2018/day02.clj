@@ -1,16 +1,16 @@
 (ns adventofcode.2018.day02)
 
-(defn char-counts [line]
+(defn counts [coll]
   (reduce
     (fn [counts c]
       (assoc counts c (inc (get counts c 0)))
     )
     {}
-    line))
+    coll))
 
 (defn solve-a [lines]
   (->> lines
-    (map (comp vals char-counts))
+    (map (comp vals counts))
     (map (fn [counts]
       [
         (if (some #(= 2 %) counts) 1 0)
