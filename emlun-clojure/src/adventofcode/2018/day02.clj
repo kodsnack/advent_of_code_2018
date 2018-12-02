@@ -39,14 +39,10 @@
   ))
 
 (defn solve-b [lines]
-  (->>
-    (map without-each lines)
-    (reduce
-      (fn [result withouts]
-        (merge-with #(flatten (vector %1 %2)) result withouts))
-      {}
-    )
-    (mapcat #(nonunique (second %)))
+  (->> lines
+    (map without-each)
+    (apply map vector)
+    (mapcat nonunique)
     (first)
   ))
 
