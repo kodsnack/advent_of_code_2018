@@ -32,20 +32,18 @@
     (map first)
   ))
 
+(defn without-each [coll]
+  (reduce
+    (fn [result i]
+      (assoc result i (without-index i coll))
+    )
+    {}
+    (take (count coll) (iterate inc 0))
+  ))
+
 (defn solve-b [lines]
   (let [
-        withouts-per-line
-          (map
-            (fn [line]
-              (reduce
-                (fn [result i]
-                  (assoc result i (without-index i line))
-                )
-                {}
-                (take (count line) (iterate inc 0))
-              )
-            )
-            lines)
+        withouts-per-line (map without-each lines)
         all-withouts (reduce
                        (fn [result withouts]
                          (merge-with #(flatten (vector %1 %2)) result withouts))
