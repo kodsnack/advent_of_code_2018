@@ -27,7 +27,7 @@
     (reduce (fn [count next] (+ count (if (pred next) 1 0))) 0 coll)
 )
 
-((fn [{div2 2, div3 3}] (* div2 div3))
+(def solution-a ((fn [{div2 2, div3 3}] (* div2 div3))
   (reduce
     (fn [result next]
       { 2 (+ (result 2) (next 2))
@@ -43,7 +43,73 @@
         }
       )
       (get-counts lines)))
-)
+))
+
+(defn without-char [i word]
+  (let [[head tail] (split-at i word)]
+    (str (apply str head) (apply str (rest tail)))
+    ))
+
+(def withouts-per-line
+  (map
+    (fn [line]
+      (reduce
+        (fn [result i]
+          (assoc result i (without-char i line))
+        )
+        {}
+        (take-while #(< % (count line)) (iterate inc 0))
+      )
+    )
+    lines))
+
+(def all-withouts (reduce
+                    (fn [result withouts]
+                      (merge-with #(flatten (vector %1 %2)) result withouts)
+                    )
+                    {}
+                    withouts-per-line))
+
+(mapcat #(nonunique (second %)) all-withouts)
+
+(def double-withouts (filter (fn [word] (< 1 (count-filter #(= word %) all-withouts))) all-withouts))
+
+(defn nonunique [coll]
+  (loop [
+         seen #{}
+         [next & remaining] coll
+         nonunique #{}
+         ]
+    (if (nil? next)
+      nonunique
+      (recur
+        (conj seen next)
+        remaining
+        (if (contains? seen next)
+          (conj nonunique next)
+          nonunique
+        )
+      )
+    )
+    ))
+
+
+(def search (reduce
+  (fn [result word]
+    (assoc
+      (assoc result :seen (conj (:seen result) word)
+      )
+      :found
+        (if (contains? (:seen result) word)
+          (conj (:found result) word)
+          (:found result)
+        )
+    )
+  )
+  {:seen #{} :found []}
+  all-withouts
+))
+
 
 (defn first-recurrence [coll]
   (loop [history #{}
