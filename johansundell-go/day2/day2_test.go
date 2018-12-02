@@ -6,6 +6,8 @@ import (
 
 var testData = []string{"abcdef", "bababc", "abbcde", "abcccd", "aabcdd", "abcdee", "ababab"}
 
+var testData2 = []string{"abcde", "fghij", "klmno", "pqrst", "fguij", "axcye", "wvxyz"}
+
 func Test_Ex1(t *testing.T) {
 	if a, b := countStr(testData[0]); a != false && b != false {
 		t.Fail()
@@ -50,6 +52,12 @@ func Test_Ex7(t *testing.T) {
 
 func Test_Ex8(t *testing.T) {
 	if a := makeChecksum(testData); a != 12 {
+		t.Fail()
+	}
+}
+
+func Test_Ex9(t *testing.T) {
+	if findId(testData2) != "fgij" {
 		t.Fail()
 	}
 }

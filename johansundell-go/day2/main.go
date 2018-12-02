@@ -13,6 +13,29 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(makeChecksum(strings.Split(data, "\n")))
+	fmt.Println(findId(strings.Split(data, "\n")))
+}
+
+func findId(str []string) (answer string) {
+	for _, s := range str {
+		for _, f := range str {
+			c := 0
+			for i := 0; i < len(f); i++ {
+				if s[i] == f[i] {
+					c++
+				}
+			}
+			if len(s)-1 == c {
+				for i := 0; i < len(f); i++ {
+					if s[i] == f[i] {
+						answer = answer + string(s[i])
+					}
+				}
+				return
+			}
+		}
+	}
+	return
 }
 
 func makeChecksum(str []string) int {
@@ -30,7 +53,7 @@ func makeChecksum(str []string) int {
 }
 
 func countStr(str string) (found2, found3 bool) {
-	for i := 0; len(str) > 0; i++ {
+	for len(str) > 0 {
 		a := str[0]
 		if strings.Count(str, string(a)) == 3 {
 			found3 = true
