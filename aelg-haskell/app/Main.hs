@@ -12,10 +12,12 @@ import           System.Environment
 import           Control.Concurrent.ParallelIO.Local
 
 import qualified Day01
+import qualified Day02
 
 solved =
   M.fromList
     [ (1, Day01.solve)
+    , (2, Day02.solve)
     ]
 
 getSolution x = M.findWithDefault notImplemented x solved
