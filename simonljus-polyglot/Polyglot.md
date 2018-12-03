@@ -6,3 +6,5 @@ Rust
 
 ## Dag 2
 Ruby
+## Dag 3
+Ruby
