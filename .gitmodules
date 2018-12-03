@@ -40,3 +40,6 @@
 [submodule "dbgeek-go"]
 	path = dbgeek-go
 	url = git@github.com:dbgeek/aoc_2018.git
+[submodule "prositen-python"]
+	path = prositen-python
+	url = git@github.com:prositen/advent-of-code.git
