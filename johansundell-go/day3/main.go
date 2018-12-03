@@ -14,7 +14,6 @@ type claim struct {
 	top    int
 	width  int
 	height int
-	pos    map[posType]bool
 }
 
 var pos map[posType]int
@@ -62,23 +61,11 @@ func parseClaim(str string) claim {
 	t = strings.Split(res[3], "x")
 	c.width, _ = strconv.Atoi(t[0])
 	c.height, _ = strconv.Atoi(t[1])
-	c.pos = make(map[posType]bool)
 	for i := c.top; i < c.top+c.height; i++ {
 		for n := c.left; n < c.left+c.width; n++ {
-			c.pos[posType{x: i, y: n}] = true
 			pos[posType{x: i, y: n}]++
 		}
 	}
-
-	/*for i := 0; i < 8; i++ {
-		s := []rune("************")
-		for n := 0; n < len(s); n++ {
-			if c.pos[posType{x: i, y: n}] {
-				s[n] = '#'
-			}
-		}
-		fmt.Println(string(s))
-	}*/
 	return c
 }
 
@@ -94,8 +81,7 @@ func (a claim) hasConflict() bool {
 
 }
 
-func findThem() int {
-	a := 0
+func findThem() (a int) {
 	for i := 0; i < 1000; i++ {
 		for n := 0; n < 1000; n++ {
 			if pos[posType{x: i, y: n}] > 1 {
@@ -103,5 +89,5 @@ func findThem() int {
 			}
 		}
 	}
-	return a
+	return
 }
