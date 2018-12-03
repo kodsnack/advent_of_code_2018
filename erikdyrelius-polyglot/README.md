@@ -8,3 +8,6 @@ be tested and what environment I have used.
 
 Expect this to be a hobby prject that will run for a while after AoC2018 and 
 probably be forgotten and start to mold in a few months.
+
+* Day1: Pascal (Free Pascal)
+* Day2: Common Lisp
