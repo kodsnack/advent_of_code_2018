@@ -27,6 +27,25 @@
           lines)]
     (count (filter #(< 1 %) (vals claims)))))
 
+(defn solve-b [lines]
+  (let [claims (map parse-line lines)
+        grid (reduce (fn [counts claim]
+            (let [[id & rect] claim]
+              (reduce (fn [cnts coord]
+                        (update cnts coord #(inc (or % 0)))
+                        )
+                      counts
+                      (apply all-rect-coords rect))
+            )
+            )
+            {}
+            claims)
+        ]
+    (filter (fn [claim]
+              (every? (fn [coord] (= 1 (grid coord))) (apply all-rect-coords (rest claim))))
+            claims)
+    ))
+
 (defn run [input-lines & args]
   { :A (solve-a input-lines)
     :B (solve-b input-lines)
