@@ -41,12 +41,14 @@ end
 module List = struct
   include List
 
-  let unique_pairs =
+  let unique_pairs xs =
     let rec take acc = function
       | [] -> acc
       | curr :: next ->
         let acc' = next |> List.map (fun x -> curr, x) in
         take (acc' @ acc) next
-    in take []
+    in take [] xs
+
+  let reject f = filter (fun x -> not (f x))
 
 end
