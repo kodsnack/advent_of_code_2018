@@ -36,19 +36,19 @@
   ))
 
 (defn all-sleeps
-  ([sorted-events] (all-sleeps sorted-events {} nil nil))
-  ([[event & tail] guard-maps current-guard prev-event]
+  ([sorted-events] (all-sleeps (partition 2 1 sorted-events) {} nil))
+  ([[[prev-event event] & tail] guard-maps current-guard]
     (letfn [(update-guards [] (update guard-maps current-guard #(add-sleep % prev-event event)))]
       (if (nil? event)
         guard-maps
         (case (:type event)
           :guard
             (if (= :sleep (:type prev-event))
-              (recur tail (update-guards) (:id event) event)
-              (recur tail guard-maps (:id event) event)
+              (recur tail (update-guards) (:id event))
+              (recur tail guard-maps (:id event))
               )
-          :sleep (recur tail guard-maps current-guard event)
-          :wake (recur tail (update-guards) current-guard event)
+          :sleep (recur tail guard-maps current-guard)
+          :wake (recur tail (update-guards) current-guard)
         )))))
 
 (defn strategy-a [sleep-minutes] (reduce + (vals sleep-minutes)))
