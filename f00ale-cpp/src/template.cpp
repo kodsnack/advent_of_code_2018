@@ -7,6 +7,9 @@ int main() {
 
     {
         bool done = false;
+        int num = 0;
+        bool have_num = false;
+
         while (!done) {
             char c;
             std::cin.get(c);
@@ -16,12 +19,19 @@ int main() {
             }
 
             if(c >= '0' && c <= '9') {
-                int x = c - '0';
+                num *= 10;
+                num += c - '0';
+                have_num = true;
+            } else {
+                if(c == '\n') {
+
+                }
+                have_num = false;
+                num = 0;
             }
 
         }
     }
-
 
     std::cout << ans1 << std::endl;
     std::cout << ans2 << std::endl;
