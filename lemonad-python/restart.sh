@@ -9,14 +9,15 @@ OUTPUT="december${DAY}.py"
 TEST_OUTPUT="tests/test_december${DAY}.py"
 PUZZLE_FILE="input/december${DAY}.input"
 
-tmux rename-window "Advent of Code"
-tmux split-window -h
-tmux split-window -h
-tmux select-layout even-horizontal
-tmux select-pane -t 1
-tmux split-window -v
-tmux select-pane -t 3
-tmux send-keys -t 4 "pyenv activate advent; python" C-m \;
-tmux send-keys -t 3 "vim ${OUTPUT} ${TEST_OUTPUT}" C-m \;
-tmux send-keys -t 1 "pyenv activate advent; ./watch.sh ${YEAR} ${DAY}" C-m \;
-tmux send-keys -t 2 "pyenv activate advent; ./watch_test.sh ${YEAR} ${DAY}" C-m \;
+tmux new-session -s advent -n editor -d
+tmux rename-window -t advent "Advent of Code"
+tmux split-window -h -t advent
+tmux split-window -h -t advent
+tmux select-layout -t advent even-horizontal
+tmux split-window -v -t advent:1.1
+tmux send-keys -t advent:1.4 "pyenv activate advent; python" C-m
+tmux send-keys -t advent:1.3 "vim ${OUTPUT} ${TEST_OUTPUT}" C-m
+tmux send-keys -t advent:1.1 "pyenv activate advent; ./watch.sh ${YEAR} ${DAY}" C-m
+tmux send-keys -t advent:1.2 "pyenv activate advent; ./watch_test.sh ${YEAR} ${DAY}" C-m
+tmux select-pane -t advent:1.3
+tmux attach -t advent
