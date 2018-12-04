@@ -60,7 +60,7 @@
 
 (defn strategy-b [sleep-minutes] (apply max (vals sleep-minutes)))
 
-(defn finish [guard-maps guard-strategy]
+(defn solve [guard-maps guard-strategy]
   (let [
         [sleepiest-id {minutes :sleep-minutes}] (apply max-key #(guard-strategy (:sleep-minutes (second %))) guard-maps)
         sleepiest-minute (apply max-key second minutes)
@@ -73,8 +73,8 @@
         sorted-events (sort-events events)
         guard-maps (all-sleeps sorted-events)
         ]
-    { :A (finish guard-maps strategy-a)
-      :B (finish guard-maps strategy-b)
+    { :A (solve guard-maps strategy-a)
+      :B (solve guard-maps strategy-b)
     }
   )
 )
