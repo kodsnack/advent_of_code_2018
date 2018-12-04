@@ -1,8 +1,5 @@
 (ns adventofcode.2018.day04)
 
-(def lines (adventofcode.2018.core/day-lines 4))
-(def line (first lines))
-
 (def guard-pattern #"\[(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})\] Guard \#(\d+) begins shift")
 (def sleep-pattern #"\[(\d{4}-\d{2}-\d{2}) (\d{2}):(\d{2})\] falls asleep")
 (def wake-pattern  #"\[(\d{4}-\d{2}-\d{2}) (\d{2}):(\d{2})\] wakes up")
@@ -27,79 +24,7 @@
 
 (defn timestamp [event] (str (:date event) " " (:time event)))
 
-(def events (map parse-event lines))
-
-(defn guard-dates [events]
-  (as-> events $
-    (filter #(= :guard (:type %)) $)
-    (reduce
-      (fn [result event]
-        (update result (:id event) #(conj (or % []) (:date event)))
-      )
-      {}
-      $)
-    )
-  )
-
-(defn dates-to-guards [events]
-  (as-> events $
-    (filter #(= :guard (:type %)) $)
-    (reduce
-      (fn [result event]
-        (assoc result (:date event) (:id event))
-      )
-      {}
-      $)
-    )
-  )
-
-(defn date-events [events]
-  (->> events
-    (filter #(not (= :guard (:type %))))
-    (reduce
-      (fn [result event]
-        (update result (:date event) #(conj (or % []) event))
-        )
-      {}
-    )
-    ))
-
-(defn events-on-date [date events]
-  ((date-events events) date))
-
 (defn sort-events [events] (sort-by timestamp events))
-
-(defn count-sleep-minutes [date events]
-  (let [events-this-day (events-on-date date events)
-        sorted-events (sort-events events-this-day)
-        ]
-    (reduce
-      (fn [sum event]
-        ((case (:type event) :sleep - :wake +) sum (:minute event)))
-      0
-      events-this-day
-    )))
-
-(defn total-sleep-minutes [sorted-events]
-  (loop [[event & tail] sorted-events
-         sleep-sums {}
-         current-guard nil
-         prev-event nil
-         ]
-    (if (nil? event)
-      sleep-sums
-      (case (:type event)
-        :guard
-          (if (= :sleep (:type prev-event))
-            (recur tail (update sleep-sums current-guard #(+ (or % 0) (- 60 (:minute prev-event)))) (:id event) event)
-            (recur tail sleep-sums (:id event) event)
-            )
-        :sleep (recur tail sleep-sums current-guard event)
-        :wake (recur tail (update sleep-sums current-guard #(+ (or % 0) (- (:minute event) (:minute prev-event)))) current-guard event)
-        )
-      )
-    )
-  )
 
 (defn add-sleep [guard-map start-event end-event]
   (reduce
@@ -139,7 +64,6 @@
         [sleepiest-id {minutes :sleep-minutes}] (apply max-key #(sleep-tots (first %)) guard-maps)
         sleepiest-minute (apply max-key second minutes)
         ]
-    [sleepiest-id sleepiest-minute]
     (* (read-string sleepiest-id) (first sleepiest-minute))
   ))
 
