@@ -7,68 +7,103 @@ inp = readInput()
 #: [1518-04-21 00:04] Guard #3331 begins shift
 p = re.compile(r"^\[(\d+)-(\d+)-(\d+) (\d+):(\d+)\] (wakes up|falls asleep|Guard #(\d+) begins shift)$")
 
-def linePar(s, f=lambda x:x):
+def lineParse(s, f=lambda x:x):
     m = p.match(s)
     if m==None:
         raise s
     return tuple(map(f, m.groups()))
 
-def filePar(inp, f=linePar, ff=lambda x:x):
+def fileParse(inp, f=lineParse, ff=lambda x:x):
     return list(map(lambda x, fx=ff:f(x, fx), inp.splitlines()))
 
-events = filePar(inp)
+def shiftStart(event):
+    return event[5][0] == 'G'
+
+def fallAsleep(event):
+    return event[5][0] == 'f'
+
+def wakeUp(event):
+    return event[5][0] == 'w'
+
+def getGuardId(event):
+    return event[6]
+
+def getMinute(event):
+    return int(event[4])
+
+def calcGuardSleepTime(events):
+    guardSleepTime = dict()
+    guardId = "None"
+    sleepStart = 0
+    for event in events:
+        if shiftStart(event):
+            guardId = getGuardId(event)
+        if fallAsleep(event):
+            sleepStart = getMinute(event)
+        if wakeUp(event):
+            guardSleepTime[guardId] = guardSleepTime.get(guardId, 0) + getMinute(event) - sleepStart
+    return guardSleepTime
+
+def findSleepiestGuard(guardSleepTime):
+    maxTime = 0
+    theGuard = 0
+    for guard in guardSleepTime:
+        if guardSleepTime[guard] > maxTime:
+            maxTime = guardSleepTime[guard]
+            theGuard = guard
+    return theGuard
+
+def findSleepiestTimeForGuard(guard, guardSleepTime):
+    minuteMap = [0]*59
+    sleeping = False
+    maxTime, theMinute = 0, 0
+    for event in events:
+        if shiftStart(event):
+            if guard == getGuardId(event):
+                sleeping = True
+            else:
+                sleeping = False
+        elif fallAsleep(event):
+            sleepStart = getMinute(event)
+        if wakeUp(event):
+            if sleeping == True:
+                for minute in range(sleepStart, getMinute(event)):
+                    minuteMap[minute] += 1
+                    if minuteMap[minute] > maxTime:
+                        maxTime = minuteMap[minute]
+                        theMinute = minute
+    return theMinute
+
+def findSleepiestTime(guardSleepTime):
+    maxTime, theMinute, theGuard = 0, 0, ""
+    minuteMaps = dict()
+    for event in events:
+        if shiftStart(event):
+            guard = getGuardId(event)
+        if fallAsleep(event):
+            sleepStart = getMinute(event)
+        if wakeUp(event):
+            for minute in range(sleepStart, getMinute(event)):
+                if guard not in minuteMaps:
+                    minuteMaps[guard] = [0]*60
+                minuteMaps[guard][minute] += 1
+                if minuteMaps[guard][minute] > maxTime:
+                    maxTime = minuteMaps[guard][minute]
+                    theMinute = minute
+                    theGuard = guard
+    return theMinute, theGuard
+
+
+events = fileParse(inp)
 events.sort()
-guardSleepTime = dict()
-guardId = "None"
-sleepStart = 0
-for event in events:
-    if event[5][0] == 'G':
-        guardId = event[5].split()[1][1:]
-    if event[5][0] == 'f':
-        sleepStart = int(event[4])
-    if event[5][0] == 'w':
-        guardSleepTime[guardId] = guardSleepTime.get(guardId, 0) + int(event[4]) - sleepStart
-mt = 0
-mg = 0
-for guard in guardSleepTime:
-    if guardSleepTime[guard] > mt:
-        mt = guardSleepTime[guard]
-        mg = guard
-minuteMap = [0]*59
-on = False
-mxt, mxm = 0, 0
-for event in events:
-    if event[5][0] == 'G':
-        if mg == event[5].split()[1][1:]:
-            on = True
-        else:
-            on = False
-    if on:
-        pass
-    if event[5][0] == 'f':
-        sleepStart = int(event[4])
-    if event[5][0] == 'w':
-        if on == True:
-            for j in range(sleepStart, int(event[4])):
-                minuteMap[j] += 1
-                if minuteMap[j] > mxt:
-                    mxt = minuteMap[j]
-                    mxm = j
-mxt, mxm, mxg = 0, 0, ""
-d3 = dict()
-for i in events:
-    if i[5][0] == 'G':
-        gg = i[5].split()[1][1:]
-    if i[5][0] == 'f':
-        sleepStart = int(i[4])
-    if i[5][0] == 'w':
-        for j in range(sleepStart, int(i[4])):
-            if gg not in d3:
-                d3[gg] = [0]*60
-            d3[gg][j] += 1
-            if d3[gg][j] > mxt:
-                mxt = d3[gg][j]
-                mxm = j
-                mxg = gg
-print("Solution to day 4 part 1:", int(mg)*mxm)
-print("Solution to day 4 part 2:", mxm*int(mxg))
+
+guardSleepTime = calcGuardSleepTime(events)
+sleepiestGuard = findSleepiestGuard(guardSleepTime)
+sleepiestTime = findSleepiestTimeForGuard(sleepiestGuard, guardSleepTime)
+
+print("Solution to day 4 part 1:", int(sleepiestGuard)*sleepiestTime)
+
+theMinute, theGuard = findSleepiestTime(guardSleepTime)
+
+
+print("Solution to day 4 part 2:", theMinute*int(theGuard))
