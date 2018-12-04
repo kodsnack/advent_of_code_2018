@@ -38,16 +38,11 @@
 (defn all-sleeps [sorted-events]
   (first (reduce
     (fn [[guard-maps current-guard] [prev-event event]]
-      (letfn [(update-guards [] (update guard-maps current-guard #(add-sleep % prev-event event)))]
-        (case (:type event)
-          :guard
-            (if (= :sleep (:type prev-event))
-              [(update-guards) (:id event)]
-              [guard-maps (:id event)]
-              )
-          :sleep [guard-maps current-guard]
-          :wake [(update-guards) current-guard]
-    )))
+      (case (:type event)
+        :guard [guard-maps (:id event)]
+        :sleep [guard-maps current-guard]
+        :wake [(update guard-maps current-guard #(add-sleep % prev-event event)) current-guard]
+    ))
     [{} nil nil]
     (partition 2 1 sorted-events)
   )))
