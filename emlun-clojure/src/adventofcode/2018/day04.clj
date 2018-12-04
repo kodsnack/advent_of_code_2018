@@ -35,12 +35,9 @@
     (take-while #(< % (:minute end-event)) (iterate inc (:minute start-event)))
   ))
 
-(defn all-sleeps [sorted-events]
-  (loop [[event & tail] sorted-events
-         guard-maps {}
-         current-guard nil
-         prev-event nil
-         ]
+(defn all-sleeps
+  ([sorted-events] (all-sleeps sorted-events {} nil nil))
+  ([[event & tail] guard-maps current-guard prev-event]
     (if (nil? event)
       guard-maps
       (case (:type event)
