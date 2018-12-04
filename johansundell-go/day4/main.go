@@ -24,9 +24,6 @@ type guard struct {
 
 var guards map[string]guard
 
-/*
-var guards [guard]bool
-*/
 func init() {
 	guards = make(map[string]guard)
 }
@@ -42,34 +39,22 @@ func main() {
 }
 
 func parseData(input []string) {
-	//fmt.Println(len(input))
-	//str := strings.FieldsFunc(input[1], func(r rune) bool { return r == '[' || r == ']' })
-	//str := strings.Fields(input[1])
-	//fmt.Println(time.Parse("2006-01-02 15:04", str[0]))
-	/*for _, s := range str {
-		fmt.Println(s)
-	}*/
 	log := logType{}
 	for _, s := range input {
 		str := strings.FieldsFunc(s, func(r rune) bool { return r == '[' || r == ']' })
 		g := logEntry{}
 		g.t, _ = time.Parse("2006-01-02 15:04", str[0])
 		g.i = g.t.Unix()
-		//fmt.Println(g.t.String())
 		g.mess = strings.TrimSpace(str[1])
 		log = append(log, g)
 	}
-	fmt.Println("Part 2")
 	sort.Slice(log, func(i, j int) bool {
 		return log[i].i < log[j].i
 	})
-	//guards := guards{}
 	currentGuard := ""
 	feelAsleepAt := time.Time{}
 	for _, l := range log {
-		//fmt.Println(time.Unix(l.i, 0), l.mess)
 		str := strings.Fields(l.mess)
-		//fmt.Println(str)
 		switch {
 		case str[0] == "Guard":
 			currentGuard = str[1]
@@ -82,7 +67,6 @@ func parseData(input []string) {
 				guards[currentGuard] = g
 			}
 			g := guards[currentGuard]
-			fmt.Println(currentGuard, feelAsleepAt, time.Unix(l.i, 0), "d", feelAsleepAt.Sub(time.Unix(l.i, 0)).Minutes())
 			g.duration += int(time.Unix(l.i, 0).Sub(feelAsleepAt).Minutes())
 
 			// TODO: remove this
@@ -96,7 +80,7 @@ func parseData(input []string) {
 
 	}
 
-	// TODO: Fix thsi better
+	// TODO: Fix this better
 	g := guard{}
 	top := 0
 	for _, r := range guards {
@@ -105,7 +89,7 @@ func parseData(input []string) {
 			top = r.duration
 		}
 	}
-	fmt.Println(g)
+
 	top = 0
 	n := 0
 	for i := 0; i <= 59; i++ {
