@@ -1,4 +1,4 @@
-const day3 = (input, { width, height, noLog }) => {
+const getCoordinates = (input, { width, height, noLog }) => {
   const array = new Array(width)
     .fill(0)
     .map(() => new Array(height).fill(0).map(() => "."));
@@ -16,6 +16,7 @@ const day3 = (input, { width, height, noLog }) => {
       len: len.split("x")
     };
   });
+
   coordinates.map((value, i) => {
     const x1 = parseInt(value.pos[1]);
     const xDelta = parseInt(value.len[1]);
@@ -33,6 +34,13 @@ const day3 = (input, { width, height, noLog }) => {
     }
   });
 
+  return { array, coordinates };
+};
+
+const part1 = (input, options) => {
+  const { noLog } = options || {};
+  const { array } = getCoordinates(input, options);
+
   !noLog && console.log("####");
   return array.reduce((acc, value) => {
     !noLog && console.log("");
@@ -46,4 +54,23 @@ const day3 = (input, { width, height, noLog }) => {
   }, 0);
 };
 
-module.exports = day3;
+const part2 = (input, options) => {
+  const { noLog } = options || {};
+  const { array, coordinates } = getCoordinates(input, options);
+  return coordinates.reduce((acc, value, i) => {
+    const x1 = parseInt(value.pos[1]);
+    const xDelta = parseInt(value.len[1]);
+    const y1 = parseInt(value.pos[0]);
+    const yDelta = parseInt(value.len[0]);
+    for (let x = x1; x < xDelta + x1; x++) {
+      for (let y = y1; y < yDelta + y1; y++) {
+        if (array[x][y] === "X") {
+          return acc;
+        }
+      }
+    }
+    return parseInt(value.id);
+  }, 0);
+};
+
+module.exports = { part1, part2 };
