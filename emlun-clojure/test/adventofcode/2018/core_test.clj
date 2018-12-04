@@ -12,8 +12,8 @@
 (def solutions {
   1  { :A 416, :B 56752 }
   2  { :A 7657, :B "ivjhcadokeltwgsfsmqwrbnuy" }
-  3  { :A nil, :B nil }
-  4  { :A nil, :B nil }
+  3  { :A 113716, :B 742 }
+  4  { :A 102688, :B 56901 }
   5  { :A nil, :B nil }
   6  { :A nil, :B nil }
   7  { :A nil, :B nil }
