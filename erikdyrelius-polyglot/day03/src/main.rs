@@ -1,12 +1,21 @@
-fn main() {
-    let home_team = "Liverpool";
-    let result = " beat ";
-    let away_team = "Manchester United";
-    let home_score = '3';
-    let away_score = "-0";
+extern crate regex;
 
-    let mut the_string = format!("{}{}{} ", home_team, result, away_team);
-    the_string.push(home_score);
-    the_string.push_str(away_score);
-    println!("{}", the_string);
+use std::io;
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::fs::File;
+use regex::Regex;
+
+fn main() -> io::Result<()> {
+    let pattern = Regex::new(r"#(\d+) @ (\d+),(\d+): (\d+)x(\d+)").unwrap();
+
+    let f = File::open("day03.txt")?;
+    let mut reader = BufReader::new(f);
+    let mut ln = String::new();
+
+    reader.read_line(&mut ln)?;
+    let caps = pattern.captures(&ln).unwrap();
+
+    println!("{}", caps.get(1).unwrap().as_str());
+    Ok(())
 }
