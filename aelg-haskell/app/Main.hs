@@ -13,11 +13,13 @@ import           Control.Concurrent.ParallelIO.Local
 
 import qualified Day01
 import qualified Day02
+import qualified Day03
 
 solved =
   M.fromList
     [ (1, Day01.solve)
     , (2, Day02.solve)
+    , (3, Day03.solve)
     ]
 
 getSolution x = M.findWithDefault notImplemented x solved

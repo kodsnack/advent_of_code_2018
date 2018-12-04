@@ -9,7 +9,6 @@ module File = struct
     with e ->
       close_in ch;
       raise e
-  ;;
 
 end
 
@@ -21,4 +20,35 @@ module Seq = struct
       try Cons (input_line ch, next)
       with End_of_file -> Nil
     in next
+end
+
+module String = struct
+  include String
+
+  let to_chars s =
+    let rec build n l =
+      if n = 0 then l
+      else build (n - 1) (s.[n - 1] :: l)
+    in
+    build (String.length s) []
+  ;;
+
+  let from_chars chars =
+    String.init (List.length chars) (fun i -> List.nth chars i)
+
+end
+
+module List = struct
+  include List
+
+  let unique_pairs xs =
+    let rec take acc = function
+      | [] -> acc
+      | curr :: next ->
+        let acc' = next |> List.map (fun x -> curr, x) in
+        take (acc' @ acc) next
+    in take [] xs
+
+  let reject f = filter (fun x -> not (f x))
+
 end
