@@ -56,22 +56,15 @@
   )
 )
 
-(defn solve-a [guard-maps]
-  (let [sleep-tots (reduce (fn [tots [id guard-map]] (assoc tots id (reduce + (vals (:sleep-minutes guard-map))))) {} guard-maps)
-        [sleepiest-id {minutes :sleep-minutes}] (apply max-key #(sleep-tots (first %)) guard-maps)
-        ]
-    [sleepiest-id minutes]
-  ))
+(defn strategy-a [sleep-minutes] (reduce + (vals sleep-minutes)))
 
-(defn solve-b [guard-maps]
+(defn strategy-b [sleep-minutes] (apply max (vals sleep-minutes)))
+
+(defn finish [guard-maps guard-strategy]
   (let [
-        [sleepiest-id {minutes :sleep-minutes}] (apply max-key #(apply max (vals (:sleep-minutes (second %)))) guard-maps)
+        [sleepiest-id {minutes :sleep-minutes}] (apply max-key #(guard-strategy (:sleep-minutes (second %))) guard-maps)
+        sleepiest-minute (apply max-key second minutes)
         ]
-    [sleepiest-id minutes]
-  ))
-
-(defn finish [[sleepiest-id minutes]]
-  (let [sleepiest-minute (apply max-key second minutes)]
     (* (read-string sleepiest-id) (first sleepiest-minute))
   ))
 
@@ -80,8 +73,8 @@
         sorted-events (sort-events events)
         guard-maps (all-sleeps sorted-events)
         ]
-    { :A (finish (solve-a guard-maps))
-      :B (finish (solve-b guard-maps))
+    { :A (finish guard-maps strategy-a)
+      :B (finish guard-maps strategy-b)
     }
   )
 )
