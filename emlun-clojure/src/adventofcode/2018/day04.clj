@@ -32,7 +32,7 @@
       (update-in guard-map [:sleep-minutes minute] #(inc (or % 0)))
     )
     guard-map
-    (take-while #(< % (:minute end-event)) (iterate inc (:minute start-event)))
+    (range (:minute start-event) (:minute end-event))
   ))
 
 (defn all-sleeps [sorted-events]
