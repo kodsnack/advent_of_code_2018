@@ -56,29 +56,32 @@
   )
 )
 
-(defn solve-a [lines]
-  (let [events (map parse-event lines)
-        sorted-events (sort-events events)
-        guard-maps (all-sleeps sorted-events)
-        sleep-tots (reduce (fn [tots [id guard-map]] (assoc tots id (reduce + (vals (:sleep-minutes guard-map))))) {} guard-maps)
+(defn solve-a [guard-maps]
+  (let [sleep-tots (reduce (fn [tots [id guard-map]] (assoc tots id (reduce + (vals (:sleep-minutes guard-map))))) {} guard-maps)
         [sleepiest-id {minutes :sleep-minutes}] (apply max-key #(sleep-tots (first %)) guard-maps)
-        sleepiest-minute (apply max-key second minutes)
         ]
-    (* (read-string sleepiest-id) (first sleepiest-minute))
+    [sleepiest-id minutes]
   ))
 
-(defn solve-b [lines]
-  (let [events (map parse-event lines)
-        sorted-events (sort-events events)
-        guard-maps (all-sleeps sorted-events)
+(defn solve-b [guard-maps]
+  (let [
         [sleepiest-id {minutes :sleep-minutes}] (apply max-key #(apply max (vals (:sleep-minutes (second %)))) guard-maps)
-        sleepiest-minute (apply max-key second minutes)
         ]
+    [sleepiest-id minutes]
+  ))
+
+(defn finish [[sleepiest-id minutes]]
+  (let [sleepiest-minute (apply max-key second minutes)]
     (* (read-string sleepiest-id) (first sleepiest-minute))
   ))
 
 (defn run [input-lines & args]
-  { :A (solve-a input-lines)
-    :B (solve-b input-lines)
-  }
+  (let [events (map parse-event input-lines)
+        sorted-events (sort-events events)
+        guard-maps (all-sleeps sorted-events)
+        ]
+    { :A (finish (solve-a guard-maps))
+      :B (finish (solve-b guard-maps))
+    }
+  )
 )
