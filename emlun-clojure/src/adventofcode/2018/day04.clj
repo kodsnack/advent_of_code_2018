@@ -24,8 +24,6 @@
 
 (defn timestamp [event] (str (:date event) " " (:time event)))
 
-(defn sort-events [events] (sort-by timestamp events))
-
 (defn add-sleep [guard-map start-event end-event]
   (reduce
     (fn [guard-map minute]
@@ -61,7 +59,7 @@
 
 (defn run [input-lines & args]
   (let [events (map parse-event input-lines)
-        sorted-events (sort-events events)
+        sorted-events (sort-by timestamp events)
         guard-maps (all-sleeps sorted-events)
         ]
     { :A (solve guard-maps strategy-a)
