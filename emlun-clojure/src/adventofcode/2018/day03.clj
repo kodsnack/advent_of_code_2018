@@ -41,9 +41,9 @@
             {}
             claims)
         ]
-    (filter (fn [claim]
+    (first (first (filter (fn [claim]
               (every? (fn [coord] (= 1 (grid coord))) (apply all-rect-coords (rest claim))))
-            claims)
+            claims)))
     ))
 
 (defn run [input-lines & args]
