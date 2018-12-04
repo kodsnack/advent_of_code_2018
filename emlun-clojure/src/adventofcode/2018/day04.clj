@@ -144,7 +144,14 @@
   ))
 
 (defn solve-b [lines]
-  ())
+  (let [events (map parse-event lines)
+        sorted-events (sort-events events)
+        guard-maps (all-sleeps sorted-events)
+        [sleepiest-id {minutes :sleep-minutes}] (apply max-key #(apply max (vals (:sleep-minutes (second %)))) guard-maps)
+        sleepiest-minute (apply max-key second minutes)
+        ]
+    (* (read-string sleepiest-id) (first sleepiest-minute))
+  ))
 
 (defn run [input-lines & args]
   { :A (solve-a input-lines)
