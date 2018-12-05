@@ -46,3 +46,6 @@
 [submodule "p1xelHer0-OCaml"]
 	path = p1xelHer0-OCaml
 	url = https://github.com/p1xelHer0/advent-of-code-2018-ocaml.git
+[submodule "LinAGKar-rust"]
+	path = LinAGKar-rust
+	url = https://github.com/LinAGKar/advent-of-code-2018-rust.git
