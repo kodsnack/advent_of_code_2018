@@ -10,14 +10,14 @@ with open('input.txt') as f:
 
 # Part 2
 base_var = 0
-set_var = set([0])
+set_var = {0}
 with open('input.txt') as f:
     my_lines = f.readlines()
     pool = cycle(my_lines)
     for line in pool:
-        lenght = len(set_var)
+        length = len(set_var)
         base_var = eval(f"base_var{line}")
         set_var.add(base_var)
-        if(len(set_var) == lenght):
+        if len(set_var) == length:
             print(f"Part2 answer: {base_var}")
             break
