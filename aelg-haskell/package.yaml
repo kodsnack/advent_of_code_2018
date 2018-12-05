@@ -28,6 +28,7 @@ dependencies:
 - case-insensitive
 - containers
 - parallel-io
+- directory
 
 library:
   source-dirs: src
