@@ -33,6 +33,7 @@ end
 most = 0
 the_minute_that_the_sleepiest_guard_slept_the_most_on = -1
 the_guard_that_fell_asleep_most_often_on_the_same_minute = -1
+the_minute_most_slept_on = 0
 max_minutes = 0
 do guard = 1 to nr_of_guards
 	sleeping = 0
@@ -41,10 +42,10 @@ do guard = 1 to nr_of_guards
 	do minute = 0 to 59
 		sleeping = sleeping + guards.guard.minute
 		if guards.guard.minute > max_minutes then do
-			top = minute
-			say 'top >' top
 			the_guard_that_fell_asleep_most_often_on_the_same_minute = guard
+			the_minute_most_slept_on = minute
 		end
+		if guards.guard.minute > personal_max then top = minute
 		personal_max = max(guards.guard.minute, personal_max)
 		max_minutes = max(personal_max, max_minutes)
 	end
@@ -63,6 +64,7 @@ say 'sleepiest:' sleepiest
 say 'he slept the most on:' the_minute_that_the_sleepiest_guard_slept_the_most_on
 say 'nr_of_guards:' nr_of_guards
 say 'most often on the same minute:' the_guard_that_fell_asleep_most_often_on_the_same_minute
+say 'where the minute is:' the_minute_most_slept_on
 say sleepiest * the_minute_that_the_sleepiest_guard_slept_the_most_on
-say top * the_guard_that_fell_asleep_most_often_on_the_same_minute
+say the_minute_most_slept_on * the_guard_that_fell_asleep_most_often_on_the_same_minute
 say guards.the_guard_that_fell_asleep_most_often_on_the_same_minute.top
