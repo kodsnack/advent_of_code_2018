@@ -72,8 +72,6 @@ is
     return varchar2
     is
         l_strings strings_aat;
-        l_comp1 varchar2(1);
-        l_comp2 varchar2(1);
         l_difference number;
         l_result varchar2(100);        
     begin
