@@ -1,0 +1,4 @@
+[package]
+name = "day2"
+version = "0.1.0"
+authors = ["Tomas Skäre <tomas.skare@gmail.com>"]

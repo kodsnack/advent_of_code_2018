@@ -4,15 +4,21 @@
 #include "config.h"
 
 #include <common/common.h>
+
+#include <algorithm>
+#include <deque>
+#include <functional>
 #include <iostream>
-#include <string>
-#include <unordered_set>
 #include <stdexcept>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 
 using namespace westerstrom;
 using namespace std;
 using namespace std::string_literals;
-
 
 int parseLine(const string& line)
 {
@@ -36,10 +42,9 @@ void solve_part1()
 {
 	auto parsedInput = parseLines(readLines(string(inputFile)));
 
-	cout << dayName << " - part 1: " << "" << endl;
+	cout << dayName << " - part 1: "
+	     << "" << endl;
 }
-
-
 
 void solve_part2()
 {

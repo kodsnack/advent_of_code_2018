@@ -43,3 +43,6 @@
 [submodule "prositen-python"]
 	path = prositen-python
 	url = git@github.com:prositen/advent-of-code.git
+[submodule "p1xelHer0-OCaml"]
+	path = p1xelHer0-OCaml
+	url = https://github.com/p1xelHer0/advent-of-code-2018-ocaml.git

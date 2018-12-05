@@ -2,11 +2,11 @@
 Solutions in Oracle PL/SQL.
 
 ## Prerequisites
-- Access to an Oracle Database
-OR
-- Access to [Oracle Live SQL](https://livesql.oracle.com/).
+- Access to an Oracle Database, version 12c or higher.
 
-A free Oracle account is required to run scripts on Live SQL.  
+OR 
+
+- An alternative is [Oracle Live SQL](https://livesql.oracle.com/). A free Oracle account is required to run scripts on Live SQL.  
 
 ## Code
 - `day*.sql`: Input+code for the day.
