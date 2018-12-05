@@ -52,3 +52,27 @@ module List = struct
   let reject f = filter (fun x -> not (f x))
 
 end
+
+module Map = struct
+  module type S = sig
+    include Map.S
+    val maxf: (key -> 'a -> 'b) -> 'a t -> key * 'a
+  end
+
+  module Make (Ord: Map.OrderedType) : S with type key = Ord.t = struct
+    module Map = Map.Make(Ord)
+    include Map
+
+    let maxf f m =
+      fold (fun key value acc ->
+        let a' = f key value in
+        match acc with
+        | Some (a,_) when a' <= a -> acc
+        | _ -> Some (a', (key,value))
+      ) m None
+      |> function
+        | None -> failwith "no values"
+        | Some (_,max) -> max
+
+  end
+end
