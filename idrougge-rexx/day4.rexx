@@ -1,4 +1,4 @@
-/* REXX */
+/* Advent of code 2018, day 4, parts 1 & 2 in ANSI REXX */
 in = 'day4.txt'
 fn = 'sorted.txt'
 'sort' in '>' fn
@@ -6,31 +6,25 @@ guards. = 0
 nr_of_guards = 0
 do while lines(fn)
 	line = linein(fn)
-	say line
 	parse var line '['y'-'mo'-'d h':'mi']' text
-	say d'/'mo 'kl.' h':'mi':' text
 	select
 		when pos('wakes', text) > 0 then do
-			say 'Vakt' nr 'vaknade'
 			woke = mi - 1
 			do i = fell to woke
 				guards.nr.i = guards.nr.i + 1
 			end
-			say 'Vakt' nr 'sov i' mi - fell 'minuter'
 		end
 		when pos('falls', text) > 0 then do
-			say 'Vakt' nr 'somnade'
 			fell = mi
 		end
 		otherwise do
 			parse var text . '#'nr .
-			say 'Vakt nr' nr
 			nr_of_guards = max(nr, nr_of_guards)
 		end
 	end
 end
 
-most = 0
+longest_time_slept = 0
 the_minute_that_the_sleepiest_guard_slept_the_most_on = -1
 the_guard_that_fell_asleep_most_often_on_the_same_minute = -1
 the_minute_most_slept_on = 0
@@ -49,22 +43,12 @@ do guard = 1 to nr_of_guards
 		personal_max = max(guards.guard.minute, personal_max)
 		max_minutes = max(personal_max, max_minutes)
 	end
-	if sleeping > 0 then say 'Vakt' guard 'sov i' sleeping 'minuter med maxnoteringen' personal_max
-	if sleeping > most then do
-		say 'new sleepiest with top =' top
+	if sleeping > longest_time_slept then do
 		the_minute_that_the_sleepiest_guard_slept_the_most_on = top
 		sleepiest = guard
 	end
-	most = max(sleeping, most)
+	longest_time_slept = max(sleeping, longest_time_slept)
 end
-say 'most:' most
-say 'top:' top
-say 'max_minutes:' max_minutes
-say 'sleepiest:' sleepiest
-say 'he slept the most on:' the_minute_that_the_sleepiest_guard_slept_the_most_on
-say 'nr_of_guards:' nr_of_guards
-say 'most often on the same minute:' the_guard_that_fell_asleep_most_often_on_the_same_minute
-say 'where the minute is:' the_minute_most_slept_on
-say sleepiest * the_minute_that_the_sleepiest_guard_slept_the_most_on
-say the_minute_most_slept_on * the_guard_that_fell_asleep_most_often_on_the_same_minute
-say guards.the_guard_that_fell_asleep_most_often_on_the_same_minute.top
+
+say 'Part 1:' sleepiest * the_minute_that_the_sleepiest_guard_slept_the_most_on
+say 'Part 2:' the_minute_most_slept_on * the_guard_that_fell_asleep_most_often_on_the_same_minute
