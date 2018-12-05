@@ -16,7 +16,7 @@ describe("day3", () => {
   describe("part1", () => {
     it("should return 4 overlaps for example input", () => {
       const input = "#1 @ 1,3: 4x4 \n #2 @ 3,1: 4x4 \n #3 @ 5,5: 2x2";
-      var result = part1(input, { width: 8, height: 8 });
+      var result = part1(input, { width: 8, height: 8, noLog: true });
       expect(result).to.equal(4);
     });
   });
@@ -24,7 +24,7 @@ describe("day3", () => {
   describe("part2", () => {
     it("should return id 3 for example input", () => {
       const input = "#1 @ 1,3: 4x4 \n #2 @ 3,1: 4x4 \n #3 @ 5,5: 2x2";
-      var result = part2(input, { width: 8, height: 8 });
+      var result = part2(input, { width: 8, height: 8, noLog: true });
       expect(result).to.equal(3);
     });
   });
