@@ -7,52 +7,63 @@
 
 #include <algorithm>
 #include <cassert>
-#include <deque>
-#include <functional>
 #include <iostream>
-#include <regex>
-#include <stdexcept>
-#include <string>
-#include <tuple>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
+#include <optional>
 
 using namespace westerstrom;
 using namespace std;
-using namespace std::string_literals;
 
-int parseLine(const string& line)
+auto reactPolymer(string polymer)
 {
-	auto remaining = line;
-	size_t taken = 0;
-	auto n = std::stoi(remaining, &taken);
-	return n;
-}
-
-vector<int> parseLines(const vector<string>& lines)
-{
-	vector<int> parsedLines;
-	for(auto& line : lines)
+	auto len = polymer.length();
+	for(int i = 0; i < len - 1;)
 	{
-		parsedLines.push_back(parseLine(line));
+		char x = polymer[i];
+		char y = polymer[i + 1];
+		if(tolower(x) == tolower(y) && (((isupper(x) && islower(y)) || (islower(x) && isupper(y)))))
+		{
+			polymer.erase(i, 2);
+			len -= 2;
+			if(i > 0)
+				i--;
+		} else
+		{
+			++i;
+		}
 	}
-	return parsedLines;
+	return len;
 }
 
 void solve_part1()
 {
-	auto parsedInput = parseLines(readLines(string(inputFile)));
-	for(auto x : parsedInput)
-	{
-	}
-
-	cout << dayName << " - part 1: " << endl;
+	auto parsedInput = readLines(string(inputFile));
+	auto polymer = parsedInput[0];
+	auto len = reactPolymer(polymer);
+	assert(len == 11754);
+	cout << dayName << " - part 1: " << len << endl;
 }
 
 void solve_part2()
 {
-	cout << dayName << " - part 2: " << endl;
+	auto parsedInput = readLines(string(inputFile));
+	auto polymer = parsedInput[0];
+	optional<size_t> shortestLen;
+	for(char c = 'a'; c <= 'z'; ++c)
+	{
+		auto p = polymer;
+		p.erase(remove_if(p.begin(), p.end(), [c](char x) { return tolower(x) == tolower(c); }),
+		        p.end());
+		auto len = reactPolymer(p);
+		if(!shortestLen)
+		{
+			shortestLen = len;
+		} else
+		{
+			shortestLen = std::min(*shortestLen, len);
+		}
+	}
+	assert(shortestLen && *shortestLen == 4098);
+	cout << dayName << " - part 2: " << *shortestLen << endl;
 }
 
 int main()
