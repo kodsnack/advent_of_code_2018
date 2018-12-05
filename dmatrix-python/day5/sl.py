@@ -3,17 +3,17 @@ import string
 
 def clear(word: str) -> str:
     previous = ''
-    new_word = ""
-    for i, char in enumerate(word):
+    stack = []
+    for char in word:
         if previous == char or previous.lower() != char.lower(
         ) or previous.upper() != char.upper():
-            new_word += char
+            stack.append(char)
             previous = char
             continue
 
-        new_word = new_word[:-1]
+        stack.pop()
         previous = ""
-    return new_word
+    return "".join(stack)
 
 
 def part1(line_inp: str) -> int:
