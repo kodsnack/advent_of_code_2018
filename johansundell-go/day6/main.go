@@ -19,6 +19,13 @@ func (a *point) distance(b point) int {
 	return int(math.Abs(float64(a.x)-float64(b.x))) + int(math.Abs(float64(a.y)-float64(b.y)))
 }
 
+func (a *point) sumDist(mp points) (sum int) {
+	for _, r := range mp {
+		sum += a.distance(r)
+	}
+	return
+}
+
 type points []point
 
 func main() {
@@ -26,10 +33,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	parseInput(data)
+	parseInput(data, 10000)
 }
 
-func parseInput(input string) {
+func parseInput(input string, part2Limit int) {
 
 	res := strings.Fields(input)
 	mp := make(points, len(res)/2)
@@ -40,7 +47,7 @@ func parseInput(input string) {
 		n++
 	}
 	maxY, maxX := getMaxYx(mp)
-	//fmt.Println(mp)
+
 	// Left
 	for y := 0; y < maxY; y++ {
 		p := point{y: y, x: 0}
@@ -65,34 +72,20 @@ func parseInput(input string) {
 		sort.Slice(mp, func(i, j int) bool { return mp[i].distance(p) < mp[j].distance(p) })
 		mp[0].isEdge = true
 	}
-	//fmt.Println(mp)
 
-	//dist := 0
+	within := 0
 	for y := 0; y < maxY; y++ {
-		//str := ""
 		for x := 0; x < maxX; x++ {
 			p := point{y: y, x: x}
-			//t := point{y: y, x: x}
+			if p.sumDist(mp) < part2Limit {
+				within++
+			}
 			sort.Slice(mp, func(i, j int) bool { return mp[i].distance(p) < mp[j].distance(p) })
-			/*if mp[0].distance(p) == mp[1].distance(p) {
-				str += "."
-			} else {
-				str += fmt.Sprintf("%d", mp[0].id)
-			}*/
-
 			if !mp[0].isEdge && mp[0].distance(p) != mp[1].distance(p) {
 				mp[0].sum++
 			}
-			/*
-				if mp[0].id == 3 && mp[0].distance(p) != mp[1].distance(p) { //&& mp[0].distance(p) != mp[1].distance(p)
-					dist++
-					//fmt.Println(p)
-				}
-			*/
 		}
-		//fmt.Println(str)
 	}
-	//fmt.Println(dist)
 	top := 0
 	for i := 0; i < len(mp); i++ {
 		if !mp[i].isEdge && mp[i].sum > top {
@@ -100,6 +93,7 @@ func parseInput(input string) {
 		}
 	}
 	fmt.Println(top)
+	fmt.Println(within)
 }
 
 func getMaxYx(input []point) (y, x int) {

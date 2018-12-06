@@ -13,5 +13,5 @@ var data = `1, 1
 
 func Test_Ex1(t *testing.T) {
 	//fmt.Println(data)
-	parseInput(data)
+	parseInput(data, 32)
 }
