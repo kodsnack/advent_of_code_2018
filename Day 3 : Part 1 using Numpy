@@ -1,0 +1,41 @@
+import numpy as np
+
+cloth = np.zeros((1000, 1000))
+
+#get space separated claims and convert to a list
+claims = list(input().split())
+
+start = ""
+size = ""
+# decode claims into numpy coordinates
+for element in claims:
+    if element.startswith("#") or element.startswith("@"):
+        # ignore these
+        continue
+    elif "," in element:
+        # these must be top left corner
+        start = element.rstrip(":").split(",")
+    else:
+        #these must be dimensions
+        size = element.split("x")
+    
+    # print("found ", start, size)
+    if start != "" and size != "":
+        # decode area size (Row start and end, Col start/end) and update array with a +1 
+        rs = int(start[1])
+        re = rs + int(size[1]) 
+        cs = int(start[0])
+        ce = cs + int(size[0])
+        cloth[rs:re, cs:ce] += 1
+        start = ""
+        size = ""
+        #print(cloth)
+
+#summarise final array
+cellcounts = np.array(np.unique(cloth, return_counts=True)).T
+
+count0 = cellcounts[0,1]
+count1 = cellcounts[1,1]
+
+answer = 1000000 - (count0 + count1) 
+print(answer)
