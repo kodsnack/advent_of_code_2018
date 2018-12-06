@@ -57,7 +57,7 @@ readInput session ms = try cache >>= either (const download :: IOException -> IO
       s <- withResponse req manager (brConsume . responseBody)
       let input = concatMap unpack s
       writeFile (cacheName ms) input
-      return $ input
+      return input
     cache = do
       createCacheDir
       readFile (cacheName ms)
