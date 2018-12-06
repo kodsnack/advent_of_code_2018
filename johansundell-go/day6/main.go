@@ -6,11 +6,13 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/johansundell/advent_of_code_2017/johansundell-go/adventofcode2017"
 )
 
 type point struct {
-	y, x, id int
-	isEdge   bool
+	y, x, id, sum int
+	isEdge        bool
 }
 
 func (a *point) distance(b point) int {
@@ -20,7 +22,11 @@ func (a *point) distance(b point) int {
 type points []point
 
 func main() {
-	fmt.Println("Sudde")
+	data, err := adventofcode2017.GetInput("day6.txt")
+	if err != nil {
+		panic(err)
+	}
+	parseInput(data)
 }
 
 func parseInput(input string) {
@@ -59,21 +65,41 @@ func parseInput(input string) {
 		sort.Slice(mp, func(i, j int) bool { return mp[i].distance(p) < mp[j].distance(p) })
 		mp[0].isEdge = true
 	}
-	fmt.Println(mp)
+	//fmt.Println(mp)
 
-	dist := 0
-	for y := 0; y < maxX; y++ {
-		for x := 0; x < maxY; x++ {
+	//dist := 0
+	for y := 0; y < maxY; y++ {
+		//str := ""
+		for x := 0; x < maxX; x++ {
 			p := point{y: y, x: x}
 			//t := point{y: y, x: x}
 			sort.Slice(mp, func(i, j int) bool { return mp[i].distance(p) < mp[j].distance(p) })
-			if mp[0].id == 4 { //&& mp[0].distance(p) != mp[1].distance(p)
-				dist++
-				//fmt.Println(p)
+			/*if mp[0].distance(p) == mp[1].distance(p) {
+				str += "."
+			} else {
+				str += fmt.Sprintf("%d", mp[0].id)
+			}*/
+
+			if !mp[0].isEdge && mp[0].distance(p) != mp[1].distance(p) {
+				mp[0].sum++
 			}
+			/*
+				if mp[0].id == 3 && mp[0].distance(p) != mp[1].distance(p) { //&& mp[0].distance(p) != mp[1].distance(p)
+					dist++
+					//fmt.Println(p)
+				}
+			*/
+		}
+		//fmt.Println(str)
+	}
+	//fmt.Println(dist)
+	top := 0
+	for i := 0; i < len(mp); i++ {
+		if !mp[i].isEdge && mp[i].sum > top {
+			top = mp[i].sum
 		}
 	}
-	fmt.Println(dist)
+	fmt.Println(top)
 }
 
 func getMaxYx(input []point) (y, x int) {
