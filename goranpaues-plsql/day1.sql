@@ -2176,4 +2176,8 @@ from   output
 order by id
 /
 
-rollback;
+drop table input purge
+/
+
+drop table output purge
+/
