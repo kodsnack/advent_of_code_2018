@@ -13,7 +13,7 @@ Step D must be finished before step E can begin.
 Step F must be finished before step E can begin.`
 
 func Test_Ex1(t *testing.T) {
-	if str, _ := parseData(data); str != "CABDFE" {
+	if str, time := parseData(data, 0); str != "CABDFE" || time != 14 {
 		t.Fail()
 	}
 }
