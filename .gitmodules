@@ -49,3 +49,6 @@
 [submodule "LinAGKar-rust"]
 	path = LinAGKar-rust
 	url = https://github.com/LinAGKar/advent-of-code-2018-rust.git
+[submodule "toblu302-x86_64"]
+	path = toblu302-x86_64
+	url = https://github.com/toblu302/AdventOfCode
