@@ -15,22 +15,22 @@ namespace day07
         public char followChar;
     }
 
-    public class Node
+    public struct Node
     {
         public char id;
         public List<char> prereq;
 
-        public Node()
+        public Node(char c)
         {
-            id = '0';
+            id = c;
             prereq = new List<char>();
         }
 
         public Node DeepCopy()
         {
-            Node copy = (Node)this.MemberwiseClone();
-            copy.prereq = new List<char>(prereq);
-            return copy;
+            Node n = new Node(id);
+            n.prereq = new List<char>(prereq);
+            return n;
         }
     }
 
@@ -48,7 +48,7 @@ namespace day07
 
             // First read input
             List<Step> input = new List<Step>();
-            Regex parts = new Regex(@"^Step (\w) must be finished before step (\w)");
+            Regex parts = new Regex(@"^S.*([A-Z]).*([A-Z])");
             string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\input.txt");
             StreamReader reader = File.OpenText(path);
             string line;
@@ -67,40 +67,31 @@ namespace day07
             }
 
             // Part A
-            Dictionary<char, Node> nodes = new Dictionary<char, Node>();
+            Dictionary<char, Node> nodeDict = new Dictionary<char, Node>();
             foreach(Step s in input)
             {
-                Node a = new Node();
-                a.id = s.prereqChar;
-                if (!nodes.ContainsKey(a.id))
-                {
-                    nodes[a.id] = a;
-                }
-                Node b = new Node();
-                b.id = s.followChar;
-                if (!nodes.ContainsKey(b.id))
-                {
-                    nodes[b.id] = b;
-                }
+                nodeDict[s.prereqChar] = new Node(s.prereqChar);
+                nodeDict[s.followChar] = new Node(s.followChar);
             }
             foreach (Step s in input)
             {
-                nodes[s.followChar].prereq.Add(s.prereqChar);
+                nodeDict[s.followChar].prereq.Add(s.prereqChar);
             }
-            Dictionary<char, Node> nodesCopy = new Dictionary<char, Node>();
-            foreach (KeyValuePair<char, Node> kvp in nodes)
+            List<Node> nodes = nodeDict.Values.ToList();
+            List<Node> nodesCopy = new List<Node>();
+            foreach (Node n in nodes)
             {
-                nodesCopy[kvp.Key] = kvp.Value.DeepCopy();
+                nodesCopy.Add(n.DeepCopy());
             }
             List<char> result = new List<char>();
             while (nodes.Any())
             {
                 List<char> candidates = new List<char>();
-                foreach (KeyValuePair<char, Node> kvp in nodes)
+                foreach (Node n in nodes)
                 {
-                    if (!kvp.Value.prereq.Any())
+                    if (!n.prereq.Any())
                     {
-                        candidates.Add(kvp.Value.id);
+                        candidates.Add(n.id);
                     }
                 }
                 candidates.Sort();
@@ -108,62 +99,53 @@ namespace day07
                 {
                     char c = candidates.First();
                     result.Add(c);
-                    foreach (KeyValuePair<char, Node> kvp in nodes)
+                    foreach (Node n in nodes)
                     {
-                        kvp.Value.prereq.Remove(c);
+                        n.prereq.Remove(c);
                     }
-                    nodes.Remove(c);
+                    nodes.RemoveAll(n => n.id == c);
                 }
             }
-            Console.WriteLine("Part A: Take steps in this order: " + String.Join("", result) + ".");
+            string resultString = new string(result.ToArray());
+            Console.WriteLine("Part A: Take steps in this order: " + resultString + ".");
 
             // Part B
-            string resultB = "";
             int totalSecs = 0;
-            int stepSecs = 0;
             nodes = nodesCopy;
-            int nWorkers = 5;
-            int offsSecs = 60;
+            const int nWorkers = 5;
+            const int offsSecs = 60;
             List<Worker> workers = new List<Worker>();
-            SortedDictionary<int, char> workerDoneTime = new SortedDictionary<int, char>();
             while (nodes.Any())
             {
                 List<char> candidates = new List<char>();
-                foreach (KeyValuePair<char, Node> kvp in nodes)
+                foreach (Node n in nodes)
                 {
-                    if (!kvp.Value.prereq.Any())
+                    if (!n.prereq.Any())
                     {
-                        candidates.Add(kvp.Value.id);
+                        candidates.Add(n.id);
                     }
                 }
-                stepSecs = 0;
                 candidates.Sort();
                 while (candidates.Any() && (workers.Count() < nWorkers))
                 {
                     char c = candidates.First();
                     candidates.RemoveAt(0);
-                    Worker w = new Worker();
-                    w.id = c;
-                    w.timeDone = totalSecs + offsSecs + (c - 'A' + 1);
-                    workers.Add(w);
-                    nodes.Remove(c);
-                    resultB += c;
-                }
-                int tNext = int.MaxValue;
-                foreach (Worker w in workers)
-                {
-                    if (w.timeDone < tNext)
+                    Worker w = new Worker
                     {
-                        tNext = w.timeDone;
-                    }
+                        id = c,
+                        timeDone = totalSecs + offsSecs + (c - 'A' + 1)
+                    };
+                    workers.Add(w);
+                    nodes.RemoveAll(n => n.id == c);
                 }
+                int tNext = workers.Min(w => w.timeDone);
                 foreach (Worker w in workers)
                 {
                     if (w.timeDone == tNext)
                     {
-                        foreach (KeyValuePair<char, Node> kvp in nodes)
+                        foreach (Node n in nodes)
                         {
-                            kvp.Value.prereq.Remove(w.id);
+                            n.prereq.Remove(w.id);
                         }
                     }
                 }
