@@ -1,10 +1,9 @@
 /* REXX */
-fn = 'day6b.txt'
+fn = 'day6.txt'
 map. = '.'
 h = 0; b = 0
 do while lines(fn)
 	parse value linein(fn) with x',' y .
-	say x y
 	push x y
 	h = max(x,h)
 	b = max(y,b)
@@ -19,59 +18,66 @@ do queued()
 	queue x y
 end
 say v h t b
-call show
-
-say minimum_delta(2, 2)
-say minimum_delta(3, 4)
-say minimum_delta(2, b)
-
-do y = 0 to b
-	do x = 0 to h
-		say x y '>' minimum_delta(x,y)
-	end
-end
-
-do queued()
-	pull rx ry
-	queue rx ry
-	do y = 0 to b
-		do x = 0 to h
-			say x':'y '>' delta(x,y,rx,ry)
-		end
-	end	
-end
 
 points. = 0
-hits = 0
-do queued()
-pull ox oy
-do y = 0 to b
-	do x = 0 to h + 1
-		od = delta(x,y,ox,oy)
-		min_d = od + 1
+max_hits = 0
+do nr = 1 to queued()
+	pull ox oy
+	hits = 0
+	do y = 0 to b
+		do x = 0 to h + 1
+			od = delta(x,y,ox,oy)
+			min_d = od + 1
+			do queued()
+				pull rx ry
+				queue rx ry
+				d = delta(x,y,rx,ry)
+				/*
+				say x':'y '<>' rx':'ry '->' d
+				*/
+				min_d = min(min_d, d)
+			end
+			if od < min_d then do
+				points.y.x = nr
+				/* points.oy.ox = points.oy.ox + 1 */
+				hits = hits + 1
+			end
+			if od = min_d then points.y.x = .
+		end
+	end
+	out.1.1 = v;  out.1.2 = oy
+	out.2.1 = h;  out.2.2 = oy
+	out.3.1 = ox; out.3.2 = t
+	out.4.1 = ox; out.4.2 = b
+	do # = 1 to 4
+		say '#'# '('ox':'oy') -->' out.#.1':'out.#.2
+		od = delta(out.#.1,out.#.2,ox,oy)
+		min_d = b + h
+		say '#'# 'od:' od
 		do queued()
 			pull rx ry
 			queue rx ry
-			say 'od:' od
-			d = delta(x,y,rx,ry)
-			say x':'y '<>' rx':'ry '->' d
+			d = delta(v,oy,rx,ry)
+			say rx ry 'd:' d
 			min_d = min(min_d, d)
+			say 'min_d:' min_d 'od:' od
 		end
-		say 'min_d:' min_d 'od:' od
 		if od < min_d then do
-			points.y.x = 'f'
-			/* points.oy.ox = points.oy.ox + 1 */
-			hits = hits + 1
+			say 'ILLEGAL'
+			hits = 0
+			leave #
 		end
-		if od = min_d then points.y.x = .
 	end
+	say ox oy 'hits:' hits
+	max_hits = max(hits, max_hits)
+	queue ox oy
 end
-queue ox oy
-end
+/*
 call show
 say rx ry
 say ox oy
-say hits
+*/
+say max_hits
 exit
 
 delta:
