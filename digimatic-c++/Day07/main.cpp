@@ -7,17 +7,11 @@
 
 #include <algorithm>
 #include <cassert>
-#include <deque>
 #include <functional>
 #include <iostream>
-#include <regex>
-#include <stdexcept>
 #include <string>
-#include <tuple>
-#include <unordered_map>
-#include <unordered_set>
 #include <utility>
-#include <map>
+#include <vector>
 
 using namespace westerstrom;
 using namespace std;
@@ -41,30 +35,18 @@ Deps parseLines(const vector<string>& lines)
 	return parsedLines;
 }
 
-//using DepTree = multimap<char, char>;
-
-/*auto findNext(const Deps& deps)
+auto getAlphabet(const Deps& deps)
 {
-	unordered_map<char, int> counts;
-	for(int i=0;i<deps.size();i++)
+	vector<char> alphabet;
+	for(auto d : deps)
 	{
-		counts[deps[i].second] ++;
+		alphabet.push_back(d.first);
+		alphabet.push_back(d.second);
 	}
-	vector<pair<char, int>> countsv;
-	countsv.resize(counts.size());
-	copy(counts.begin(), counts.end(), countsv.begin());
-
-	countsv.erase(remove_if(countsv.begin(), countsv.end(), 
-		[](const pair<char, int>& x) { return x.second > 0; }), countsv.end());
-	char best = 0;
-	auto it = min_element(countsv.begin(), countsv.end(), [](auto&& x, auto&& y) {
-		return x.first < y.first;
-	});
-	if(it != countsv.end())
-		return it->first;
-	else
-		return '\0';
-}*/
+	sort(begin(alphabet), end(alphabet));
+	alphabet.erase(unique(begin(alphabet), end(alphabet)), end(alphabet));
+	return alphabet;
+}
 
 bool hasParent(const Deps& deps, char c)
 {
@@ -79,81 +61,106 @@ bool hasParent(const Deps& deps, char c)
 void solve_part1()
 {
 	auto deps = parseLines(readLines(string(inputFile)));
-
-	vector<char> alphabet;
-	for(auto d : deps)
-	{
-		alphabet.push_back(d.first);
-		alphabet.push_back(d.second);
-	}
-	sort(begin(alphabet), end(alphabet));
-	alphabet.erase(unique(begin(alphabet), end(alphabet)), end(alphabet));
+	auto alphabet = getAlphabet(deps);
 
 	string r;
 	while(alphabet.size() > 0)
 	{
 		char c;
-		for(int i=0;i<alphabet.size();++i)
+		for(int i = 0; i < alphabet.size(); ++i)
 		{
 			char cand = alphabet[i];
 			if(!hasParent(deps, cand))
 			{
 				c = cand;
-				alphabet.erase(alphabet.begin()+i);
+				alphabet.erase(alphabet.begin() + i);
 				break;
 			}
 		}
-
-
 		r += c;
-
-		deps.erase(remove_if(deps.begin(), deps.end(), [c](auto&& d) {return d.first == c; }), deps.end());
+		deps.erase(remove_if(deps.begin(), deps.end(), [c](auto&& d) { return d.first == c; }),
+		           deps.end());
 	}
-
-
+	assert(r == "GDHOSUXACIMRTPWNYJLEQFVZBK");
 	cout << dayName << " - part 1: " << r << endl;
 }
 
 void solve_part2()
 {
 	auto deps = parseLines(readLines(string(inputFile)));
+	auto alphabet = getAlphabet(deps);
 
-	vector<char> alphabet;
-	for(auto d : deps)
-	{
-		alphabet.push_back(d.first);
-		alphabet.push_back(d.second);
-	}
-	sort(begin(alphabet), end(alphabet));
-	alphabet.erase(unique(begin(alphabet), end(alphabet)), end(alphabet));
+	const int workerCount = 5;
+	// Worker pairs of current letter beeing worked on or '\0' if worker is free, and finnish time.
+	vector<pair<char, int>> worker;
+	worker.resize(workerCount);
 
-	int t=0;
-
-	tuple<char, int> worker[2] = { {'\0', 0}, {'\0', 0}};
-
+	int t = 0;
 	string r;
+
 	while(alphabet.size() > 0)
 	{
-		vector<char> c;
-		for(int i=0;i<alphabet.size();++i)
+		// job completion
 		{
-			char cand = alphabet[i];
-			if(!hasParent(deps, cand))
+			auto firstCompleteIt = min_element(begin(worker), end(worker), [](auto&& x, auto&& y) {
+				if(x.first == '\0')
+				{
+					// x == 0
+					return false;
+				} else if(y.first == '\0')
+				{
+					// x != 0 && y == 0
+					return true;
+				}
+				return x.second < y.second;
+			});
+			if(firstCompleteIt->first != '\0')
 			{
-				c.push_back(cand);
-				alphabet.erase(alphabet.begin()+i);
-				if(c.size()==2)
-					break;
+				char c = firstCompleteIt->first;
+				t = firstCompleteIt->second;
+				alphabet.erase(find(begin(alphabet), end(alphabet), c));
+				deps.erase(
+				    remove_if(deps.begin(), deps.end(), [c](auto&& d) { return d.first == c; }),
+				    deps.end());
+				firstCompleteIt->first = '\0';
+				r += c;
 			}
 		}
 
-//		r += c;
+		// job assigning
+		for(int workerToAssign = 0; workerToAssign < workerCount; ++workerToAssign)
+		{
+			if(worker[workerToAssign].first != '\0')
+				continue;
 
-//		deps.erase(remove_if(deps.begin(), deps.end(), [c](auto&& d) {return d.first == c; }), deps.end());
+			// get next job
+			char c = '\0';
+			for(int i = 0; i < alphabet.size(); ++i)
+			{
+				char cand = alphabet[i];
+
+				if(!hasParent(deps, cand))
+				{
+					if(find_if(worker.begin(), worker.end(),
+					           [cand](auto&& w) { return w.first == cand; }) == worker.end())
+					{
+						c = cand;
+						break;
+					}
+				}
+			}
+
+			if(c != '\0')
+			{ // found a possible job to assign
+				// assign job
+				worker[workerToAssign].first = c;
+				worker[workerToAssign].second = t + 61 + static_cast<int>(c - 'A');
+			}
+		}
 	}
 
-
-	cout << dayName << " - part 2: " << endl;
+	assert(t == 1024);
+	cout << dayName << " - part 2: " << t << endl;
 }
 
 int main()
