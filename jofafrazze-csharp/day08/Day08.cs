@@ -7,13 +7,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace dayXX
+namespace day08
 {
-    class Program
+    class Day08
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("AoC 2018 - " + typeof(Program).Namespace + ":");
+            Console.WriteLine("AoC 2018 - " + typeof(Day08).Namespace + ":");
 
             // First read input
             string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\input.txt");

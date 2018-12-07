@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace day01
 {
-    class Program
+    class Day01
     {
         public static readonly int[] input = { +14, -15, +7, -10, +14, -6, -13, -8, -1, -19, -16, -5, +1, +11, +7, +16, -3, +1, -10, +8, +17, -10, -12, +1, -16, +5, +12, -20,
                 +9, -19, -10, -2, +10, +6, -10, -17, -2, -4, +14, -4, +11, +4, +19, +5, +4, +15, -3, +8, -17, +4, +10, -9, -16, -7, -16, -7,
@@ -47,7 +47,7 @@ namespace day01
 
         static void Main(string[] args)
         {
-            Console.WriteLine("AoC 2018 - " + typeof(Program).Namespace + ":");
+            Console.WriteLine("AoC 2018 - " + typeof(Day01).Namespace + ":");
 
             // Part A
             int nInput = input.Length;

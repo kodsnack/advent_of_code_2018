@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace day04
 {
-    class Program
+    class Day04
     {
         public struct GuardNote
         {
@@ -22,7 +22,7 @@ namespace day04
 
         static void Main(string[] args)
         {
-            Console.WriteLine("AoC 2018 - " + typeof(Program).Namespace + ":");
+            Console.WriteLine("AoC 2018 - " + typeof(Day04).Namespace + ":");
 
             // First read input
             SortedDictionary<DateTime, string> guardNotesRaw = new SortedDictionary<DateTime, string>();

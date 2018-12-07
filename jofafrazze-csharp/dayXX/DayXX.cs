@@ -7,18 +7,18 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace day07
+namespace dayXX
 {
-    class Program
+    class DayXX
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("AoC 2018 - " + typeof(Program).Namespace + ":");
+            Console.WriteLine("AoC 2018 - " + typeof(DayXX).Namespace + ":");
 
             // First read input
             string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\input.txt");
-            StreamReader reader = File.OpenText(path);
-            string input = reader.ReadLine();
+            //StreamReader reader = File.OpenText(path);
+            //string input = reader.ReadLine();
 
             // Part A
             Console.WriteLine("Part A: Result is " + 'A' + ".");
