@@ -1,3 +1,6 @@
+#!/bin/sh
+exec scala $0 $@
+!#
 // Advent of Code 2018
 // Peter Westerström (digimatic)
 import scala.language.postfixOps
@@ -22,14 +25,13 @@ def react(p : List[Char]) : List[Char] = {
 	react2(Nil, p).reverse
 }
 
-val polymerDemo="dabAcCaCBAcCcaDA";
-/*val r=react(polymerDemo.toList).mkString
-r.length
-r=="dabCBAcaDA"*/
-
+// read input
 val polymer = scala.io.Source.fromFile("input.txt", "utf-8").getLines.mkString("\n")
+
+//
+// part 1
+//
 val l = react(polymer.toList).length
-l==11754
 println(s"Day 5 part 1 answer: ${l}")
 
 //
