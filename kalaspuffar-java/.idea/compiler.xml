@@ -9,7 +9,7 @@
         <module name="kalaspuffar-java" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.8">
       <module name="kalaspuffar-java" target="1.8" />
     </bytecodeTargetLevel>
   </component>
