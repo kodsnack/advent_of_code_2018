@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace day03
 {
-    class Program
+    class Day03
     {
         public struct Claim
         {
@@ -22,7 +22,7 @@ namespace day03
 
         static void Main(string[] args)
         {
-            Console.WriteLine("AoC 2018 - " + typeof(Program).Namespace + ":");
+            Console.WriteLine("AoC 2018 - " + typeof(Day03).Namespace + ":");
 
             // First read input
             List<Claim> claims = new List<Claim>();

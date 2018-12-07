@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace day06
 {
-    class Program
+    class Day06
     {
         public struct Coord
         {
@@ -26,7 +26,7 @@ namespace day06
 
         static void Main(string[] args)
         {
-            Console.WriteLine("AoC 2018 - " + typeof(Program).Namespace + ":");
+            Console.WriteLine("AoC 2018 - " + typeof(Day06).Namespace + ":");
 
             // First read input
             List<Coord> coords = new List<Coord>();

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace day02
 {
-    class Program
+    class Day02
     {
         public static readonly string[] input =
         {
@@ -65,7 +65,7 @@ namespace day02
 
         static void Main(string[] args)
         {
-            Console.WriteLine("AoC 2018 - " + typeof(Program).Namespace + ":");
+            Console.WriteLine("AoC 2018 - " + typeof(Day02).Namespace + ":");
 
             // Part A
             int nInput = input.Length;
