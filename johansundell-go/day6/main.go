@@ -85,11 +85,8 @@ func parseInput(input string, part2Limit int) (part1, part2 int) {
 		}
 	}
 
-	for i := 0; i < len(mp); i++ {
-		if !mp[i].isEdge && mp[i].sum > part1 {
-			part1 = mp[i].sum
-		}
-	}
+	sort.Slice(mp, func(i, j int) bool { return mp[i].sum > mp[j].sum })
+	part1 = mp[0].sum
 	return
 }
 
