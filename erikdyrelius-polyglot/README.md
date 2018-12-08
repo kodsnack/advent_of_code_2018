@@ -14,3 +14,4 @@ probably be forgotten and start to mold in a few months.
 * Day  3: Rust (incomplete)
 * Dat  4:
 * Day  5: C
+* Day  8: Java
