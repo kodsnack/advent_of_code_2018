@@ -33,11 +33,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	parseInput(data, 10000)
+	fmt.Println(parseInput(data, 10000))
 }
 
-func parseInput(input string, part2Limit int) {
-
+func parseInput(input string, part2Limit int) (part1, part2 int) {
 	res := strings.Fields(input)
 	mp := make(points, len(res)/2)
 	for i, n := 0, 0; i < len(res); i = i + 2 {
@@ -73,12 +72,11 @@ func parseInput(input string, part2Limit int) {
 		mp[0].isEdge = true
 	}
 
-	within := 0
 	for y := 0; y < maxY; y++ {
 		for x := 0; x < maxX; x++ {
 			p := point{y: y, x: x}
 			if p.sumDist(mp) < part2Limit {
-				within++
+				part2++
 			}
 			sort.Slice(mp, func(i, j int) bool { return mp[i].distance(p) < mp[j].distance(p) })
 			if !mp[0].isEdge && mp[0].distance(p) != mp[1].distance(p) {
@@ -86,24 +84,16 @@ func parseInput(input string, part2Limit int) {
 			}
 		}
 	}
-	top := 0
-	for i := 0; i < len(mp); i++ {
-		if !mp[i].isEdge && mp[i].sum > top {
-			top = mp[i].sum
-		}
-	}
-	fmt.Println(top)
-	fmt.Println(within)
+
+	sort.Slice(mp, func(i, j int) bool { return mp[i].sum > mp[j].sum })
+	part1 = mp[0].sum
+	return
 }
 
 func getMaxYx(input []point) (y, x int) {
-	sort.Slice(input, func(i, j int) bool {
-		return input[i].y > input[j].y
-	})
+	sort.Slice(input, func(i, j int) bool { return input[i].y > input[j].y })
 	y = input[0].y
-	sort.Slice(input, func(i, j int) bool {
-		return input[i].x > input[j].x
-	})
+	sort.Slice(input, func(i, j int) bool { return input[i].x > input[j].x })
 	x = input[0].x
 	return
 }

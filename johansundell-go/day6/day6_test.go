@@ -12,6 +12,7 @@ var data = `1, 1
 8, 9`
 
 func Test_Ex1(t *testing.T) {
-	//fmt.Println(data)
-	parseInput(data, 32)
+	if p1, p2 := parseInput(data, 32); p1 != 17 || p2 != 16 {
+		t.Fail()
+	}
 }

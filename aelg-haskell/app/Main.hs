@@ -9,13 +9,18 @@ import           Data.Maybe
 import           Network.HTTP.Client
 import           Network.HTTP.Client.TLS
 import           System.Environment
+import           System.Directory
 import           Control.Concurrent.ParallelIO.Local
+import           Control.Exception
 
 import qualified Day01
 import qualified Day02
 import qualified Day03
 import qualified Day04
 import qualified Day05
+import qualified Day06
+import qualified Day07
+import qualified Day08
 
 solved =
   M.fromList
@@ -24,6 +29,9 @@ solved =
     , (3, Day03.solve)
     , (4, Day04.solve)
     , (5, Day05.solve)
+    , (6, Day06.solve)
+    , (7, Day07.solve)
+    , (8, Day08.solve)
     ]
 
 getSolution x = M.findWithDefault notImplemented x solved
@@ -37,15 +45,26 @@ solve x f s = do
 
 notImplemented s = ("Not implemented", "Input: " ++ unlines s)
 
+createCacheDir = createDirectoryIfMissing False ".cache"
+
+cacheName ms = ".cache/input-" ++ show ms ++ ".txt"
+
 readInput :: String -> Int -> IO String
-readInput session ms = do
-  initRequest <-
-    parseRequest $ "http://adventofcode.com/2018/day/" ++ show ms ++ "/input"
-  let session' = "session=" ++ session
-      req = initRequest {requestHeaders = [(mk $ pack "Cookie", pack session')]}
-  manager <- newTlsManager
-  s <- withResponse req manager (brConsume . responseBody)
-  return $ concatMap unpack s
+readInput session ms = try cache >>= either (const download :: IOException -> IO String) return
+  where
+    download = do
+      initRequest <-
+        parseRequest $ "http://adventofcode.com/2018/day/" ++ show ms ++ "/input"
+      let session' = "session=" ++ session
+          req = initRequest {requestHeaders = [(mk $ pack "Cookie", pack session')]}
+      manager <- newTlsManager
+      s <- withResponse req manager (brConsume . responseBody)
+      let input = concatMap unpack s
+      writeFile (cacheName ms) input
+      return input
+    cache = do
+      createCacheDir
+      readFile (cacheName ms)
 
 maybeRead = fmap fst . listToMaybe . reads
 
