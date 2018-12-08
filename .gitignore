@@ -1,3 +1,7 @@
+erikdyrelius-polyglot/day03/target/*
+*.o
+erikdyrelius-polyglot/lib/*
 erikdyrelius-polyglot/*.exe
 erikdyrelius-polyglot/backup/*
-erikdyrelius-polyglot/lib/*
+erikdyrelius-python/.vscode/settings.json
+Day 3*

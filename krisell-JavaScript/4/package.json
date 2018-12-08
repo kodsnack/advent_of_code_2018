@@ -1,0 +1,17 @@
+{
+  "name": "1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.test.js",
+  "dependencies": {
+    "jest": "^23.6.0",
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "jest --watchAll --verbose=false"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
