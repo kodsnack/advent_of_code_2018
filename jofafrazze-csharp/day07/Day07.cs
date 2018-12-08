@@ -25,13 +25,6 @@ namespace day07
             id = c;
             prereq = new List<char>();
         }
-
-        public Node DeepCopy()
-        {
-            Node n = new Node(id);
-            n.prereq = new List<char>(prereq);
-            return n;
-        }
     }
 
     public struct Worker
@@ -47,42 +40,45 @@ namespace day07
             Console.WriteLine("AoC 2018 - " + typeof(Day07).Namespace + ":");
 
             // First read input
-            List<Step> input = new List<Step>();
-            Regex parts = new Regex(@"^S.*([A-Z]).*([A-Z])");
-            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\input.txt");
-            StreamReader reader = File.OpenText(path);
-            string line;
-            while ((line = reader.ReadLine()) != null)
+            List<Step> ReadInput()
             {
-                MatchCollection matches = parts.Matches(line);
-                if (matches.Count > 0)
+                List<Step> input = new List<Step>();
+                Regex parts = new Regex(@"^S.*([A-Z]).*([A-Z])");
+                string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\input.txt");
+                StreamReader reader = File.OpenText(path);
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    GroupCollection groups = matches[0].Groups;
-                    Step step = new Step();
-                    int i = 1;
-                    step.prereqChar = groups[i++].Value[0];
-                    step.followChar = groups[i++].Value[0];
-                    input.Add(step);
+                    MatchCollection matches = parts.Matches(line);
+                    if (matches.Count > 0)
+                    {
+                        GroupCollection groups = matches[0].Groups;
+                        Step step = new Step();
+                        int i = 1;
+                        step.prereqChar = groups[i++].Value[0];
+                        step.followChar = groups[i++].Value[0];
+                        input.Add(step);
+                    }
                 }
+                return input;
             }
 
             // Part A
-            Dictionary<char, Node> nodeDict = new Dictionary<char, Node>();
-            foreach(Step s in input)
+            List<Node> BuildNodes(List<Step> steps)
             {
-                nodeDict[s.prereqChar] = new Node(s.prereqChar);
-                nodeDict[s.followChar] = new Node(s.followChar);
+                Dictionary<char, Node> nodeDict = new Dictionary<char, Node>();
+                foreach (Step s in steps)
+                {
+                    nodeDict[s.prereqChar] = new Node(s.prereqChar);
+                    nodeDict[s.followChar] = new Node(s.followChar);
+                }
+                foreach (Step s in steps)
+                {
+                    nodeDict[s.followChar].prereq.Add(s.prereqChar);
+                }
+                return nodeDict.Values.ToList();
             }
-            foreach (Step s in input)
-            {
-                nodeDict[s.followChar].prereq.Add(s.prereqChar);
-            }
-            List<Node> nodes = nodeDict.Values.ToList();
-            List<Node> nodesCopy = new List<Node>();
-            foreach (Node n in nodes)
-            {
-                nodesCopy.Add(n.DeepCopy());
-            }
+            List<Node> nodes = BuildNodes(ReadInput());
             List<char> result = new List<char>();
             while (nodes.Any())
             {
@@ -111,7 +107,7 @@ namespace day07
 
             // Part B
             int totalSecs = 0;
-            nodes = nodesCopy;
+            nodes = BuildNodes(ReadInput());
             const int nWorkers = 5;
             const int offsSecs = 60;
             List<Worker> workers = new List<Worker>();
