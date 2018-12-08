@@ -1,6 +1,6 @@
 
 
-from day8_utils import read_tree
+from utils import read_tree
 
 
 def sum_meta(node):
