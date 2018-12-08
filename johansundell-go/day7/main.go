@@ -33,10 +33,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(parseData(data))
+	fmt.Println(parseData(data, 60))
 }
 
-func parseData(input string) (part1 string, part2 int) {
+func parseData(input string, secToAdd int) (part1 string, part2 int) {
 	data := strings.Split(input, "\n")
 	list := make(listType)
 	for _, r := range data {
@@ -49,6 +49,7 @@ func parseData(input string) (part1 string, part2 int) {
 	for k, r := range list {
 		instructions = append(instructions, instructionType{key: k, str: r})
 	}
+	//fmt.Printf("%+v", instructions)
 
 	for len(instructions) > 0 {
 		sort.Slice(instructions, func(i, j int) bool {
@@ -103,7 +104,7 @@ func parseData(input string) (part1 string, part2 int) {
 		for i := 0; i < len(wPool) && len(iList) > 0; i++ {
 			if wPool[i].workingOn == "" && len(iList[0].str) == 0 {
 				wPool[i].workingOn = iList[0].key
-				wPool[i].secLeft = int(iList[0].key[0]) - int('A') + 1 + 60
+				wPool[i].secLeft = int(iList[0].key[0]) - int('A') + 1 + secToAdd
 				iList = append(iList[:0], iList[1:]...)
 				active++
 			}
