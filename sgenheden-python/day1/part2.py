@@ -1,13 +1,5 @@
 
-import fileinput
-import numpy as np
-
-
-def stdin2ndarray() :
-    data = []
-    for line in fileinput.input() :
-        data.append(line.strip())
-    return np.array(data,dtype=int)
+from utils import stdin2ndarray
 
 
 def find_repeating(inp):

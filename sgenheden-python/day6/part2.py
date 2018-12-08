@@ -1,14 +1,8 @@
 
-import fileinput
 import numpy as np
 from scipy.spatial.distance import cityblock
 
-
-def stdin2ndarray() :
-    data = []
-    for line in fileinput.input() :
-        data.append(line.strip().split(", "))
-    return np.array(data,dtype=int)
+from utils import stdin2ndarray
 
 
 if __name__ == "__main__":
