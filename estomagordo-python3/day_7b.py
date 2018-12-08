@@ -72,6 +72,10 @@ def solve(d, number_workers, added_time):
 
     return total_time
 
-with open('input_7.txt') as f:
-	data = [line.rstrip() for line in f]
-	print(solve(data, 5, 61))
+def read_and_solve():
+	with open('input_7.txt') as f:
+		data = [line.rstrip() for line in f]
+		return solve(data, 5, 61)
+
+if __name__ == '__main__':
+	print(read_and_solve())

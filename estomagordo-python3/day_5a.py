@@ -21,14 +21,12 @@ def react(d):
 
 
 def solve(d):
-	d = react(d)
-	best = len(d)
-	for y in range(26):
-		char = chr(ord('a') + y)
-		polymer = ''.join(c for c in d if c.lower() != char)
-		best = min(best, len(react(polymer)))
-	return best
+	return len(react(d))
 
-with open('input_5.txt') as f:
-	data = [line.rstrip() for line in f]
-	print(solve(data[0]))
+def read_and_solve():
+	with open('input_5.txt') as f:
+		data = [line.rstrip() for line in f]
+		return solve(data[0])
+
+if __name__ == '__main__':
+	print(read_and_solve())

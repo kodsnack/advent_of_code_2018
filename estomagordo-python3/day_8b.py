@@ -38,6 +38,10 @@ def solve(d):
 
     return score(graph, 1)
 
-with open('input_8.txt') as f:
-    data = [list(map(int, line.split())) for line in f]
-    print(solve(data[0]))
+def read_and_solve():
+	with open('input_8.txt') as f:
+		data = [list(map(int, line.split())) for line in f]
+		return solve(data[0])
+
+if __name__ == '__main__':
+	print(read_and_solve())
