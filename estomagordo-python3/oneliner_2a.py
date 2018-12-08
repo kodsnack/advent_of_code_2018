@@ -1,0 +1,1 @@
+print(sum(any(line[x] == line[x - 1] and (x == len(line) - 1 or line[x] != line[x + 1]) and (x == 1 or line[x] != line[x - 2]) for x in range(1, len(line))) for line in map(sorted, open('input_2.txt').readlines())) * sum(any(line[x] == line[x - 1] and line[x] == line[x + 1] for x in range(1, len(line) - 1)) for line in map(sorted, open('input_2.txt').readlines())))
