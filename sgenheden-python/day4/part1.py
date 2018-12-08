@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from day4_utils import read_stdin, parse_events
+from utils import read_stdin, parse_events
 
 
 if __name__ == "__main__":
