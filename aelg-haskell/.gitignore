@@ -3,3 +3,4 @@ aelg-haskell.cabal
 *~
 sessionKey.txt
 .cache/
+*.swp
