@@ -1,45 +1,25 @@
 from aocbase import readInput
-import re
 
-inp = readInput()
-#inp = "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"
+def intGen(inp):
+    for i in inp.strip().split():
+        yield int(i)
 
-s = list(map(int, inp.strip().split()))
-
-def buildTree(s):
-    d = dict()
-    d["nc"] = s[0]
-    d["nm"] = s[1]
-    d["c"] = []
-    s = s[2:]
-    for i in range(d["nc"]):
-        dc, s = buildTree(s)
-        d["c"].append(dc)
-    if d["nm"] == 0:
-        d["m"] == []
-    else:
-        d["m"] = s[:d["nm"]]
-        s = s[d["nm"]:]
-    return d, s
+def buildTree(it):
+    d = {"nc":it.__next__(), "nm":it.__next__(), "m":[]}
+    d["c"] = [buildTree(it) for i in range(d["nc"])]
+    d["m"] = [it.__next__() for i in range(d["nm"])]
+    return d
 
 def calcMeta(d):
-    sm = sum(d["m"])
-    for i in d["c"]:
-        sm += calcMeta(i)
-    return sm
+    return sum(d["m"]) + sum(map(calcMeta, d["c"]))
 
 def calcValue(d):
     if d["nc"] == 0:
         return sum(d["m"])
     else:
-        sm = 0
-        for i in d["m"]:
-            if 0 < i <= d["nc"]:
-                sm += calcValue(d["c"][i-1])
-        return sm
+        return sum([calcValue(d["c"][i-1]) for i in d["m"] if 0 < i <= d["nc"]])
 
-t, _ = buildTree(s)
-
+inp = readInput()
+t = buildTree(intGen(inp))
 print("Solution to day 8 part 1:", calcMeta(t))
-
 print("Solution to day 8 part 2:", calcValue(t))
