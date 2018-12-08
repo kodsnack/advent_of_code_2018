@@ -9,22 +9,39 @@ import (
 )
 
 type node struct {
-	id       int
 	children []node
 	meta     []int
+	sum      int
 }
 
-var check = 0
+func (n node) getSum() int {
+	s := n.sum
+	for i := 0; i < len(n.children); i++ {
+		s += n.children[i].getSum()
+	}
+	return s
+}
+
+func (n node) getSum2() int {
+	if len(n.children) == 0 {
+		return n.sum
+	}
+	s := 0
+	for i := 0; i < len(n.meta); i++ {
+		if n.meta[i] != 0 && n.meta[i] <= len(n.children) {
+			s += n.children[n.meta[i]-1].getSum2()
+		}
+	}
+	return s
+}
 
 func main() {
 	data, err := adventofcode2017.GetInput("day8.txt")
 	if err != nil {
 		panic(err)
 	}
-	//fmt.Println(parseData(data, 60))
-	list := parseInput(data)
-	makeNodes(list, 0)
-	fmt.Println(check)
+	_, n := makeNodes(parseInput(data), 0, node{})
+	fmt.Println(n.getSum(), n.getSum2())
 }
 
 func parseInput(str string) (list []int) {
@@ -36,21 +53,20 @@ func parseInput(str string) (list []int) {
 	return list
 }
 
-func makeNodes(list []int, pos int) int {
+func makeNodes(list []int, pos int, n node) (int, node) {
 	kids := list[pos]
 	metaNum := list[pos+1]
 	pos += 2
-
 	for i := 0; i < kids; i++ {
-		pos = makeNodes(list, pos)
+		child := node{}
+		pos, child = makeNodes(list, pos, child)
+		n.children = append(n.children, child)
 	}
 
 	for i := 0; i < metaNum; i++ {
-		//fmt.Println(list[pos])
-		check += list[pos]
+		n.sum += list[pos]
+		n.meta = append(n.meta, list[pos])
 		pos++
 	}
-	/*if kids == 0 {
-	}*/
-	return pos
+	return pos, n
 }
