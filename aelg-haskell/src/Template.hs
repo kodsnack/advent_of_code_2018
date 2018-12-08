@@ -1,6 +1,7 @@
 module Template ( solve ) where
 
 import           Control.Arrow
+import           Control.Monad
 import           Data.List
 import           Data.Monoid
 import qualified Data.Map.Strict as M
