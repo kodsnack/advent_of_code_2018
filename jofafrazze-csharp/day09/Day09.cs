@@ -7,9 +7,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace dayXX
+namespace day09
 {
-    class DayXX
+    class Day09
     {
         static int[] ReadInput()
         {
@@ -32,7 +32,7 @@ namespace dayXX
 
         static void Main(string[] args)
         {
-            Console.WriteLine("AoC 2018 - " + typeof(DayXX).Namespace + ":");
+            Console.WriteLine("AoC 2018 - " + typeof(Day09).Namespace + ":");
             PartA();
             PartB();
         }
