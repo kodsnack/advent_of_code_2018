@@ -35,20 +35,22 @@ def solve(d):
 			for x in range(last_time, minute):
 				guards[active].append(x)
 
-	longest = -1
+	most = -1
 	answer = -1
 
-	for guard, minutes in guards.items():
-		if len(minutes) <= longest:
-			continue
-			
-		longest = len(minutes)
+	for guard, minutes in guards.items():		
 		c = Counter(minutes)
-		candidate = c.most_common(1)[0][0]
-		answer = candidate * guard
+		candidate, count = c.most_common(1)[0]
+		if count > most:
+			most = count
+			answer = guard * candidate
 
 	return answer
 
-with open('input_4.txt') as f:
-	data = [line.rstrip() for line in f]
-	print(solve(data))
+def read_and_solve():
+	with open('input_4.txt') as f:
+		data = [line.rstrip() for line in f]
+		return solve(data)
+
+if __name__ == '__main__':
+	print(read_and_solve())
