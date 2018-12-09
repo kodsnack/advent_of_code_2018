@@ -7,37 +7,8 @@ import (
 	"strings"
 
 	"github.com/johansundell/advent_of_code_2017/johansundell-go/adventofcode2017"
+	"github.com/johansundell/advent_of_code_2018/johansundell-go/day9/ringints"
 )
-
-type stone struct {
-	id   int
-	prev *stone
-	next *stone
-}
-
-func newStone() *stone {
-	s := &stone{}
-	s.id = 0
-	s.next = s
-	s.prev = s
-	return s
-}
-
-func (s *stone) insert(stone *stone) *stone {
-	next := s.next
-	s.next = stone
-	stone.prev = s
-	stone.next = next
-	next.prev = stone
-	return stone
-}
-
-func (s *stone) remove() *stone {
-	next := s.next
-	s.next = next.next
-	s.next.prev = s
-	return next
-}
 
 func main() {
 	data, err := adventofcode2017.GetInput("day9.txt")
@@ -57,18 +28,18 @@ func parseInput(str string) (a, b int) {
 }
 
 func playGame(numElfes, last int) int {
-	curr := newStone()
+	curr := ringints.New()
 	elfes := make([]int, numElfes)
 	for i := 1; i <= last; i++ {
 		if (i)%23 == 0 {
 			for n := 0; n < 8; n++ {
-				curr = curr.prev
+				curr = curr.Prev
 			}
-			s := curr.remove()
-			curr = curr.next
-			elfes[i%numElfes] += i + s.id
+			s := curr.RemoveNext()
+			curr = curr.Next
+			elfes[i%numElfes] += i + s.Id
 		} else {
-			curr = curr.next.insert(&stone{id: i})
+			curr = curr.Next.Insert(&ringints.RingInt{Id: i})
 		}
 	}
 	sort.Sort(sort.Reverse(sort.IntSlice(elfes)))
