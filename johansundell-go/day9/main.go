@@ -59,16 +59,16 @@ func parseInput(str string) (a, b int) {
 func playGame(numElfes, last int) int {
 	curr := newStone()
 	elfes := make([]int, numElfes)
-	for i := 0; i < last; i++ {
-		if (i+1)%23 == 0 {
+	for i := 1; i <= last; i++ {
+		if (i)%23 == 0 {
 			for n := 0; n < 8; n++ {
 				curr = curr.prev
 			}
 			s := curr.remove()
 			curr = curr.next
-			elfes[i%numElfes] += i + 1 + s.id
+			elfes[i%numElfes] += i + s.id
 		} else {
-			curr = curr.next.insert(&stone{id: i + 1})
+			curr = curr.next.insert(&stone{id: i})
 		}
 	}
 	sort.Sort(sort.Reverse(sort.IntSlice(elfes)))
