@@ -1,10 +1,19 @@
-# Advent of code 2018
-Contribute your solutions to [Advent of Code 2018](https://adventofcode.com) and be inspired by others.
+## Usage
 
-Bidra med dina lösningar på problemen i Advent of code, i vilket språk du vill. Välj ett du kan, eller ett du vill lära dig!
+The following assume [Leiningen][lein] is installed.
 
-Vi har också en Slackkanal dit alla är välkomna att snacka Advent of code, eller egentligen allt mellan himmel och jord med lite koppling till kod. Maila info@kodsnack.se eller twittra din epost till @kodsnack så släpper vi in er.
+Run a single day:
 
-Dina lösningar får gärna checkas in i en mapp med namn på formen #användarnamn-språk#, så blir det lite lättare för alla att få överblick.
+    $ lein run 1
 
-Lösningarna kan komma att diskuteras i avsnitt av Kodsnack, så lägg med en readme.md med en notis om du inte vill riskera att bli omnämnd.
+Run a single day with your own input:
+
+    $ lein run 1 day1.txt
+    $ lein run 1 - < day1.txt
+
+Run all:
+
+    $ lein run
+
+
+[lein]: https://leiningen.org/
