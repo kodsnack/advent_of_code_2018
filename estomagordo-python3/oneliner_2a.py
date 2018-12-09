@@ -1,0 +1,1 @@
+print(sum(any(l[x]==l[x-1]and(x==len(l)-1 or l[x]!=l[x+1])and(x==1 or l[x]!=l[x-2])for x in range(1,len(l)))for l in map(sorted,open('input_2.txt')))*sum(any(l[x]==l[x-1]and l[x]==l[x+1]for x in range(1,len(l)-1))for l in map(sorted,open('input_2.txt'))))
