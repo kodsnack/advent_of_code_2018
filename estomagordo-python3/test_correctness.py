@@ -93,3 +93,15 @@ def test_8b():
     
     answer = day_8b.read_and_solve()
     assert(19276 == answer)
+
+def test_9a():
+    import day_9a
+
+    answer = day_9a.read_and_solve()
+    assert(428690 == answer)
+
+def test_9b():
+    import day_9b
+
+    answer = day_9b.read_and_solve()
+    assert(3628143500 == answer)
