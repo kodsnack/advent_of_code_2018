@@ -68,8 +68,7 @@ func playGame(numElfes, last int) int {
 			curr = curr.next
 			elfes[i%numElfes] += i + 1 + s.id
 		} else {
-			curr = curr.next
-			curr = curr.insert(&stone{id: i + 1})
+			curr = curr.next.insert(&stone{id: i + 1})
 		}
 	}
 	sort.Sort(sort.Reverse(sort.IntSlice(elfes)))
