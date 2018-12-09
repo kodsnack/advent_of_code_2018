@@ -1,33 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace day09
 {
+    static class CircularLinkedList
+    {
+        public static LinkedListNode<T> NextOrFirst<T>(this LinkedListNode<T> current)
+        {
+            return current.Next ?? current.List.First;
+        }
+
+        public static LinkedListNode<T> PreviousOrLast<T>(this LinkedListNode<T> current)
+        {
+            return current.Previous ?? current.List.Last;
+        }
+    }
+
     class Day09
     {
-        static int[] ReadInput()
+        static long PlayGame(int nPlayers, int lastMarble)
         {
-            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\input.txt");
-            StreamReader reader = File.OpenText(path);
-            string input = reader.ReadLine();
-            int[] data = { 0, 1, 2 };
-            return data;
+            long[] score = new long[nPlayers];
+            LinkedList<int> circle = new LinkedList<int>();
+            LinkedListNode<int> cPos = circle.AddFirst(0);
+            int marble = 1;
+            int player = 0;
+            for (int i = 1; i <= lastMarble; i++)
+            {
+                if (marble % 23 == 0)
+                {
+                    score[player] += marble;
+                    cPos = cPos.PreviousOrLast().PreviousOrLast().PreviousOrLast();
+                    cPos = cPos.PreviousOrLast().PreviousOrLast().PreviousOrLast();
+                    var scorePos = cPos;
+                    cPos = cPos.PreviousOrLast();
+                    circle.Remove(scorePos);
+                    score[player] += scorePos.Value;
+                }
+                else
+                {
+                    cPos = cPos.NextOrFirst().NextOrFirst();
+                    circle.AddAfter(cPos, marble);
+                }
+                marble++;
+                player = (player + 1) % nPlayers;
+            }
+            return score.Max();
         }
 
         static void PartA()
         {
-            Console.WriteLine("Part A: Result is " + 'A' + ".");
+            long score = PlayGame(419, 71052);
+            Console.WriteLine("Part A: Result is " + score + ".");
         }
 
         static void PartB()
         {
-            Console.WriteLine("Part B: Result is " + 'B' + ".");
+            long score = PlayGame(419, 71052 * 100);
+            Console.WriteLine("Part B: Result is " + score + ".");
         }
 
         static void Main(string[] args)
