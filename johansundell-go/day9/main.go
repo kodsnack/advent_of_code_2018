@@ -15,9 +15,9 @@ type stone struct {
 	next *stone
 }
 
-func newStone(i int) *stone {
+func newStone() *stone {
 	s := &stone{}
-	s.id = i
+	s.id = 0
 	s.next = s
 	s.prev = s
 	return s
@@ -57,7 +57,7 @@ func parseInput(str string) (a, b int) {
 }
 
 func playGame(numElfes, last int) int {
-	curr := newStone(0)
+	curr := newStone()
 	elfes := make([]int, numElfes)
 	for i := 0; i < last; i++ {
 		if (i+1)%23 == 0 {
