@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 int main() {
     int64_t ans1 = 0;
@@ -41,50 +42,50 @@ int main() {
         Node *prev;
     };
 
-    Node *current = new Node;
+    std::vector<Node> nodes(100*lastmarble+1);
+    Node * current = &nodes[0];
 
     current->value = 0;
     current->next = current;
     current->prev = current;
 
     std::vector<int64_t> score(players);
-    int firstmarble = 1;
-    for(int outer = 0; outer < 100; outer++) {
-        for (int i = firstmarble; i < lastmarble+firstmarble; i++) {
-            if (i % 23 == 0) {
-                int player = i % players;
-                score[player] += i;
-                for (int j = 0; j < 7; j++) {
-                    current = current->prev;
-                }
-                score[player] += current->value;
-                current->prev->next = current->next;
-                current->next->prev = current->prev;
-                auto tmp = current;
-                current = current->next;
-                delete tmp;
-            } else {
-                Node *n = new Node;
-                n->value = i;
-                current = current->next;
-                current = current->next;
 
-                auto prev = current->prev;
-                auto next = current->next;
-
-                prev->next = n;
-                n->next = current;
-
-                current->prev = n;
-                n->prev = prev;
-
-                current = n;
+    auto step = [&score, &nodes, players](int i, Node * current) -> Node* {
+        if (i % 23 == 0) {
+            int player = i % players;
+            score[player] += i;
+            for (int j = 0; j < 7; j++) {
+                current = current->prev;
             }
+            score[player] += current->value;
+            current->prev->next = current->next;
+            current->next->prev = current->prev;
+            current = current->next;
+        } else {
+            Node *n = &nodes[i];
+            n->value = i;
+            current = current->next->next;
+
+            current->prev->next = n;
+            n->next = current;
+
+            n->prev = current->prev;
+            current->prev = n;
+
+            current = n;
         }
-        if(!outer) {
-            ans1 = *std::max_element(score.begin(), score.end());
-        }
-        firstmarble += lastmarble;
+        return current;
+    };
+
+    int firstmarble = 1;
+    for (int i = firstmarble; i <= lastmarble; i++) {
+        current = step(i, current);
+    }
+    ans1 = *std::max_element(score.begin(), score.end());
+
+    for (int i = lastmarble+1; i <= 100*lastmarble; i++) {
+        current = step(i, current);
     }
     ans2 = *std::max_element(score.begin(), score.end());
 

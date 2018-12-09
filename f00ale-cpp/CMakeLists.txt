@@ -3,6 +3,9 @@ project(aoc18_f00ale)
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_compile_options($<$<BOOL:${SANITIZE}>:-fsanitize=address,leak>)
+add_link_options($<$<BOOL:${SANITIZE}>:-fsanitize=address,leak>)
+
 add_executable(template src/template.cpp)
 
 add_executable(p01 src/p01.cpp)
