@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 int main() {
     int64_t ans1 = 0;
@@ -66,17 +67,13 @@ int main() {
             } else {
                 Node *n = new Node;
                 n->value = i;
-                current = current->next;
-                current = current->next;
+                current = current->next->next;
 
-                auto prev = current->prev;
-                auto next = current->next;
-
-                prev->next = n;
+                current->prev->next = n;
                 n->next = current;
 
+                n->prev = current->prev;
                 current->prev = n;
-                n->prev = prev;
 
                 current = n;
             }
@@ -87,6 +84,15 @@ int main() {
         firstmarble += lastmarble;
     }
     ans2 = *std::max_element(score.begin(), score.end());
+
+    // cleanup
+    current->prev->next = nullptr;
+    while(current) {
+        auto tmp = current;
+        current = current->next;
+        delete tmp;
+    }
+
 
     std::cout << ans1 << std::endl;
     std::cout << ans2 << std::endl;
