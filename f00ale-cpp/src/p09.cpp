@@ -42,7 +42,8 @@ int main() {
         Node *prev;
     };
 
-    Node *current = new Node;
+    std::vector<Node> nodes(100*lastmarble+1);
+    Node * current = &nodes[0];
 
     current->value = 0;
     current->next = current;
@@ -61,11 +62,9 @@ int main() {
                 score[player] += current->value;
                 current->prev->next = current->next;
                 current->next->prev = current->prev;
-                auto tmp = current;
                 current = current->next;
-                delete tmp;
             } else {
-                Node *n = new Node;
+                Node *n = &nodes[i];
                 n->value = i;
                 current = current->next->next;
 
@@ -84,15 +83,6 @@ int main() {
         firstmarble += lastmarble;
     }
     ans2 = *std::max_element(score.begin(), score.end());
-
-    // cleanup
-    current->prev->next = nullptr;
-    while(current) {
-        auto tmp = current;
-        current = current->next;
-        delete tmp;
-    }
-
 
     std::cout << ans1 << std::endl;
     std::cout << ans2 << std::endl;
