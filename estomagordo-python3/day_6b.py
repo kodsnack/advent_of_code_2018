@@ -40,8 +40,8 @@ def solve(d):
     good = 0
     count = 0
 
-    for x in range(leftest - 350, rightest + 350):
-        for y in range(uppest - 350, lowest + 350):
+    for x in range(leftest, rightest):
+        for y in range(uppest, lowest):
             count += 1
             total = 0
             for coord in coords:
