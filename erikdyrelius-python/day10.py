@@ -2,11 +2,10 @@ from aocbase import readInput
 import re
 
 inp = readInput()
-p = re.compile(r"^position=<(-?\d+),\w+(-?\d+)> velocity=<\w*(-?\d+),\w*(-?\d+)>$")
+p = re.compile(r"-?\d+")
 
 def lineParse(s, f=lambda x:x):
-    t = (s[10:16], s[18:24], s[36:38], s[39:42])
-    return tuple(map(f, t))
+    return tuple(map(f, p.findall(s)))
 
 def fileParse(inp, f=lineParse, ff=lambda x:x):
     return list(map(lambda x, fx=ff:f(x, fx), inp.splitlines()))
@@ -19,8 +18,8 @@ def findMsg(p):
         mxx = max(map(lambda x:x[0], p1))
         mny = min(map(lambda x:x[1], p1))
         mxy = max(map(lambda x:x[1], p1))
-        if (mxx-mnx+mxy-mny < 100):
-            print("Time:",t)
+        if (mxx-mnx+mxy-mny < 80):
+            print("Solution to day 10 part 1:")
             for y in range(mny, mxy+1):
                 for x in range(mnx, mxx+1):
                     if (x,y) in p1:
@@ -28,11 +27,9 @@ def findMsg(p):
                     else:
                         print(".", end='')
                 print()
-        if t>20000:
+            print("Solution to day 10 part 2:",t)
             break
         t += 1
             
 points = fileParse(inp, ff=int)
 findMsg(points)
-print("Solution to day 10 part 1:", 10.1)
-print("Solution to day 10 part 2:", 10.2)
