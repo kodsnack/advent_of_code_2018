@@ -1,4 +1,4 @@
-/* REXX */
+/* Advent of code 2018, day 8, part 2 in ANSI REXX */
 fn = 'day8.txt'
 line = linein(fn)
 say node()
