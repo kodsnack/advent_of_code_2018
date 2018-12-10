@@ -1,4 +1,4 @@
-/* REXX */
+/* Advent of code 2018, day 6, part 2 in ANSI REXX */
 fn = 'day6.txt'
 map. = '.'
 h = 0; b = 0
@@ -17,7 +17,6 @@ do queued()
 	t = min(t,y)
 	queue x y
 end
-say v h t b
 
 size = 0
 do y = 0 to b
@@ -27,10 +26,6 @@ do y = 0 to b
 end
 say size
 exit
-
-delta:
-arg x1,y1,x2,y2
-return abs(x1 - x2) + abs(y1 - y2)
 
 sum_delta: procedure expose b h
 arg rx,ry
@@ -43,12 +38,3 @@ do queued()
 	d = d + dx + dy
 end
 return d
-
-show: procedure expose map. v h t b
-do y = 0 to b
-	line = ''
-	do x = 0 to h + 1
-		line = line || map.y.x
-	end
-	say line
-end
