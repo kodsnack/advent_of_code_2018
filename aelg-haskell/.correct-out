@@ -25,3 +25,17 @@ Day 8:
 Day 9:
   409832
   3469562780
+Day 10:
+  
+XXXXX   XXXXX   X    X  X    X  X    X  XXXXXX  XXXXXX  XXXXX 
+X    X  X    X  XX   X  XX   X  X    X  X            X  X    X
+X    X  X    X  XX   X  XX   X   X  X   X            X  X    X
+X    X  X    X  X X  X  X X  X   X  X   X           X   X    X
+XXXXX   XXXXX   X X  X  X X  X    XX    XXXXX      X    XXXXX 
+X  X    X       X  X X  X  X X    XX    X         X     X  X  
+X   X   X       X  X X  X  X X   X  X   X        X      X   X 
+X   X   X       X   XX  X   XX   X  X   X       X       X   X 
+X    X  X       X   XX  X   XX  X    X  X       X       X    X
+X    X  X       X    X  X    X  X    X  X       XXXXXX  X    X
+
+  10946
