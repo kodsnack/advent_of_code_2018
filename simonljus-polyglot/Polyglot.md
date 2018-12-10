@@ -17,3 +17,12 @@ Ruby
 
 ## Dag 5
 Ruby
+
+## Dag 6
+Ruby
+
+## Dag 7
+Ruby
+
+## Dag 8
+Ruby

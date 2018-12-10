@@ -1,23 +1,19 @@
 module Day08 ( solve ) where
 
 import           Control.Arrow
+import           Control.Monad
 import           Text.ParserCombinators.ReadP
 import qualified Parsing as P
 
 data Tree = Tree [Tree] [Int] deriving Show
 
-parseMetadata = do
-  m <- P.integer
-  char ' '
-  return m
+parseMetadata = P.integerAnd $ char ' '
 
 parseTree = do
-  nChilds <- P.integer
-  char ' '
-  nMetadata <- P.integer
-  char ' '
-  childs <- sequence $ replicate nChilds parseTree
-  metadata <- sequence $ replicate nMetadata parseMetadata
+  nChilds <- P.integerAnd $ char ' '
+  nMetadata <- P.integerAnd $ char ' '
+  childs <- replicateM nChilds parseTree
+  metadata <- replicateM nMetadata parseMetadata
   return $ Tree childs metadata
 
 parse = head . map (P.run parseTree . (++ " "))
