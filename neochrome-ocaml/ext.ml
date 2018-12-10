@@ -51,22 +51,29 @@ module List = struct
 
   let reject f = filter (fun x -> not (f x))
 
-  let min items =
-    let rec search items =
-      match items with
+  let min =
+    let rec search = function
       | [] -> failwith "min requires a non-empty list"
       | [x] -> x
-      | x :: tail -> min x @@ search tail
-    in
-    search items
+      | x :: xs -> Pervasives.min x (search xs)
+    in search
 
-  let max items =
+  let max =
     let rec search = function
       | [] -> failwith "a non-empty list is required"
       | [x] -> x
-      | x :: tail -> Pervasives.max x (search tail)
-    in
-    search items
+      | x :: xs -> Pervasives.max x (search xs)
+    in search
+
+  let minmax cmp xs =
+    let min a b = if cmp a b < 0 then a else b in
+    let max a b = if cmp b a < 0 then a else b in
+    let rec search mi ma = function
+      | [] -> mi,ma
+      | x :: xs -> search (min mi x) (max ma x) xs
+    in match xs with
+    | [] -> failwith "a non-empty list is required"
+    | x :: xs -> search x x xs
 
   let minf f xs =
     let minf a b = if f a < f b then a else b in
@@ -112,4 +119,16 @@ module Map = struct
         | Some (_,max) -> max
 
   end
+end
+
+module Range = struct
+
+  let rec iter b e f =
+    if b > e then ()
+    else begin f (b); iter (b + 1) e f end
+
+  let rec fold b e f a =
+    if b > e then a
+    else fold (b + 1) e f (f a b)
+
 end
