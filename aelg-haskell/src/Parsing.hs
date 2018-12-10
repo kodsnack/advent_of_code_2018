@@ -8,7 +8,7 @@ import           Text.ParserCombinators.ReadP
 import           Data.Char
 
 integer :: ReadP Int
-integer = read <$> many1 (satisfy isDigit)
+integer = skipSpaces >> read <$> ((++) <$> option "" (string "-") <*> many1 (satisfy isDigit))
 
 integerAnd :: ReadP a -> ReadP Int
 integerAnd r = integer >>= \n -> r >> return n
