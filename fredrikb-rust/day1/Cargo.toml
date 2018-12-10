@@ -1,0 +1,11 @@
+[package]
+name = "day1"
+version = "0.1.0"
+authors = ["Fredrik Broman <fredrik.broman@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+
+[[bin]]
+name = "day1"
+path = "src/main.rs"
