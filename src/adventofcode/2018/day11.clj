@@ -9,7 +9,6 @@
   (mod (int (/ x 100)) 10))
 
 (defn power-level [serial [x y]]
-
   (->> [x y]
     (apply rack-id)
     (* y)
@@ -34,25 +33,114 @@
 (defn sqgrid [minx miny size]
   (grid minx (+ minx size) miny (+ miny size)))
 
-(defn total-power-level [serial [x y]]
-  (let [coords (sqgrid x y 3)]
+(defn transpose [& colls]
+  (apply map vector colls)
+  )
+
+(defn to-map [pairs]
+  (->> pairs
+    (apply transpose)
+    (apply zipmap)
+  ))
+
+(defn to-grid-map [f grid]
+  (to-map
+    (for [[x y] grid]
+      [[x y] (f [x y])])
+  ))
+
+(defn zero-power-grid []
+  (to-grid-map (fn [_] 0) (sqgrid 1 1 300)))
+
+(defn power-grid [serial]
+  (to-grid-map (partial power-level serial) (sqgrid 1 1 300)))
+
+(defn region-border-coords [size [x y]]
+  (let [maxx (dec (+ size x))
+        maxy (dec (+ size y))
+        xs (range x (inc maxx))
+        ys (range y (inc maxy))
+        coords (concat
+                 (map #(vector % maxy) xs)
+                 (map #(vector maxx %) ys)
+                 )
+        ]
+    (butlast coords)
+  ))
+
+(defn sum-border [pg size [x y]]
+  (let [coords (region-border-coords size [x y])
+        ]
     (->> coords
-      (map (partial power-level serial))
+      (map pg)
       (reduce +)
       )
+  ))
+
+(defn next-total-power-grid [pg prev-totpg size]
+  (to-grid-map
+    (fn [[x y]] (+ (prev-totpg [x y]) (sum-border pg size [x y])))
+    (sqgrid 1 1 (- 301 size))
     ))
 
-(defn solve-a [lines]
-  (let [serial (grid-serial-number lines)
-        [x y] (apply max-key (partial total-power-level serial) (sqgrid 1 1 298))
-        ]
-    (str x "," y)))
+(defn total-power-grid [size pg]
+  (if (= 1 size)
+    pg
+    (next-total-power-grid pg (total-power-grid (dec size) pg) size)
+    ))
 
-(defn solve-b [lines]
-  "hej")
+(defn triplet [size [x y]]
+  [x y size])
+
+(defn max-triplet [grid size]
+  (->> (sqgrid 1 1 (- 301 size))
+    (apply max-key grid)
+    (triplet size)
+  ))
+
+(defn solve-a [pg]
+  (let [totpg (total-power-grid 3 pg)]
+    (apply max-key totpg (sqgrid 1 1 298))
+    ))
+
+(defn solve-b [pg]
+  (loop [[size & rest-sizes] (range 1 301)
+         max-value (pg [1 1])
+         max-tripl [1 1 1]
+         prev-totpg (zero-power-grid)
+         ]
+    (if (nil? size)
+      max-tripl
+      (let [totpg (next-total-power-grid pg prev-totpg size)
+            maxtrip (max-triplet totpg size)
+            [x y size] maxtrip
+            maxval (totpg [x y])
+            ]
+        (if (> maxval max-value)
+          (recur
+            rest-sizes
+            maxval
+            maxtrip
+            totpg
+            )
+          (recur
+            rest-sizes
+            max-value
+            max-tripl
+            totpg
+            )
+        )
+      )
+    )
+  )
+)
 
 (defn run [input-lines & args]
-  { :A (solve-a input-lines)
-   :B (solve-b input-lines)
-   }
+  (let [serial (grid-serial-number input-lines)
+        pg (power-grid serial)
+        ]
+    { :A (clojure.string/join "," (solve-a pg))
+     :B (clojure.string/join "," (solve-b pg))
+     }
   )
+)
