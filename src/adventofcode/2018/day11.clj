@@ -37,6 +37,18 @@
   (apply map vector colls)
   )
 
+(defn cumsum [coll] (reductions + 0 coll))
+
+(defn row-add [row1 row2] (mapv + row1 row2))
+
+(defn sum-grid [rows]
+  (->> rows
+       (mapv cumsum)
+       (reductions row-add (take (inc (count (first rows))) (repeat 0)))
+       (map #(apply vector %))
+       (apply vector)
+       ))
+
 (defn to-map [pairs]
   (->> pairs
     (apply transpose)
@@ -54,6 +66,12 @@
 
 (defn power-grid [serial]
   (to-grid-map (partial power-level serial) (sqgrid 1 1 300)))
+
+(defn power-grid-rows [serial]
+  (mapv (fn [y]
+          (mapv #(power-level serial [% y]) (range 1 301)))
+        (range 1 301)
+        ))
 
 (defn region-border-coords [size [x y]]
   (let [maxx (dec (+ size x))
@@ -77,6 +95,16 @@
       )
   ))
 
+(defn square-sum [sumgrid [x y size]]
+  (let [xi (dec x)
+        yi (dec y)
+        sg (fn [x y] (get-in sumgrid [y x]))]
+    (-
+     (+ (sg xi yi)          (sg (+ xi size) (+ yi size)))
+     (+ (sg (+ xi size) yi) (sg xi (+ yi size)))
+    )
+  ))
+
 (defn next-total-power-grid [pg prev-totpg size]
   (to-grid-map
     (fn [[x y]] (+ (prev-totpg [x y]) (sum-border pg size [x y])))
@@ -98,10 +126,11 @@
     (triplet size)
   ))
 
-(defn solve-a [pg]
-  (let [totpg (total-power-grid 3 pg)]
-    (apply max-key totpg (sqgrid 1 1 298))
-    ))
+(defn solve-a [sumgrid]
+  (apply max-key
+         (fn [[x y]] (square-sum sumgrid [x y 3]))
+         (sqgrid 1 1 298)
+         ))
 
 (defn solve-b [pg]
   (loop [[size & rest-sizes] (range 1 301)
@@ -138,8 +167,10 @@
 (defn run [input-lines & args]
   (let [serial (grid-serial-number input-lines)
         pg (power-grid serial)
+        pg-rows (power-grid-rows serial)
+        sumgrid (sum-grid pg-rows)
         ]
-    { :A (clojure.string/join "," (solve-a pg))
+    { :A (clojure.string/join "," (solve-a sumgrid))
      :B (clojure.string/join "," (solve-b pg))
      }
   )
