@@ -6,15 +6,6 @@ namespace day11
 {
     class Day11
     {
-        static int[] ReadInput()
-        {
-            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\input.txt");
-            StreamReader reader = File.OpenText(path);
-            string input = reader.ReadLine();
-            int[] data = { 0, 1, 2 };
-            return data;
-        }
-
         static int CellValue(int x, int y, int serial)
         {
             int r = x + 10;
@@ -39,13 +30,14 @@ namespace day11
         }
 
         public static readonly int serial = 4151;
-        public static int[,] fuelCells = new int[300, 300];
+        public static readonly int fSize = 300;
+        public static int[,] fuelCells = new int[fSize, fSize];
 
         static void PartA()
         {
-            for (int x = 0; x < 300; x++)
+            for (int x = 0; x < fSize; x++)
             {
-                for (int y = 0; y < 300; y++)
+                for (int y = 0; y < fSize; y++)
                 {
                     fuelCells[x, y] = CellValue(x + 1, y + 1, serial);
                 }
@@ -53,11 +45,13 @@ namespace day11
             int xMax = 0;
             int yMax = 0;
             int sumMax = 0;
-            for (int x = 0; x < 298; x++)
+            const int wSize = 3;
+            int xyMax = fSize - wSize + 1;
+            for (int x = 0; x < xyMax; x++)
             {
-                for (int y = 0; y < 298; y++)
+                for (int y = 0; y < xyMax; y++)
                 {
-                    int sum = SumCells(ref fuelCells, x, y, 3);
+                    int sum = SumCells(ref fuelCells, x, y, wSize);
                     if (sum > sumMax)
                     {
                         sumMax = sum;
@@ -69,7 +63,7 @@ namespace day11
             Console.WriteLine("Part A: Result is " + (xMax + 1) + "," + (yMax + 1) + ".");
         }
 
-        static int SumCellsZoom(ref int[,,] cells, int x, int y, int size, int origSize, int depth = 9)
+        static int SumCellsZoom(ref int[,,] cells, int x, int y, int size, int origSize, int depth)
         {
             int sum = 0;
             if (size == 1)
@@ -110,20 +104,22 @@ namespace day11
 
         static void PartB()
         {
-            int[,,] cells = new int[10, 512, 512];
-            for (int x = 0; x < 300; x++)
+            int depth = (int) Math.Ceiling(Math.Log(fSize, 2));
+            int gSize = (int) Math.Pow(2, depth);
+            int[,,] cells = new int[depth + 1, gSize, gSize];
+            for (int x = 0; x < fSize; x++)
             {
-                for (int y = 0; y < 300; y++)
+                for (int y = 0; y < fSize; y++)
                 {
-                    cells[9, x, y] = CellValue(x + 1, y + 1, serial);
+                    cells[depth, x, y] = CellValue(x + 1, y + 1, serial);
                 }
             }
-            int size = 256;
-            for (int d = 8; d >= 0; d--)
+            int size = gSize / 2;
+            for (int d = depth - 1; d >= 0; d--)
             {
                 for (int x = 0; x < size; x++)
                 {
-                    for (int y = 0; y < 300; y++)
+                    for (int y = 0; y < fSize; y++)
                     {
                         int sum = 0;
                         for (int a = 0; a < 2; a++)
@@ -140,21 +136,16 @@ namespace day11
             int sMax = 0;
             int sumMax = 0;
             const int sStart = 1;
-            const int sStop = 300;
+            int sStop = fSize;
             for (int s = sStart; s <= sStop; s++)
             {
-                for (int x = 0; x < 300 - s; x++)
+                int xyMax = fSize - s + 1;
+                for (int x = 0; x < xyMax; x++)
                 {
-                    for (int y = 0; y < 300 - s; y++)
+                    for (int y = 0; y < xyMax; y++)
                     {
-                        int sum = SumCellsZoom(ref cells, x, y, s, s);
-                        /*
-                        int vSum = SumCells(ref fuelCells, x, y, s);
-                        if (sum != vSum)
-                        {
-                            int a = 4711;
-                        }
-                        */
+                        int sum = SumCellsZoom(ref cells, x, y, s, s, depth);
+                        //int sum = SumCells(ref fuelCells, x, y, s);
                         if (sum > sumMax)
                         {
                             sumMax = sum;
