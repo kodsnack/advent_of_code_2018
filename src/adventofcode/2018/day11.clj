@@ -23,10 +23,10 @@
   (mapcat (fn [x] (map #(vector x %) ys)) xs
   ))
 
-(defn grid [minx maxx miny maxy]
+(defn grid [minx-in maxx-ex miny-in maxy-ex]
   (cartprod
-    (take (- maxx minx) (iterate inc minx))
-    (take (- maxy miny) (iterate inc miny))
+    (range minx-in maxx-ex)
+    (range miny-in maxy-ex)
   ))
 
 (defn total-power-level [serial [x y]]
