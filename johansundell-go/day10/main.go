@@ -70,12 +70,6 @@ func print(list points) (str string) {
 	minX := list[0].position.x
 	sort.Slice(list, func(i, j int) bool { return list[i].position.x > list[j].position.x })
 	maxX := list[0].position.x
-
-	//diffX = maxX - minX
-	//diffY = maxY - minY
-	//fmt.Println(list[0])
-	//debug := make([]pair, 0)
-	//foundMessage := false
 	for i := minY; i <= maxY; i++ {
 		s := ""
 		for n := minX; n <= maxX; n++ {
@@ -83,14 +77,11 @@ func print(list points) (str string) {
 			_, found := area[p]
 			if found {
 				s += "#"
-				//debug = append(debug, p)
 			} else {
 				s += "."
 			}
 		}
 		str += s + "\n"
-		//fmt.Println(debug)
-
 	}
 	return
 }
@@ -101,7 +92,6 @@ func main() {
 		panic(err)
 	}
 	input := parseInput(data)
-	fmt.Println("input done")
 	walkSecond(input)
 }
 
@@ -110,15 +100,12 @@ func parseInput(input string) (list points) {
 	for scan.Scan() {
 		x, y, moveX, moveY := 0, 0, 0, 0
 		fmt.Sscanf(scan.Text(), "position=<%d, %d> velocity=<%d, %d>", &x, &y, &moveX, &moveY)
-		//fmt.Println(x, y, moveX, moveY)
 		list = append(list, newPoint(x, y, moveX, moveY))
 	}
 	return
 }
 
 func walkSecond(list points) {
-	//print(list)
-	//maxX, maxY = 0
 	diffX := math.MaxInt64
 	diffY := math.MaxInt64
 	str := ""
@@ -126,19 +113,13 @@ func walkSecond(list points) {
 	for n := 0; ; n++ {
 		for i := 0; i < len(list); i++ {
 			list[i] = list[i].move()
-			//fmt.Println("Done")
 		}
-		//s, _, _ := print(list)
-		//fmt.Println("Done", n, s)
 		x, y := getMinValues(list)
-		/*s, x, y := print(list)*/
 		if x > diffX && y > diffY {
-			//fmt.Println(str)
 			for i := 0; i < len(list); i++ {
 				list[i] = list[i].back()
-				//fmt.Println("Done")
 			}
-			fmt.Println("found it", n)
+			fmt.Println("found it after", n, "sec")
 			fmt.Println(print(list))
 			break
 		}
