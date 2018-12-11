@@ -54,10 +54,10 @@
 (defn square-sum [sumgrid [x y size]]
   (let [xi (dec x)
         yi (dec y)
-        sg (fn [x y] (get-in sumgrid [y x]))]
+        ]
     (-
-     (+ (sg xi yi)          (sg (+ xi size) (+ yi size)))
-     (+ (sg (+ xi size) yi) (sg xi (+ yi size)))
+     (+ ((sumgrid yi) xi)          ((sumgrid (+ yi size)) (+ xi size)))
+     (+ ((sumgrid yi) (+ xi size)) ((sumgrid (+ yi size)) xi))
     )
   ))
 
