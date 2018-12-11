@@ -31,11 +31,11 @@
     (range miny-in maxy-ex)
   ))
 
-(defn sqgrid [min-in max-ex]
-  (grid min-in max-ex min-in max-ex))
+(defn sqgrid [minx miny size]
+  (grid minx (+ minx size) miny (+ miny size)))
 
 (defn total-power-level [serial [x y]]
-  (let [coords (grid x (+ x 3) y (+ y 3))]
+  (let [coords (sqgrid x y 3)]
     (->> coords
       (map (partial power-level serial))
       (reduce +)
@@ -44,7 +44,7 @@
 
 (defn solve-a [lines]
   (let [serial (grid-serial-number lines)
-        [x y] (apply max-key (partial total-power-level serial) (sqgrid 1 299))
+        [x y] (apply max-key (partial total-power-level serial) (sqgrid 1 1 298))
         ]
     (str x "," y)))
 
