@@ -15,3 +15,13 @@
         ]
     numbers
 ))
+
+(defn transpose [& colls]
+  (apply map vector colls)
+  )
+
+(defn to-map [pairs]
+  (->> pairs
+       (apply transpose)
+       (apply zipmap)
+       ))
