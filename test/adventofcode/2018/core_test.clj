@@ -20,7 +20,7 @@
   8  { :A nil, :B nil }
   9  { :A nil, :B nil }
   10 { :A nil, :B nil }
-  11 { :A nil, :B nil }
+  11 { :A "20,68", :B "231,273,16" }
   12 { :A nil, :B nil }
   13 { :A nil, :B nil }
   14 { :A nil, :B nil }
