@@ -20,8 +20,10 @@
     ))
 
 (defn cartprod [xs ys]
-  (mapcat (fn [x] (map #(vector x %) ys)) xs
-  ))
+  (for [x xs
+        y ys]
+    [x y]
+    ))
 
 (defn grid [minx-in maxx-ex miny-in maxy-ex]
   (cartprod
