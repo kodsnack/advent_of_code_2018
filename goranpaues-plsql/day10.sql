@@ -1,21 +1,21 @@
 create table input
 ( 
   id number generated always as identity,
-  message varchar2(4000)
+  message varchar2(200)
 )
 /
 
 create table output
 (   
   id number generated always as identity,
-  message varchar2(4000)
+  message varchar2(200)
 )
 /
 
 create or replace package pkg_advcode
 is
-    TYPE strings_aat IS TABLE OF varchar2(200)
-    INDEX BY PLS_INTEGER; 
+    type strings_aat is table of varchar2(200)
+    index by pls_integer; 
     
     type chart_tt is table of strings_aat
     index by pls_integer;
@@ -49,13 +49,12 @@ is
         l_strings strings_aat;
         l_points points_tt;
         l_chart chart_tt;
-        l_line varchar2(4000) := null;
+        l_line varchar2(200);
         l_second number := 0;
-        l_connected boolean := true;
-        l_min_x number := 0;
-        l_max_x number := 0;
-        l_min_y number := 0;
-        l_max_y number := 0;
+        l_min_x number;
+        l_max_x number;
+        l_min_y number;
+        l_max_y number;
     begin
         select message bulk collect into l_strings from input;
         
@@ -94,10 +93,7 @@ is
             l_line := null;
             for cx in l_min_x..l_max_x loop
                 if l_chart.exists(cx) and l_chart(cx).exists(cy) then 
-                    if l_chart(cx)(cy) is not null then
-                        l_line := l_line || '#';
-                    else l_line := l_line || '.';
-                    end if;
+                    l_line := l_line || '#';
                 else l_line := l_line || '.';
                 end if;
             end loop;
@@ -105,16 +101,6 @@ is
         end loop;
         
         return l_second;
-    end;
-
-    function part2
-    return varchar2
-    is
-        l_strings strings_aat;
-        
-    begin
-        select message bulk collect into l_strings from input;
-        return 'true';
     end;
 
     procedure doit
