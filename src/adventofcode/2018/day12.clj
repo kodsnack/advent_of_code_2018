@@ -1,0 +1,101 @@
+(ns adventofcode.2018.day12
+  (:require clojure.string))
+
+(defn today-lines [] (adventofcode.2018.core/day-lines 12))
+(def lines (today-lines))
+(defn runme [] (run (today-lines)))
+
+(defn string-to-bools [state-string]
+  (mapv #(= \# %) state-string))
+
+(defn bools-to-set [first-index state-vec]
+  (->> state-vec
+       (map-indexed vector)
+       (filter second)
+       (map first)
+       (map #(+ first-index %))
+       (set)
+       )
+  )
+
+(defn set-to-bools [state-set]
+  (let [mini (apply min state-set)
+        maxi (apply max state-set)
+        ]
+    [mini
+     (->> (range mini (inc maxi))
+          (mapv #(contains? state-set %))
+          )
+     ]
+     ))
+
+(defn parse-input [lines]
+  {
+   :init (as-> lines $
+          (first $)
+          (clojure.string/split $ #": ")
+          (last $)
+          (string-to-bools $)
+          (bools-to-set 0 $)
+          )
+   :updates (as-> lines $
+              (drop 2 $)
+              (map #(clojure.string/split % #"\s*=>\s*") $)
+              (reduce (fn [result [from to]] (assoc result (string-to-bools from) (= "#" to))) {} $)
+              )
+   }
+  )
+
+(defn update-state [updates state-set]
+  (let [[start-i state-vec] (set-to-bools state-set)
+        updated-vec (->> (concat [false false false false] state-vec [false false false false])
+                         (partition 5 1)
+                         (map updates)
+                         )
+        new-start-i (- start-i 2)
+        ]
+    (bools-to-set new-start-i updated-vec)
+    ))
+
+(defn format-state [state-set]
+  (let [
+        [start-i state-vec] (set-to-bools state-set)
+        ]
+    [start-i
+     (clojure.string/join (map #(if % \# \.) state-vec))
+     ]
+    )
+  )
+
+(defn print-states [state-sets]
+  (let [formatted-states (map format-state state-sets)
+        min-start-index (apply min (map first formatted-states))
+        ]
+    (do
+      (println (str "    " (apply str (repeat min-start-index " ")) "          1         2         3"))
+      (println (str "    " (apply str (repeat min-start-index " ")) "0         0         0         0"))
+      (doseq [[n [start-i state-str]] (map-indexed vector formatted-states)
+              :let [pad-length (- start-i min-start-index)
+                    padding (apply str (repeat pad-length \.))
+                    ]
+              ]
+        (println (clojure.core/format "%2d: %s%s" n padding state-str))
+        ))))
+
+(defn solve-a [lines]
+  (let [{init :init updates :updates} (parse-input lines)]
+    (as-> init $
+         (iterate (partial update-state updates) $)
+         (nth $ 20)
+         (reduce + $)
+         )
+    ))
+
+(defn solve-b [lines]
+  "hej")
+
+(defn run [input-lines & args]
+  { :A (solve-a input-lines)
+    :B (solve-b input-lines)
+    }
+)
