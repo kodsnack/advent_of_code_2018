@@ -37,7 +37,7 @@ int calc2(const Node &n) {
         }
     } else {
         for(auto d : n.data) {
-            if(d <= n.children.size()) {
+            if(d <= (int)n.children.size()) {
                 // we could memorize the sub-data, but things go fast enough without memorization
                 ret += calc2(n.children[d - 1]);
             }

@@ -45,10 +45,10 @@ int main() {
     for(const auto & c : claims) {
         for (int y = c[1]; y < c[1] + c[3]; y++) {
             fabric.reserve(c[1] + c[3] + 1);
-            while (y >= fabric.size()) fabric.emplace_back();
+            while (y >= (int)fabric.size()) fabric.emplace_back();
             for (int x = c[2]; x < c[2] + c[4]; x++) {
                 fabric[y].reserve(c[2] + c[4] + 1);
-                while (x >= fabric[y].size()) fabric[y].emplace_back(0);
+                while (x >= (int)fabric[y].size()) fabric[y].emplace_back(0);
                 fabric[y][x]++;
             }
         }
