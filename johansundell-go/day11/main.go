@@ -18,9 +18,9 @@ func (c cell) power(serial int) int {
 	return i - 5
 }
 
-func (c cell) getAreaSum(serial int) (tot int) {
-	for i := 0; i < 3; i++ {
-		for n := 0; n < 3; n++ {
+func (c cell) getAreaSum(serial, dial int) (tot int) {
+	for i := 0; i < dial; i++ {
+		for n := 0; n < dial; n++ {
 			tot += (cell{x: c.x + n, y: c.y + i}).power(serial)
 		}
 	}
@@ -28,17 +28,31 @@ func (c cell) getAreaSum(serial int) (tot int) {
 }
 
 func main() {
-	fmt.Println(getLargestPowerArea(4842))
+	fmt.Println(getLargestPowerArea(4842, 3))
+	fmt.Println(moveTheDial(4842))
 }
 
-func getLargestPowerArea(serial int) (x, y, top int) {
-	for i := 1; i < 297; i++ {
-		for n := 1; n < 297; n++ {
-			if sum := (cell{x: n, y: i}).getAreaSum(serial); sum > top {
+func getLargestPowerArea(serial, dial int) (x, y, top int) {
+	size := 300
+	for i := 1; i < size-dial; i++ {
+		for n := 1; n < size-dial; n++ {
+			if sum := (cell{x: n, y: i}).getAreaSum(serial, dial); sum > top {
 				x = n
 				y = i
 				top = sum
 			}
+		}
+	}
+	return
+}
+
+func moveTheDial(serial int) (x, y, top, dial int) {
+	for i := 0; i < 25; i++ {
+		if a, b, t := getLargestPowerArea(serial, i); t > top {
+			top = t
+			x = a
+			y = b
+			dial = i
 		}
 	}
 	return
