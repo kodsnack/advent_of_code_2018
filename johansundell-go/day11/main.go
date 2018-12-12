@@ -73,8 +73,6 @@ func moveTheDialWithChannels(serial int) answer {
 	for i := 0; i < testSize; i++ {
 		list[i] = (<-answ)
 	}
-	sort.Slice(list, func(i, j int) bool {
-		return list[i].top > list[j].top
-	})
+	sort.Slice(list, func(i, j int) bool { return list[i].top > list[j].top })
 	return list[0]
 }
