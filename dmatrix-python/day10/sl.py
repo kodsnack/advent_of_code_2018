@@ -1,9 +1,11 @@
 import re
 
+
 def parse(lines):
     d = []
     for line in lines:
-        d.append(list(map(int, list(filter(None, re.findall(r"-?\d*", line))))))
+        d.append(
+            list(map(int, list(filter(None, re.findall(r"-?\d*", line))))))
     return d
 
 
@@ -17,8 +19,8 @@ def move(d):
 def pp(d, maxx, minx, maxy, miny):
     set_of_points = set()
     for x, y, dx, dy in d:
-        set_of_points.add((x, y))   
-        
+        set_of_points.add((x, y))
+
     ln = []
     for y in range(maxy - miny + 1):
         ln.append(['.'] * (maxx - minx + 1))
@@ -43,19 +45,19 @@ def part1(d):
         if maxy - miny < letter_height:
             return pp(d, maxx, minx, maxy, miny)
 
+
 def part2(d):
     letter_height = 10
     sec = 0
     while True:
         move(d)
         sec += 1
-        maxx = max(pnt[0] for pnt in d)
-        minx = min(pnt[0] for pnt in d)
         maxy = max(pnt[1] for pnt in d)
         miny = min(pnt[1] for pnt in d)
 
         if maxy - miny < letter_height:
             return sec
+
 
 if __name__ == "__main__":
     with open("input.txt") as f:
