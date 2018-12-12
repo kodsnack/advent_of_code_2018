@@ -122,3 +122,41 @@ def test_9b():
 
     answer = day_9b.read_and_solve()
     assert(3628143500 == answer)
+
+
+def test_10a():
+    import day_10a
+
+    answer = day_10a.read_and_solve()
+    expected = """xxxxx---xxxxx---x----x--x----x--x----x--xxxxxx--xxxxxx--xxxxx-
+x----x--x----x--xx---x--xx---x--x----x--x------------x--x----x
+x----x--x----x--xx---x--xx---x---x--x---x------------x--x----x
+x----x--x----x--x-x--x--x-x--x---x--x---x-----------x---x----x
+xxxxx---xxxxx---x-x--x--x-x--x----xx----xxxxx------x----xxxxx-
+x--x----x-------x--x-x--x--x-x----xx----x---------x-----x--x--
+x---x---x-------x--x-x--x--x-x---x--x---x--------x------x---x-
+x---x---x-------x---xx--x---xx---x--x---x-------x-------x---x-
+x----x--x-------x---xx--x---xx--x----x--x-------x-------x----x
+x----x--x-------x----x--x----x--x----x--x-------xxxxxx--x----x"""
+    assert(expected == answer)
+
+
+def test_10b():
+    import day_10b
+
+    answer = day_10b.read_and_solve()
+    assert(10946 == answer)
+
+
+def test_11a():
+    import day_11a
+
+    answer = day_11a.read_and_solve()
+    assert('243,72' == answer)
+
+
+def test_11b():
+    import day_11b
+
+    answer = day_11b.read_and_solve()
+    assert('229,192,11' == answer)
