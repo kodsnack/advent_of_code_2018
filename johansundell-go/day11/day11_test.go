@@ -31,3 +31,21 @@ func Test_Ext4(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func Test_Ext5(t *testing.T) {
+	if i := (cell{x: 33, y: 45}).getAreaSum(18); i != 29 {
+		t.Fail()
+	}
+}
+
+func Test_Ext6(t *testing.T) {
+	if x, y, sum := getLargestPowerArea(18); x != 33 || y != 45 || sum != 29 {
+		t.Fail()
+	}
+}
+
+func Test_Ext7(t *testing.T) {
+	if x, y, sum := getLargestPowerArea(42); x != 21 || y != 61 || sum != 30 {
+		t.Fail()
+	}
+}
