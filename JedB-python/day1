@@ -1,4 +1,5 @@
 ```python
+
 # define a function to add a list of numbers to a running total
 def drift(x):
     freq = 0
@@ -13,4 +14,5 @@ listx = list(map(int, input().split()))
 
 #do the math
 print(drift(listx))
+
 ```
