@@ -107,21 +107,16 @@
     )
   )
 
-(defn solve-a [lines]
+(defn solve [lines steps]
   (let [{init :init updates :updates} (parse-input lines)]
     (->> init
-         (run-state-updates updates 20 ())
+         (run-state-updates updates steps ())
          (reduce +)
          )
     ))
 
-(defn solve-b [lines]
-  (let [{init :init updates :updates} (parse-input lines)]
-    (->> init
-         (run-state-updates updates 50000000000 ())
-         (reduce +)
-         )
-    ))
+(defn solve-a [lines] (solve lines 20))
+(defn solve-b [lines] (solve lines 50000000000))
 
 (defn run [input-lines & args]
   { :A (solve-a input-lines)
