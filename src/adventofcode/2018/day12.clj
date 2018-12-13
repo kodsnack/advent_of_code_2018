@@ -1,10 +1,6 @@
 (ns adventofcode.2018.day12
   (:require clojure.string))
 
-(defn today-lines [] (adventofcode.2018.core/day-lines 12))
-(def lines (today-lines))
-(defn runme [] (run (today-lines)))
-
 (defn string-to-bools [state-string]
   (mapv #(= \# %) state-string))
 
@@ -57,23 +53,25 @@
     (bools-to-set new-start-i updated-vec)
     ))
 
+(defn format-state-vec [state-vec]
+  (clojure.string/join (map #(if % \# \.) state-vec)))
+
 (defn format-state [state-set]
   (let [
         [start-i state-vec] (set-to-bools state-set)
         ]
     [start-i
-     (clojure.string/join (map #(if % \# \.) state-vec))
+     (format-state-vec state-vec)
      ]
-    )
-  )
+    ))
 
 (defn print-states [state-sets]
   (let [formatted-states (map format-state state-sets)
         min-start-index (apply min (map first formatted-states))
         ]
     (do
-      (println (str "    " (apply str (repeat min-start-index " ")) "          1         2         3"))
-      (println (str "    " (apply str (repeat min-start-index " ")) "0         0         0         0"))
+      (println (str "    " (apply str (repeat (- min-start-index) " ")) "          1         2         3"))
+      (println (str "    " (apply str (repeat (- min-start-index) " ")) "0         0         0         0"))
       (doseq [[n [start-i state-str]] (map-indexed vector formatted-states)
               :let [pad-length (- start-i min-start-index)
                     padding (apply str (repeat pad-length \.))
@@ -82,17 +80,48 @@
         (println (clojure.core/format "%2d: %s%s" n padding state-str))
         ))))
 
+(defn run-state-updates [updates steps history state-set]
+  (if (= steps 0)
+    state-set
+    (let [new-state (update-state updates state-set)
+          [start-i state-vec] (set-to-bools state-set)
+          ]
+      (if-let [[match-index diff] (first
+                                   (keep-indexed
+                                    (fn [i [hist-start-i hist-state]]
+                                      (if (= state-vec hist-state)
+                                        [i (- start-i hist-start-i)]
+                                        nil))
+                                    history
+                                    ))
+               ]
+        (let [loop-length (inc match-index)
+              num-loops (biginteger (/ steps loop-length))
+              steps-left (mod steps loop-length)
+              pot-diff (* diff num-loops)
+              ]
+          (recur updates steps-left () (set (map #(+ pot-diff %) state-set)))
+          )
+        (recur updates (dec steps) (cons [start-i state-vec] history) new-state)
+        ))
+    )
+  )
+
 (defn solve-a [lines]
   (let [{init :init updates :updates} (parse-input lines)]
-    (as-> init $
-         (iterate (partial update-state updates) $)
-         (nth $ 20)
-         (reduce + $)
+    (->> init
+         (run-state-updates updates 20 ())
+         (reduce +)
          )
     ))
 
 (defn solve-b [lines]
-  "hej")
+  (let [{init :init updates :updates} (parse-input lines)]
+    (->> init
+         (run-state-updates updates 50000000000 ())
+         (reduce +)
+         )
+    ))
 
 (defn run [input-lines & args]
   { :A (solve-a input-lines)
