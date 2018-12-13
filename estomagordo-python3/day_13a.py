@@ -7,7 +7,7 @@ def solve(d):
 
     for y, line in enumerate(d):
         for x, c in enumerate(line):
-            if c not in '>v>^':
+            if c not in '>v<^':
                 continue
             carts.append([x, y, 0])
             if c == '>':
@@ -18,18 +18,13 @@ def solve(d):
                 carts[-1].append(2)
             else:
                 carts[-1].append(3)
-    steps = 0
+                
     while True:
-        location_list = sorted([cart[:2] for cart in carts], key=lambda location: [location[1], location[0]])
-        cart_order = [-1] * len(carts)
-        for i in range(len(carts)):
-            for j in range(len(carts)):
-                if carts[j][:2] == location_list[i]:
-                    cart_order[i] = j
-                    break
+        mv = set()
+        carts.sort(key=lambda cart: [cart[1], cart[0]])
         
-        for cart_number in cart_order:
-            x, y, mode, direction = carts[cart_number]
+        for cart_number, cart in enumerate(carts):
+            x, y, mode, direction = cart
             
             if direction == 0:
                 x += 1
@@ -42,8 +37,10 @@ def solve(d):
 
             moved[cart_number] += 1
 
-            if any(cart[:2] == [x, y] for cart in carts):
-                return x, y
+            for cn, cart in enumerate(carts):
+                if cart[:2] == [x, y]:
+                    if cn in mv or (cart[3] != direction and not (cart[3] + direction) % 2):
+                        return ','.join(map(str, [x, y]))
 
             if d[y][x] == '/':
                 if direction == 0:
@@ -71,8 +68,7 @@ def solve(d):
                 mode = (mode + 1) % 3            
             
             carts[cart_number] = [x, y, mode, direction]
-
-        steps += 1
+            mv.add(cart_number)
 
 def read_and_solve():
     with open('input_13.txt') as f:
