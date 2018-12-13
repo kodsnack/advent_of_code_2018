@@ -198,7 +198,7 @@ int main() {
             int tmp = 0;
             for(int x = cx; x < cx+8; x++) {
                 tmp <<= 1;
-                if(x < output[y].size()) {
+                if(x < (int)output[y].size()) {
                     tmp |= output[y][x] ? 1 : 0;
                 }
             }

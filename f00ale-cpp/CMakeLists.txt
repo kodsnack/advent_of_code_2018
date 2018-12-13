@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 add_compile_options($<$<BOOL:${SANITIZE}>:-fsanitize=address,leak>)
 add_link_options($<$<BOOL:${SANITIZE}>:-fsanitize=address,leak>)
 
+add_compile_options(-Wall -Wextra)
+
 add_executable(template src/template.cpp)
 
 add_executable(p01 src/p01.cpp)
@@ -20,3 +22,4 @@ add_executable(p09 src/p09.cpp)
 add_executable(p10 src/p10.cpp)
 add_executable(p11 src/p11.cpp)
 add_executable(p12 src/p12.cpp)
+add_executable(p13 src/p13.cpp)
