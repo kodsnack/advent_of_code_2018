@@ -36,9 +36,21 @@
        (clojure.string/join)
        ))
 
+(defn eliminate [line ch]
+  (->> line
+       (filter #(not= ch (first (clojure.string/lower-case %))))
+       (apply str)
+  ))
+
 (defn solve-a [line] (count (first-fixpoint step-reduction line)))
 
-(defn solve-b [lines] ())
+(defn solve-b [line]
+  (let [alphabet (set (clojure.string/lower-case line))
+        ]
+    (apply min
+           (map #(solve-a (eliminate line %))
+                alphabet
+                ))))
 
 (defn run [input-lines & args]
   { :A (solve-a (first input-lines))
