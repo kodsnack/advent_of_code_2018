@@ -31,12 +31,18 @@ step = {'>':(0,1), '<':(0,-1), '^':(-1,0), 'v':(1,0)}
 first = True
 
 # Loop over carts
+collision_time = 0
 while True:
     # Get oldest cart in top left
     t,y,x = min(carts)
     # Pop its direction and next turn from carts
     direction, next_turn = carts.pop((t,y,x))
 
+    # If this was the last cart
+    if not carts and t > collision_time:
+        print('Part 2:', str(x)+','+str(y))
+        break
+    
     # Move cart
     if track[(y,x)] == '/':
         # Top left or bottom right corner
@@ -59,16 +65,14 @@ while True:
             print('Part 1:', str(x)+','+str(y))
             first = False
         carts.pop((t,y,x))
+        collision_time = t
     # Check if cart collides with already moved cart
     elif (t+1,y,x) in carts:
         if first:
             print('Part 1:', str(x)+','+str(y))
             first = False
         carts.pop((t+1,y,x))
-    # If this was the last cart
-    elif not carts:
-        print('Part 2:', str(x)+','+str(y))
-        break
+        collision_time = t
     # Else add to carts with incremented time
     else:
         carts[(t+1,y,x)] = (direction,next_turn)
