@@ -3,9 +3,7 @@
 
 (defn append-cell [state ch]
   (update state :map (fn [m]
-                       (update m (dec (count m)) (fn [r]
-                                                   (conj r ch)))))
-  )
+                       (update m (dec (count m)) #(conj % ch)))))
 
 (defn append-cart [state ch]
   (as-> state $
@@ -19,55 +17,51 @@
     ))
 
 (defn parse-state [lines]
-  (reduce
-   (fn [state line]
-     (reduce
-      (fn [state ch]
-        (case ch
-          \. (append-cell state ch)
-          \- (append-cell state ch)
-          \+ (append-cell state ch)
-          \| (append-cell state ch)
-          \\ (append-cell state ch)
-          \/ (append-cell state ch)
-          \> (append-cart state ch)
-          \< (append-cart state ch)
-          \^ (append-cart state ch)
-          \v (append-cart state ch)
-          \space (append-cell state ch)
-          )
-        )
-      (update state :map (fn [m] (conj m [])))
-      line
-      )
-     )
-   {
-    :carts []
-    :map []
-    }
-   lines
-   ))
+  (reduce (fn [state line]
+            (reduce (fn [state ch]
+                      (case ch
+                        \. (append-cell state ch)
+                        \- (append-cell state ch)
+                        \+ (append-cell state ch)
+                        \| (append-cell state ch)
+                        \\ (append-cell state ch)
+                        \/ (append-cell state ch)
+                        \> (append-cart state ch)
+                        \< (append-cart state ch)
+                        \^ (append-cart state ch)
+                        \v (append-cart state ch)
+                        \space (append-cell state ch)
+                        ))
+                    (update state :map (fn [m] (conj m [])))
+                    line
+                    ))
+          {
+           :carts []
+           :map []
+           }
+          lines
+          ))
 
 (defn format-state [state]
-  (->> (reduce
-        (fn [lines {[y x] :pos dir :dir}]
-          (update-in lines [y x] (fn [_] dir))
-          )
-        (:map state)
-        (:carts state)
-        )
-       (map-indexed (fn [i line] (format "%3d %s" i (clojure.string/join line))))
+  (->> (reduce (fn [lines {[y x] :pos dir :dir}]
+                 (update-in lines [y x] (fn [_] dir))
+                 )
+               (:map state)
+               (:carts state)
+               )
+       (map-indexed (fn [i line]
+                      (format "%3d %s" i (clojure.string/join line))))
        (clojure.string/join \newline)
        ))
 
 (defn print-state [state]
   (println (format-state state))
-  (doseq [cart (:carts state)] (println cart))
-  )
+  (doseq [cart (:carts state)]
+    (println cart)
+    ))
 
 (defn next-dir [dir turn]
-  (
-   (case turn
+  ((case turn
      :left {\v \>
             \> \^
             \^ \<
@@ -79,17 +73,17 @@
              \^ \>
              \< \^
              }
-     ) dir)
-  )
+     ) dir))
 
 (defn turn-dir [dir turn]
   (next-dir dir
             (case turn
               \\ (if (#{\^ \v} dir) :left :right)
               \/ (if (#{\< \>} dir) :left :right)
-            )))
+              )))
 
-(defn vec-add [& vectors] (apply mapv + vectors))
+(defn vec-add [& vectors]
+  (apply mapv + vectors))
 
 (defn dir-to-dydx [dir]
   ({\v [1 0]
@@ -133,9 +127,8 @@
               (update state :carts (fn [carts]
                                      (conj carts (update-cart (:map state) cart)))))
             (assoc state :carts [])
-            sorted-carts)
-    )
-  )
+            sorted-carts
+            )))
 
 (defn get-crashes [carts]
   (->> carts
@@ -148,7 +141,8 @@
        (keep (fn [[pos count]]
                (if (> count 1)
                  pos
-                 nil)))
+                 nil
+                 )))
        (set)
        ))
 
@@ -161,8 +155,7 @@
           ]
       (recur (update updated-state :carts (fn [carts] (filter #(not (crashes (:pos %))) carts)))
              (filter #(not (crashes (:pos %))) carts)
-             )
-      )))
+             ))))
 
 (defn update-state-remove-crashes [state]
   (update-state-remove-crashes-step
@@ -172,9 +165,11 @@
 (defn find-end-state [state]
   (if (= 1 (count (:carts state)))
     state
-    nil))
+    nil
+    ))
 
-(defn flip [[y x]] [x y])
+(defn flip [[y x]]
+  [x y])
 
 (defn solve-a [lines]
   (->> lines
@@ -199,9 +194,9 @@
        ))
 
 (defn run [input-lines & args]
-  { :A (solve-a input-lines)
-    :B (solve-b input-lines)
-    }
+  {:A (solve-a input-lines)
+   :B (solve-b input-lines)
+   }
 )
 
 (defn day-lines [] (adventofcode.2018.core/day-lines 13))
@@ -213,6 +208,6 @@
     (iterate update-state-remove-crashes $)
     (nth $ tick)
     (print-state $)
-   ))
+    ))
 (defn n [] (def tick (inc tick)) (show-tick tick))
 (defn p [] (def tick (dec tick)) (show-tick tick))
