@@ -203,3 +203,16 @@
     :B (solve-b input-lines)
     }
 )
+
+(defn day-lines [] (adventofcode.2018.core/day-lines 13))
+(def lines (day-lines))
+(def tick 0)
+(defn show-tick [tick]
+  (as-> lines $
+    (parse-state $)
+    (iterate update-state-remove-crashes $)
+    (nth $ tick)
+    (print-state $)
+   ))
+(defn n [] (def tick (inc tick)) (show-tick tick))
+(defn p [] (def tick (dec tick)) (show-tick tick))
