@@ -16,6 +16,16 @@
     numbers
 ))
 
+
+(defn take-while-changing [xs]
+  (->> xs
+       (partition 2 1)
+       (split-with #(apply not= %))
+       (fn [[all fst]] (concat all (take 1 fst)))
+       (all-and-first)
+       (map first)
+       ))
+
 (defn transpose [& colls]
   (apply map vector colls)
   )
