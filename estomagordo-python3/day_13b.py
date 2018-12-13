@@ -1,44 +1,50 @@
+from collections import defaultdict
+
+
 def solve(d):
-    carts = {}
-    cart_locations = {}
+    moved = defaultdict(int)
+    carts = []
 
     for y, line in enumerate(d):
         for x, c in enumerate(line):
-            if c not in '>v>^':
+            if c not in '>v<^':
                 continue
-            number = len(carts)
-            cart_locations[(x, y)] = number
+            carts.append([x, y, 0])
             if c == '>':
-                carts[number] = [0, 0]
+                carts[-1].append(0)
             elif c == 'v':
-                carts[number] = [1, 0]
+                carts[-1].append(1)
             elif c == '<':
-                carts[number] = [2, 0]
+                carts[-1].append(2)
             else:
-                carts[number] = [3, 0]
+                carts[-1].append(3)
     steps = 0
     while True:
-        location_list = sorted(cart_locations.keys(), key=lambda location: [location[1], location[0]])
+        mv = set()
+        removal = []
+        carts.sort(key=lambda cart: [cart[1], cart[0]])
         
-        for x, y in location_list:
-            cart_number = cart_locations[(x, y)]
-            direction, mode = carts[cart_number]
-            dx = x
-            dy = y
+        for cart_number, cart in enumerate(carts):
+            x, y, mode, direction = carts[cart_number]
             
             if direction == 0:
-                dx += 1
+                x += 1
             elif direction == 1:
-                dy += 1
+                y += 1
             elif direction == 2:
-                dx -= 1
+                x -= 1
             else:
-                dy -= 1
+                y -= 1
 
-            if (dx, dy) in cart_locations:
-                return dx, dy
+            moved[cart_number] += 1
 
-            if d[dy][dx] == '/':
+            for cn, cart in enumerate(carts):
+                if cart[:2] == [x, y]:
+                    if cn in mv or (cart[3] != direction and not (cart[3] + direction) % 2):
+                        removal.append(cart_number)
+                        removal.append(cn)
+
+            if d[y][x] == '/':
                 if direction == 0:
                     direction = 3
                 elif direction == 1:
@@ -47,7 +53,7 @@ def solve(d):
                     direction = 1
                 else:
                     direction = 0
-            elif d[dy][dx] == '\\':
+            elif d[y][x] == '\\':
                 if direction == 0:
                     direction = 1
                 elif direction == 1:
@@ -56,16 +62,21 @@ def solve(d):
                     direction = 3
                 else:
                     direction = 2
-            elif d[dy][dx] == '+':
+            elif d[y][x] == '+':
                 if mode == 0:
                     direction = (direction - 1) % 4
                 elif mode == 2:
                     direction = (direction + 1) % 4
-                mode = (mode + 1) % 3
+                mode = (mode + 1) % 3            
             
-            del cart_locations[(x, y)]
-            carts[cart_number] = [direction, mode]
-            cart_locations[(dx, dy)] = cart_number
+            carts[cart_number] = [x, y, mode, direction]
+            mv.add(cart_number)
+
+        carts = [carts[i] for i in range(len(carts)) if i not in removal]
+
+        if len(carts) == 1:
+            return ','.join(map(str, carts[0][:2]))
+
         steps += 1
 
 def read_and_solve():
