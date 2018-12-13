@@ -56,12 +56,14 @@
         (:map state)
         (:carts state)
         )
-       (map (fn [line] (clojure.string/join line)))
+       (map-indexed (fn [i line] (format "%3d %s" i (clojure.string/join line))))
        (clojure.string/join \newline)
        ))
 
 (defn print-state [state]
-  (println (format-state state)))
+  (println (format-state state))
+  (doseq [cart (:carts state)] (println cart))
+  )
 
 (defn next-dir [dir turn]
   (
