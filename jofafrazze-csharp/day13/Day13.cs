@@ -53,9 +53,21 @@ namespace day13
                 this.x = x;
                 this.y = y;
             }
+            public override bool Equals(Object obj)
+            {
+                return obj is Position && Equals((Position)obj);
+            }
             public bool Equals(Position p)
             {
                 return (x == p.x) && (y == p.y);
+            }
+            public override int GetHashCode()
+            {
+                var hashCode = 1502939027;
+                hashCode = hashCode * -1521134295 + base.GetHashCode();
+                hashCode = hashCode * -1521134295 + x.GetHashCode();
+                hashCode = hashCode * -1521134295 + y.GetHashCode();
+                return hashCode;
             }
             public static bool operator ==(Position p1, Position p2)
             {
@@ -67,8 +79,39 @@ namespace day13
             }
         }
 
-        // 0 = left, 1 = straight, 2 = right
-        static public Dictionary<Position, int> carts = new Dictionary<Position, int>();
+        public struct Cart
+        {
+            public Position pos;
+            public int heading;     // 0 = up, 1 = right, 2 = down, 3 = left
+            public int nextTurn;    // 0 = left, 1 = straight, 2 = right
+            public bool moved;
+            public bool crashed;
+
+            public Cart(Position p, int direction)
+            {
+                pos = p;
+                heading = direction;
+                nextTurn = 0;
+                moved = false;
+                crashed = false;
+            }
+            public Cart(Cart c)
+            {
+                pos = c.pos;
+                heading = c.heading;
+                nextTurn = c.nextTurn;
+                moved = c.moved;
+                crashed = c.crashed;
+            }
+            public Cart(Cart c, bool crashedDirectly)
+            {
+                this = new Cart(c);
+                crashed = crashedDirectly;
+            }
+        }
+
+        static public List<Cart> carts = new List<Cart>();
+        static public Dictionary<Position, int> cartIndexes = new Dictionary<Position, int>();
 
         static public readonly Dictionary<char, char> turnLeft = new Dictionary<char, char>()
         {
@@ -96,9 +139,15 @@ namespace day13
         };
 
         static public readonly List<char> cartChars = new List<char>() { '^', '>', 'v', '<' };
+        static public readonly List<char> roadChars = new List<char>() { '|', '/', '-', '\\', '+' };
 
-        static void PopulateCarts(char[,] map)
+        static public readonly List<char> canGoVertical = new List<char>() { '\\', '|', '/', '+' };
+        static public readonly List<char> canGoHorizontal = new List<char>() { '\\', '-', '/', '+' };
+
+        static void CreateCarts(char[,] map)
         {
+            carts.Clear();
+            cartIndexes.Clear();
             int width = map.GetLength(0);
             int height = map.GetLength(1);
             for (int x = 0; x < width; x++)
@@ -109,14 +158,13 @@ namespace day13
                     if (cartChars.Contains(c))
                     {
                         Position p = new Position(x, y);
-                        carts[p] = 0;
+                        Cart cart = new Cart(p, cartChars.IndexOf(c));
+                        carts.Add(cart);
+                        cartIndexes[p] = carts.Count - 1;
                     }
                 }
             }
         }
-
-        static public readonly List<char> canGoVertical = new List<char>() { '\\', '|', '/', '+'};
-        static public readonly List<char> canGoHorizontal = new List<char>() { '\\', '-', '/', '+' };
 
         static void CleanCartPosition(ref char[,] m, int x, int y)
         {
@@ -175,7 +223,6 @@ namespace day13
 
         static void PrintMap(char[,] map)
         {
-            Console.Clear();
             int width = map.GetLength(0);
             int height = map.GetLength(1);
             for (int y = 0; y < height; y++)
@@ -188,6 +235,16 @@ namespace day13
                 Console.WriteLine(sb.ToString());
             }
             Console.WriteLine();
+        }
+
+        static void PrintMap(char[,] map, List<Cart> carts)
+        {
+            char[,] printMap = (char[,])map.Clone();
+            foreach (Cart c in carts)
+            {
+                printMap[c.pos.x, c.pos.y] = cartChars[c.heading];
+            }
+            PrintMap(printMap);
         }
 
         static void SaveMap(char[,] map, string fileName)
@@ -208,179 +265,179 @@ namespace day13
             writer.Close();
         }
 
-        static public readonly List<char> roadChars = new List<char>() { '|', '/', '-', '\\', '+' };
-
-        static Position StepMap(ref char[,] map, ref char[,] nextMap, char[,] cleanMap, Position curPos, ref bool crashed)
+        static Cart MoveCart(Cart cart, ref char[,] map)
         {
-            Position newPos = curPos;
-            char c = map[curPos.x, curPos.y];
-            if (c == '^')
+            Cart movedCart = new Cart(cart);
+            movedCart.moved = true;
+            switch (cart.heading)
             {
-                newPos.y = curPos.y - 1;
+                case 0: movedCart.pos.y -= 1; break;
+                case 1: movedCart.pos.x += 1; break;
+                case 2: movedCart.pos.y += 1; break;
+                case 3: movedCart.pos.x -= 1; break;
             }
-            else if (c == '>')
+            char c = cartChars[cart.heading];
+            char r = map[movedCart.pos.x, movedCart.pos.y];
+            char cNext = '*';
+            if (r == '|')
             {
-                newPos.x = curPos.x + 1;
+                cNext = hitVertical[c];
             }
-            else if (c == 'v')
+            else if (r == '/')
             {
-                newPos.y = curPos.y + 1;
+                cNext = hitUpRight[c];
             }
-            else if (c == '<')
+            else if (r == '-')
             {
-                newPos.x = curPos.x - 1;
+                cNext = hitHorizontal[c];
             }
-            if (newPos != curPos)
+            else if (r == '\\')
             {
-                int nextTurn = carts[curPos];
-                carts.Remove(curPos);
-                char r = cleanMap[newPos.x, newPos.y];
-                char cNext = '*';
-                if (r == '|')
+                cNext = hitDownRight[c];
+            }
+            else if (r == '+')
+            {
+                if (movedCart.nextTurn == 0)
                 {
-                    cNext = hitVertical[c];
+                    cNext = turnLeft[c];
+                    movedCart.nextTurn = 1;
                 }
-                else if (r == '/')
+                else if (movedCart.nextTurn == 1)
                 {
-                    cNext = hitUpRight[c];
+                    cNext = c;
+                    movedCart.nextTurn = 2;
                 }
-                else if (r == '-')
+                else
                 {
-                    cNext = hitHorizontal[c];
-                }
-                else if (r == '\\')
-                {
-                    cNext = hitDownRight[c];
-                }
-                else if (r == '+')
-                {
-                    if (nextTurn == 0)
-                    {
-                        cNext = turnLeft[c];
-                        nextTurn = 1;
-                    }
-                    else if (nextTurn == 1)
-                    {
-                        cNext = c;
-                        nextTurn = 2;
-                    }
-                    else
-                    {
-                        cNext = turnRight[c];
-                        nextTurn = 0;
-                    }
-                }
-                char rNext = nextMap[newPos.x, newPos.y];
-                if (!roadChars.Contains(rNext))
-                {
-                    crashed = true;
-                }
-                carts[newPos] = nextTurn;
-                nextMap[curPos.x, curPos.y] = cleanMap[curPos.x, curPos.y];
-                nextMap[newPos.x, newPos.y] = cNext;
-                if ((cNext == '*') && !crashed)
-                {
-                    int bug = 1;
+                    cNext = turnRight[c];
+                    movedCart.nextTurn = 0;
                 }
             }
-            return newPos;
+            if (!cartChars.Contains(cNext))
+            {
+                int bug = 1;
+            }
+            movedCart.heading = cartChars.IndexOf(cNext);
+            return movedCart;
         }
 
-        static int CountCarts(char[,] map, ref Position pos)
+        static bool FindNewCrashes(ref Position pos)
         {
-            int n = 0;
-            int width = map.GetLength(0);
-            int height = map.GetLength(1);
-            for (int x = 0; x < width; x++)
+            bool newCrashes = false;
+            for (int i = 0; i < carts.Count; i++)
             {
-                for (int y = 0; y < height; y++)
+                if (!carts[i].crashed)
                 {
-                    if (cartChars.Contains(map[x, y]))
+                    for (int n = 0; n < carts.Count; n++)
                     {
-                        n++;
-                        pos = new Position(x, y);
+                        if ((i != n) && (carts[i].pos == carts[n].pos))
+                        {
+                            pos = carts[i].pos;
+                            carts[i] = new Cart(carts[i], true);
+                            carts[n] = new Cart(carts[n], true);
+                            newCrashes = true;
+                        }
                     }
                 }
             }
-            return n;
+            return newCrashes;
         }
 
         static void PartA()
         {
             char[,] map = ReadInput();
             //PrintMap(map);
-            PopulateCarts(map);
+            CreateCarts(map);
             char[,] cleanMap = CleanCarts(map);
             //PrintMap(cleanMap);
             int width = map.GetLength(0);
             int height = map.GetLength(1);
-            Position curPos = new Position();
-            Position newPos = new Position();
+            Position pos = new Position();
+            Position crashPos = new Position();
             bool crashed = false;
             int tick = 0;
             do
             {
-                char[,] nextMap = (char[,])map.Clone();
                 for (int y = 0; (y < height) && !crashed; y++)
                 {
-                    curPos.y = y;
+                    pos.y = y;
                     for (int x = 0; (x < width) && !crashed; x++)
                     {
-                        curPos.x = x;
-                        newPos = StepMap(ref map, ref nextMap, cleanMap, curPos, ref crashed);
+                        pos.x = x;
+                        for (int i = 0; i < carts.Count; i++)
+                        {
+                            if (carts[i].pos == pos)
+                            {
+                                if (!carts[i].moved && !carts[i].crashed)
+                                {
+                                    carts[i] = MoveCart(carts[i], ref cleanMap);
+                                    crashed = FindNewCrashes(ref crashPos);
+                                }
+                            }
+                        }
                     }
                 }
-                map = (char[,])nextMap.Clone();
-                //PrintMap(map);
+                for (int i = 0; i < carts.Count; i++)
+                {
+                    Cart c = carts[i];
+                    c.moved = false;
+                    carts[i] = c;
+                }
+                //PrintMap(cleanMap, carts);
                 tick++;
             }
             while (!crashed);
-            Console.WriteLine("Part A: Result is " + newPos.x + ", " + newPos.y + " (took " + tick + " ticks).");
+            Console.WriteLine("Part A: Result is " + crashPos.x + ", " + crashPos.y + " (took " + tick + " ticks).");
         }
 
         static void PartB()
         {
             char[,] map = ReadInput();
             //SaveMap(map, "map_b.txt");
-            PopulateCarts(map);
+            CreateCarts(map);
             char[,] cleanMap = CleanCarts(map);
             //SaveMap(cleanMap, "map_b_clean.txt");
             int width = map.GetLength(0);
             int height = map.GetLength(1);
-            Position curPos = new Position();
-            Position newPos = new Position();
-            bool crashed = false;
+            Position pos = new Position();
+            Position lastPos = new Position();
             int tick = 0;
             int nCarts = 0;
             do
             {
-                if (tick < 50)
+                for (int y = 0; y < height; y++)
                 {
-                    //SaveMap(map, "map_tick_" + tick.ToString("D2") + ".txt");
-                }
-                char[,] nextMap = (char[,])map.Clone();
-                for (int y = 0; (y < height) && !crashed; y++)
-                {
-                    curPos.y = y;
-                    for (int x = 0; (x < width) && !crashed; x++)
+                    pos.y = y;
+                    for (int x = 0; x < width; x++)
                     {
-                        curPos.x = x;
-                        newPos = StepMap(ref map, ref nextMap, cleanMap, curPos, ref crashed);
-                        if (crashed)
+                        pos.x = x;
+                        for (int i = 0; i < carts.Count; i++)
                         {
-                            nextMap[newPos.x, newPos.y] = cleanMap[newPos.x, newPos.y];
-                            crashed = false;
+                            if (carts[i].pos == pos)
+                            {
+                                if (!carts[i].moved && !carts[i].crashed)
+                                {
+                                    carts[i] = MoveCart(carts[i], ref cleanMap);
+                                    FindNewCrashes(ref lastPos);
+                                }
+                            }
                         }
                     }
                 }
-                map = (char[,])nextMap.Clone();
-                nCarts = CountCarts(map, ref newPos);
-                //PrintMap(map);
-                //Thread.Sleep(200);
+                carts.RemoveAll(c => c.crashed);
+                for (int i = 0; i < carts.Count; i++)
+                {
+                    Cart c = carts[i];
+                    c.moved = false;
+                    carts[i] = c;
+                }
+                nCarts = carts.Count;
+                //PrintMap(cleanMap, carts);
                 tick++;
             }
             while (nCarts > 1);
-            Console.WriteLine("Part B: WRONG Result is " + newPos.x + ", " + newPos.y + " (took " + tick + " ticks).");
+            lastPos = carts[0].pos;
+            Console.WriteLine("Part B: Result is " + lastPos.x + ", " + lastPos.y + " (took " + tick + " ticks).");
         }
 
         static void Main(string[] args)
