@@ -137,19 +137,42 @@
     )
   )
 
-(defn find-crash [state]
-  (->> (:carts state)
+(defn get-crashes [carts]
+  (->> carts
        (reduce
         (fn [pos-counts cart]
           (update pos-counts (:pos cart) (fn [cnt]
                                            (inc (or cnt 0)))))
         {}
         )
-       (some (fn [[pos count]]
+       (keep (fn [[pos count]]
                (if (> count 1)
                  pos
                  nil)))
+       (set)
        ))
+
+(defn update-state-remove-crashes-step [state [cart & carts]]
+  (if (nil? cart)
+    state
+    (let [updated-state (update state :carts (fn [carts]
+                                               (conj carts (update-cart (:map state) cart))))
+          crashes (get-crashes (concat (:carts updated-state) carts))
+          ]
+      (recur (update updated-state :carts (fn [carts] (filter #(not (crashes (:pos %))) carts)))
+             (filter #(not (crashes (:pos %))) carts)
+             )
+      )))
+
+(defn update-state-remove-crashes [state]
+  (update-state-remove-crashes-step
+   (assoc state :carts [])
+   (sort-by :pos (:carts state))))
+
+(defn find-end-state [state]
+  (if (= 1 (count (:carts state)))
+    state
+    nil))
 
 (defn flip [[y x]] [x y])
 
@@ -157,12 +180,23 @@
   (->> lines
        (parse-state)
        (iterate update-state)
-       (some find-crash)
+       (some (comp seq get-crashes :carts))
+       (first)
        (flip)
        (clojure.string/join ",")
        ))
 
-(defn solve-b [lines] nil)
+(defn solve-b [lines]
+  (->> lines
+       (parse-state)
+       (iterate update-state-remove-crashes)
+       (some find-end-state)
+       (:carts)
+       (first)
+       (:pos)
+       (flip)
+       (clojure.string/join ",")
+       ))
 
 (defn run [input-lines & args]
   { :A (solve-a input-lines)
