@@ -2,7 +2,7 @@ from aocbase import readInput
 import re
 
 inp = readInput()
-inp='''/->-\        
+inp2='''/->-\        
 |   |  /----\\
 | /-+--+-\  |
 | | |  | v  |
@@ -19,23 +19,23 @@ for line in inp.splitlines():
         if c in '-/\\|+':
             t[(x,y)] = c
         if c == '^':
-            d.append((x, y, 0, 0))
+            d.append((y, x, 0, 0))
             t[(x,y)] = '|'
         if c == 'v':
-            d.append((x, y, 2, 0))
+            d.append((y, x, 2, 0))
             t[(x,y)] = '|'
         if c == '<':
-            d.append((x, y, 3, 0))
+            d.append((y, x, 3, 0))
             t[(x,y)] = '-'
         if c == '>':
-            d.append((x, y, 1, 0))
+            d.append((y, x, 1, 0))
             t[(x,y)] = '-'
         x += 1
     y = y + 1
 
 def collision(d):
     s = set()
-    for x,y,di,st in d:
+    for y,x,di,st in d:
         s.add((x, y))
     if len(s)!= len(d):
         return (x,y)
@@ -44,7 +44,7 @@ def collision(d):
 
 def step(t, d):
     for i in range(len(d)):
-        x, y, di, st = d[i][0], d[i][1], d[i][2], d[i][3]
+        y, x, di, st = d[i][0], d[i][1], d[i][2], d[i][3]
         x2, y2, di2, st2 = x,y,di,st
         if di == 0:
             y2 -= 1
@@ -73,15 +73,15 @@ def step(t, d):
         if t[(x2, y2)] == '+':
             if st == 0:
                 di2 = (di + 3)%4
-            if st == 1:
+            elif st == 1:
                 pass
-            if st == 0:
+            elif st == 2:
                 di2 = (di + 1)%4
             st2 = (st+1)%3
-        d[i] = (x2, y2, di2, st2)
+        d[i] = (y2, x2, di2, st2)
         if collision(d) != (-1,-1):
             break
-    return d
+    return sorted(d)
 
 while collision(d) == (-1, -1):
     d = step(t, d)
