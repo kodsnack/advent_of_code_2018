@@ -27,9 +27,7 @@
      }
   ))
 
-(defn step [state]
-  (move-elves (expand-scoreboard state))
-  )
+(def step (comp move-elves expand-scoreboard))
 
 (defn solve-a [num-steps]
   (->> {:board [3 7] :elfi1 0 :elfi2 1}
