@@ -2,12 +2,11 @@
   (:require clojure.string))
 
 (defn new-recipes [score1 score2]
-  (let [scoresum (+ score1 score2)
-        str-digits (str scoresum)
-        digits (mapv (comp read-string str) str-digits)
-        ]
-    digits
-    ))
+  (let [scoresum (+ score1 score2)]
+    (if (> scoresum 9)
+      [1 (- scoresum 10)]
+      [scoresum]
+      )))
 
 (defn expand-scoreboard [{scoreboard :board elfi1 :elfi1 elfi2 :elfi2}]
   (let [new (new-recipes (scoreboard elfi1) (scoreboard elfi2))]
