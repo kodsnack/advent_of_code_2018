@@ -9,22 +9,16 @@
       )))
 
 (defn expand-scoreboard [{scoreboard :board elfi1 :elfi1 elfi2 :elfi2}]
-  (let [new (new-recipes (scoreboard elfi1) (scoreboard elfi2))]
-    {:board (into scoreboard new)
-     :elfi1 elfi1
-     :elfi2 elfi2
-     }
-    ))
+  {:board (into scoreboard (new-recipes (scoreboard elfi1) (scoreboard elfi2)))
+   :elfi1 elfi1
+   :elfi2 elfi2
+   })
 
 (defn move-elves [{scoreboard :board elfi1 :elfi1 elfi2 :elfi2}]
-  (let [new-elfi1 (mod (+ elfi1 (inc (scoreboard elfi1))) (count scoreboard))
-        new-elfi2 (mod (+ elfi2 (inc (scoreboard elfi2))) (count scoreboard))
-        ]
-    {:board scoreboard
-     :elfi1 new-elfi1
-     :elfi2 new-elfi2
-     }
-  ))
+  {:board scoreboard
+   :elfi1 (mod (+ elfi1 (inc (scoreboard elfi1))) (count scoreboard))
+   :elfi2 (mod (+ elfi2 (inc (scoreboard elfi2))) (count scoreboard))
+   })
 
 (def step (comp move-elves expand-scoreboard))
 
