@@ -57,15 +57,12 @@
        (first)
        (second)
        (:board)
-       ((fn [scoreboard]
-         (->> scoreboard
-              (map-indexed vector)
-              (partition (count target-seq) 1)
-              (filter #(= target-seq (map second %)))
-              (first)
-              (first)
-              (first)
-              )))
+       (map-indexed vector)
+       (partition (count target-seq) 1)
+       (filter #(= target-seq (map second %)))
+       (first)
+       (first)
+       (first)
        )))
 
 (defn run [input-lines & args]
