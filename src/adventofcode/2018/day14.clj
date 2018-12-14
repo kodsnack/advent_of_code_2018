@@ -43,22 +43,34 @@
        (clojure.string/join)
    ))
 
+(defn solve-b [target-seq]
+  (let [cellsize 1000000]
+  (->> {:board [3 7] :elfi1 0 :elfi2 1}
+       (iterate step)
+       (partition 1 cellsize)
+       (map first)
+       (map-indexed vector)
+       (drop-while (fn [[cellnum {scoreboard :board i1 :elfi1 i2 :elfi2}]]
+                     (->> (drop (* cellnum cellsize) scoreboard)
+                          (partition (count target-seq) 1)
+                          (some #(= target-seq %))
+                          (not)
+                          )))
+       (first)
+       (second)
+       (:board)
+       ((fn [scoreboard]
+         (->> scoreboard
+              (map-indexed vector)
+              (partition (count target-seq) 1)
+              (filter #(= target-seq (map second %)))
+              (first)
+              (first)
+              (first)
+              )))
+       )))
 
 (defn run [input-lines & args]
-  (let [num-steps (read-string (first input-lines))]
-    {:A (solve-a input-lines)
-     :B (solve-b input-lines)
-     }))
-
-(defn day-lines [] (adventofcode.2018.core/day-lines 13))
-(def lines (day-lines))
-(def tick 0)
-(defn show-tick [tick]
-  (as-> lines $
-    (parse-state $)
-    (iterate update-state-remove-crashes $)
-    (nth $ tick)
-    (print-state $)
-    ))
-(defn n [] (def tick (inc tick)) (show-tick tick))
-(defn p [] (def tick (dec tick)) (show-tick tick))
+  {:A (solve-a (read-string (first input-lines)))
+   :B (solve-b (map #(read-string (str %)) (first input-lines)))
+   })
