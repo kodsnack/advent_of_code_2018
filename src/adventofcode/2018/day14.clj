@@ -41,28 +41,28 @@
    ))
 
 (defn solve-b [target-seq]
-  (let [cellsize 1000000]
-  (->> {:board [3 7] :elfi1 0 :elfi2 1}
-       (iterate step)
-       (partition 1 cellsize)
-       (map first)
-       (map-indexed vector)
-       (drop-while (fn [[cellnum {scoreboard :board i1 :elfi1 i2 :elfi2}]]
-                     (->> (drop (* cellnum cellsize) scoreboard)
-                          (partition (count target-seq) 1)
-                          (some #(= target-seq %))
-                          (not)
-                          )))
-       (first)
-       (second)
-       (:board)
-       (map-indexed vector)
-       (partition (count target-seq) 1)
-       (filter #(= target-seq (map second %)))
-       (first)
-       (first)
-       (first)
-       )))
+  (let [target-length (count target-seq)
+        suffix-length (inc target-length)
+        equals-target #(= target-seq %)
+        contains-target (fn [{scoreboard :board}]
+                          (as-> scoreboard $
+                               (subvec $ (- (count $) suffix-length))
+                               (partition target-length 1 $)
+                               (some equals-target $)
+                               ))
+        ]
+    (->> {:board [3 7] :elfi1 0 :elfi2 1}
+         (iterate step)
+         (drop-while #(< (count (:board %)) suffix-length))
+         (filter contains-target)
+         (first)
+         (:board)
+         ((fn [board]
+            (if (= target-seq (subvec board (- (count board) suffix-length) (dec (count board))))
+              (- (count board) suffix-length)
+              (- (count board) target-length)
+              )))
+         )))
 
 (defn run [input-lines & args]
   {:A (solve-a (read-string (first input-lines)))
