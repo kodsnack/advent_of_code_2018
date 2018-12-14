@@ -20,7 +20,7 @@ gen gridSerial = foldl fill M.empty grid
       where
         xs = sum . map (\x -> power gridSerial (x, y+s-1)) $ [x..x+s-2]
         ys = sum . map (\y -> power gridSerial (x+s-1, y)) $ [y..y+s-2]
-        v = (m M.! (x,y, s-1)) + xs + ys + (power gridSerial (x+s-1, y+s-1))
+        v = (m M.! (x,y, s-1)) + xs + ys + power gridSerial (x+s-1, y+s-1)
 
 parse = gen . read . head
 

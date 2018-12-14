@@ -32,22 +32,22 @@ step creates initial = reverse $ go "" ("...." ++ initial ++ "....")
 
 calc (initial, rules) n = sum . map fst . filter ((== '#') . snd) . zip [n*(-2) .. ] . head . drop n $ iterate (step creates) initial
   where 
-    creates = genPlant $ rules
+    creates = genPlant rules
 
-solve1 (initial, rules) = show . sum . map fst . filter ((== '#') . snd) . zip [-40 .. ] . head . drop 20 $ iterate (step creates) initial
+solve1 (initial, rules) = show . sum . map fst . filter ((== '#') . snd) . zip [-40 .. ] . (!! 20) $ iterate (step creates) initial
   where 
-    creates = genPlant $ rules
+    creates = genPlant rules
 
-diffs s (x:[]) = s
-diffs s (x:y:xs) = y-x : (diffs s (y:xs))
+diffs s [x] = s
+diffs s (x:y:xs) = y-x : diffs s (y:xs)
 
 -- My god
 solve2 (initial, rules) = show $ (50000000000 - 400) * diffAt400 + at400
   where 
-    creates = genPlant $ rules
+    creates = genPlant rules
     initialValues = map (calc (initial, rules)) [0..400]
     diffAt400 = last $ diffs [] initialValues
-    at400 = last $ initialValues
+    at400 = last initialValues
 
 solve :: [String] -> (String, String)
 solve = parse ^>> solve1 &&& solve2

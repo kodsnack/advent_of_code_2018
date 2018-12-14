@@ -56,7 +56,7 @@ runTick crashes paths carts = go keys crashes carts
       where
         (crash, updated) = moveCart (M.lookup x carts) paths carts
     
-findCrashes paths carts = go [] carts
+findCrashes paths = go []
   where
     go crashes carts
       | M.size updated == 1 = (newCrashes, head . M.elems $ updated)
