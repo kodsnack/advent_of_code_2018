@@ -11,11 +11,15 @@ def fileParse(inp):
     s = inp.splitlines()
     ss = list(map(lambda x: lineParse(x), s[2:]))
     return s[0][15:], ss
-            
-first,  pat = fileParse(inp)
-d = dict()
-for i in pat:
-    d[i[0]] = i[2]
+
+def parseInput(inp)
+    first, patterns = fileParse(inp)
+    lookup = dict()
+    for pattern in patterns:
+        lookup[pattern[0]] = pattern[2]
+    return lookup
+
+lookup = parseInput(inp)
 
 cache = {}
 print(d)
@@ -23,13 +27,13 @@ s = first
 left = 0
 sm1 = 0
 for i in range(1,5000):
-    s1 = '.....'+s+'.....'
+    s1 = '....' + s + '....'
     s3 = []
-    for j in range(len(s1)-5):
+    for j in range(len(s1)-4):
         s2 = s1[j:j+5]
         s3.append(d[s2])
     s = ''.join(s3)
-    left -= 3
+    left -= 2
     s1 = s.strip('.')
     left += s.find(s1)
     s = s1
