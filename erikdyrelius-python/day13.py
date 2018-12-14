@@ -1,118 +1,79 @@
 inp = open("day13.txt").read()
-inp2='''/->-\        
-|   |  /----\\
-| /-+--+-\  |
-| | |  | v  |
-\-+-/  \-+--/
-  \------/   
-'''
-inp3='''/>-<\  
-|   |  
-| /<+-\\
-| | | v
-\>+</ |
-  |   ^
-  \<->/   
-'''
 
-def parseInp(inp):
-    y = 0
-    t = dict()
-    d = list()
-    for line in inp.splitlines():
-        x = 0
-        for c in line:
+def parseTracks(inp):
+    tracks = dict()
+    carts = list()
+    for y, line in enumerate(inp.splitlines()):
+        for x, c in enumerate(line):
             if c in '-/\\|+':
-                t[(x,y)] = c
-            elif c == '^':
-                d.append((y, x, 0, 0))
-                t[(x,y)] = '|'
-            elif c == 'v':
-                d.append((y, x, 2, 0))
-                t[(x,y)] = '|'
-            elif c == '<':
-                d.append((y, x, 3, 0))
-                t[(x,y)] = '-'
-            elif c == '>':
-                d.append((y, x, 1, 0))
-                t[(x,y)] = '-'
-            x += 1
-        y = y + 1
-    return t, d
+                tracks[(x,y)] = c
+            elif c in '^>v<':
+                facing = '^>v<'.find(c)
+                carts.append((y, x, facing, 0))
+                tracks[(x,y)] = '|-|-'[facing]
+    return tracks, carts
 
-def collision(d):
+def collision(carts):
     s = set()
-    for y,x,di,st in d:
-        if (x,y) in s:
-            return (x,y)
+    for cart in carts:
+        if not cart:
+            continue
+        y, x, direction, status = cart
+        if (x, y) in s:
+            return (x, y)
         s.add((x, y))
-    return (-1,-1)
+    return False
 
-def removeColl(d, ci):
-    for i in range(len(d)-1):
-        for j in range(i+1, len(d)):
-            if d[i][:2] == d[j][:2]:
-                d[j:j+1] = []
-                d[i:i+1] = []
-                if i < ci:
-                    ci -= 2
-                else:
-                    ci -= 1
-                return d, ci
+def removeWreck(carts):
+    for i in range(len(carts)-1):
+        if not carts[i]:
+            continue
+        for j in range(i+1, len(carts)):
+            if not carts[j]:
+                continue
+            if carts[i][:2] == carts[j][:2]:
+                carts[i] = None
+                carts[j] = None
+                return carts
 
-def step(t, d, rc=False):
+turns = {'\\':(3, 2, 1, 0), '/':(1, 0, 3, 2)}
+steps = {0:(0, -1), 1:(1, 0), 2:(0, 1), 3:(-1, 0)}
+inters = (3, 0, 1)
+def takeStep(tracks, cart):
+    if not cart:
+        return None
+    y, x, heading, status = cart
+    theStep = steps[heading]
+    x, y = x + theStep[0], y + theStep[1]
+    track = tracks[(x, y)]
+    if track in turns:
+        heading = turns[track][heading]
+    elif track == '+':
+        heading = (heading + inters[status]) % 4
+        status = (status + 1) % 3
+    return (y, x, heading, status)
+
+def step(t, d, removeWrecks=False):
     i = 0
     while i < len(d):
-        y, x, di, st = d[i][0], d[i][1], d[i][2], d[i][3]
-        x2, y2, di2, st2 = x,y,di,st
-        if di == 0:
-            y2 -= 1
-            if t[(x2, y2)] == '\\':
-                di2 = 3
-            if t[(x2, y2)] == '/':
-                di2 = 1
-        elif di == 1:
-            x2 += 1
-            if t[(x2, y2)] == '\\':
-                di2 = 2
-            if t[(x2, y2)] == '/':
-                di2 = 0
-        elif di == 2:
-            y2 += 1
-            if t[(x2, y2)] == '\\':
-                di2 = 1
-            if t[(x2, y2)] == '/':
-                di2 = 3
-        else:
-            x2 -= 1
-            if t[(x2, y2)] == '\\':
-                di2 = 0
-            if t[(x2, y2)] == '/':
-                di2 = 2
-        if t[(x2, y2)] == '+':
-            if st == 0:
-                di2 = (di + 3)%4
-            elif st == 1:
-                pass
-            elif st == 2:
-                di2 = (di + 1)%4
-            st2 = (st+1)%3
-        d[i] = (y2, x2, di2, st2)
-        if collision(d) != (-1,-1):
-            if rc:
-                d, i=removeColl(d, i)
+        d[i] = takeStep(t, d[i])
+        if collision(d):
+            if removeWrecks:
+                removeWreck(d)
             else:
                 break
         i += 1
-    return sorted(d)
+    return sorted(filter(None, d))
 
-t, d = parseInp(inp)
-while collision(d) == (-1, -1):
-    d = step(t, d)
-col = collision(d)
-print("Solution to day 12 part 1: {},{}".format(col[0], col[1]))
+tracks, carts = parseTracks(inp)
+while not collision(carts):
+    carts = step(tracks, carts)
+theCollision = collision(carts)
+print("Solution to day 12 part 1: {},{}".format(theCollision[0], 
+                                                theCollision[1]))
 
-t, d = parseInp(inp)
-while len(d)>1:
-    d = step(t, d, True)
-print("Solution to day 12 part 2: {},{}".format(d[0][1], d[0][0]))
+tracks, carts = parseTracks(inp)
+while len(carts) > 1:
+    carts = step(tracks, carts, removeWrecks=True)
+cart = carts[0]
+print("Solution to day 12 part 2: {},{}".format(cart[1], cart[0]))
