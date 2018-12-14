@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - day08",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopOnEntry": false,
+            "mainClass": "day08",
+            "args": ""
+        }
+    ]
+}

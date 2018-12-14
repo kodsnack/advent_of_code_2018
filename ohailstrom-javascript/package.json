@@ -1,0 +1,16 @@
+{
+  "name": "ohailstorm-javascript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "test-watch": "mocha -w"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
+  }
+}

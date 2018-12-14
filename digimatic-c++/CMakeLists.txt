@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.10)
+
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set (CMAKE_XCODE_ATTRIBUTE_COMPILER_INDEX_STORE_ENABLE NO)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+add_subdirectory(Day01)
+add_subdirectory(Day02)
+add_subdirectory(Day03)
+add_subdirectory(Day04)
+add_subdirectory(Day05)
+add_subdirectory(Day06)
+add_subdirectory(Day07)
+add_subdirectory(Day08)
+add_subdirectory(Day09)
+add_subdirectory(Day10)
+add_subdirectory(Day11)
+add_subdirectory(Day12)
+add_subdirectory(Day13)
+add_subdirectory(Day14)
