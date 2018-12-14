@@ -11,7 +11,7 @@
 
 (defn expand-scoreboard [{scoreboard :board elfi1 :elfi1 elfi2 :elfi2}]
   (let [new (new-recipes (scoreboard elfi1) (scoreboard elfi2))]
-    {:board (apply conj scoreboard new)
+    {:board (into scoreboard new)
      :elfi1 elfi1
      :elfi2 elfi2
      }
