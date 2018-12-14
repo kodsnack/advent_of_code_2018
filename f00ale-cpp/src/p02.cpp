@@ -53,14 +53,16 @@ int main() {
     for (auto it1 = input.begin(); it1 != input.end(); it1++) {
         for (auto it2 = it1 + 1; it2 != input.end(); it2++) {
             int diff = 0;
-            for (int i = 0; i < it1->length(); i++) {
+
+            for (size_t i = 0; i < it1->length(); i++) {
                 if (it1->at(i) != it2->at(i)) {
                     diff++;
                     if (diff > 1) break;
                 }
             }
+
             if (diff == 1) {
-                for (int i = 0; i < it1->length(); i++) {
+                for (size_t i = 0; i < it1->length(); i++) {
                     if (it1->at(i) == it2->at(i)) {
                         ans2.push_back(it1->at(i));
                     }
