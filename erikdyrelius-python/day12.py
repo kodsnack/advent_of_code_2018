@@ -1,8 +1,6 @@
 from aocbase import readInput
-import re
 
 inp = readInput()
-p = re.compile(r"-?\d+")
 
 def lineParse(s, f=lambda x:x):
     return s.split()
@@ -12,18 +10,18 @@ def fileParse(inp):
     ss = list(map(lambda x: lineParse(x), s[2:]))
     return s[0][15:], ss
 
-def parseInput(inp)
+def parseInput(inp):
     first, patterns = fileParse(inp)
     lookup = dict()
     for pattern in patterns:
         lookup[pattern[0]] = pattern[2]
-    return lookup
+    return first, lookup
 
-lookup = parseInput(inp)
+startingPattern, lookup = parseInput(inp)
 
 cache = {}
-print(d)
-s = first
+print(lookup)
+s = startingPattern
 left = 0
 sm1 = 0
 for i in range(1,5000):
@@ -31,7 +29,7 @@ for i in range(1,5000):
     s3 = []
     for j in range(len(s1)-4):
         s2 = s1[j:j+5]
-        s3.append(d[s2])
+        s3.append(lookup[s2])
     s = ''.join(s3)
     left -= 2
     s1 = s.strip('.')
