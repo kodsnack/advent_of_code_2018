@@ -23,6 +23,8 @@ int main() {
                 num += c - '0';
                 have_num = true;
             } else {
+                if(have_num) {
+                }
                 if(c == '\n') {
 
                 }
