@@ -151,9 +151,6 @@
              )
       )))
 
-(defn first-step [flood-map destination]
-  (first (find-path flood-map destination ())))
-
 (defn navigate [state start-pos destinations]
   (let [[flood-map closests] (flood (-> state
                                         (place-units)
@@ -165,7 +162,7 @@
         chosen-dest (first (sort closests))
         ]
     (if chosen-dest
-      (first-step flood-map chosen-dest)
+      (find-path flood-map chosen-dest ())
       )))
 
 (defn print-navigation [state]
@@ -189,7 +186,7 @@
   (filter #(not= (:type (first (:units state))) (:type %))
           (other-units state)))
 
-(defn choose-step [state]
+(defn choose-path [state]
   (let [unit (first (:units state))
         map-with-units (place-units state)
         ]
@@ -199,6 +196,9 @@
          (set)
          (navigate state (:pos unit))
          )))
+
+(defn choose-step [state]
+  (first (choose-path state)))
 
 (defn unit-at [state pos]
   (->> state
