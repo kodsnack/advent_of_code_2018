@@ -37,23 +37,20 @@
 (defn solve-b [target-seq]
   (let [target-length (count target-seq)
         suffix-length (inc target-length)
-        contains-target (fn [{scoreboard :board}]
-                          (or
-                           (= target-seq (subvec scoreboard (- (count scoreboard) target-length)))
-                           (= target-seq (subvec scoreboard (- (count scoreboard) suffix-length) (dec (count scoreboard))))
-                           ))
+        find-target (fn [{scoreboard :board}]
+                      (let [suffix (subvec scoreboard (- (count scoreboard) suffix-length))]
+                        (or
+                         (when (= target-seq (subvec suffix 0 target-length))
+                           (- (count scoreboard) suffix-length))
+                         (when (= target-seq (subvec suffix 1))
+                           (- (count scoreboard) target-length))
+                         )))
         ]
     (->> {:board [3 7] :elfi1 0 :elfi2 1}
          (iterate step)
          (drop-while #(< (count (:board %)) suffix-length))
-         (filter contains-target)
+         (keep find-target)
          (first)
-         (:board)
-         ((fn [board]
-            (if (= target-seq (subvec board (- (count board) suffix-length) (dec (count board))))
-              (- (count board) suffix-length)
-              (- (count board) target-length)
-              )))
          )))
 
 (defn run [input-lines & args]
