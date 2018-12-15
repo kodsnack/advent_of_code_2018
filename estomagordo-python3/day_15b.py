@@ -1,3 +1,5 @@
+from heapq import heappop, heappush
+
 def get_neighbours(x, y, width, height):
     neighbours = []
 
@@ -11,6 +13,106 @@ def get_neighbours(x, y, width, height):
         neighbours.append([x, y + 1])
 
     return neighbours
+
+
+def get_distance(d, width, height, x1, y1, x2, y2):
+    if x1 == x2 and y1 == y2:
+        return 0
+    if not 0 <= x1 < width:
+        return 100000
+    if not 0 <= y1 < height:
+        return 100000
+    if d[y1][x1] != '.':
+        return 100000
+
+    seen = set()
+    frontier = [[x1, y1, 0]]
+    pos = 0
+
+    while pos < len(frontier):
+        dx, dy, distance = frontier[pos]
+
+        pos += 1
+
+        if (dx, dy) in seen:
+            continue
+
+        seen.add((dx, dy))
+
+        if dx == x2 and dy == y2:
+            return distance
+
+        for nx, ny in get_neighbours(dx, dy, width, height):
+            if d[ny][nx] == '.' and not (nx, ny) in seen:
+                frontier.append([nx, ny, distance + 1])
+
+    return 100000
+
+
+def find_goal(d, width, height, x, y, target):
+    goals = {}
+    seen = set()
+
+    frontier = []
+
+    if y > 0 and d[y - 1][x] == '.':
+        heappush(frontier, [1, x, y - 1])
+    if y < height - 1 and d[y + 1][x] == '.':
+        heappush(frontier, [1, x, y + 1])
+    if x > 0 and d[y][x - 1] == '.':
+        heappush(frontier, [1, x - 1, y])
+    if x < width - 1 and d[y][x + 1] == '.':
+        heappush(frontier, [1, x + 1, y])
+
+    while frontier:
+        distance, dx, dy = heappop(frontier)
+
+        if (dx, dy) in seen:
+            continue
+
+        seen.add((dx, dy))
+
+        neighbours = get_neighbours(dx, dy, width, height)
+
+        for nx, ny in neighbours:
+            if d[ny][nx] == target:
+                goals[(dx, dy)] = distance
+                break
+            if not (nx, ny) in seen and d[ny][nx] == '.':
+                heappush(frontier, [distance + 1, nx, ny])
+
+    if not goals:
+        return None
+
+    lowest = min(goals.values())
+
+    for sy in range(height):
+        for sx in range(width):
+            if (sx, sy) in goals and goals[(sx, sy)] == lowest:
+                return sx, sy
+
+    if lowest == 10000:
+        return None
+
+    for sx in range(x + 1, width):
+        if (sx, y) in goals and goals[(sx, y)] == lowest:
+            return sx, y
+    
+    for sy in range(y + 1, height):
+        for sx in range(width):
+            if (sx, sy) in goals and goals[(sx, sy)] == lowest:
+                return sx, sy
+
+    for sy in range(y):
+        for sx in range(width):
+            if (sx, sy) in goals and goals[(sx, sy)] == lowest:
+                return sx, sy
+
+    for sx in range(x):
+        if (sx, y) in goals and goals[(sx, y)] == lowest:
+            return sx, y
+
+    return None
 
 
 def distance_to_target(d, width, height, x, y, target):
@@ -66,7 +168,7 @@ def solve(d, elfpow):
             if c == 'G':
                 goblins[(x, y)] = [starting_hit_points, False]
 
-    elfcount = len(elves)
+    elf_count = len(elves)
 
     while True:
         for _, elf in elves.items():
@@ -94,7 +196,7 @@ def solve(d, elfpow):
                     for hits, _ in goblins.values():
                         hitsum += hits
 
-                    return hitsum * turns, len(elves) == elfcount
+                    return hitsum * turns, len(elves) == elf_count
 
                 possible_targets = get_neighbours(x, y, width, height)
                 targets = [p for p in possible_targets if ((p[0], p[1]) in goblins and is_elf) or ((p[0], p[1]) in elves and not is_elf)]
@@ -110,33 +212,38 @@ def solve(d, elfpow):
                     if y < height - 1 and d[y + 1][x] == target_type:
                         weakest = min(weakest, target_dict[(x, y + 1)][0])
 
-
-                    if x < width - 1 and d[y][x + 1] == target_type and target_dict[(x + 1, y)][0] == weakest:
-                        target_dict[(x + 1, y)][0] -= (attack_power if c == 'G' else elfpow)
-                        if target_dict[(x + 1, y)][0] <= 0:
-                            del target_dict[(x + 1, y)]
-                            d[y][x + 1] = '.'
-                    elif y < height - 1 and d[y + 1][x] == target_type and target_dict[(x, y + 1)][0] == weakest:
-                        target_dict[(x, y + 1)][0] -= (attack_power if c == 'G' else elfpow)
-                        if target_dict[(x, y + 1)][0] <= 0:
-                            del target_dict[(x, y + 1)]
-                            d[y + 1][x] = '.'
-                    elif y > 0 and d[y - 1][x] == target_type and target_dict[(x, y - 1)][0] == weakest:
-                        target_dict[(x, y - 1)][0] -= (attack_power if c == 'G' else elfpow)
+                    if y > 0 and d[y - 1][x] == target_type and target_dict[(x, y - 1)][0] == weakest:
+                        target_dict[(x, y - 1)][0] -= (elfpow if is_elf else attack_power)
                         if target_dict[(x, y - 1)][0] <= 0:
                             del target_dict[(x, y - 1)]
                             d[y - 1][x] = '.'
                     elif x > 0 and d[y][x - 1] == target_type and target_dict[(x - 1, y)][0] == weakest:
-                        target_dict[(x - 1, y)][0] -= (attack_power if c == 'G' else elfpow)
+                        target_dict[(x - 1, y)][0] -= (elfpow if is_elf else attack_power)
                         if target_dict[(x - 1, y)][0] <= 0:
                             del target_dict[(x - 1, y)]
                             d[y][x - 1] = '.'
+                    elif x < width - 1 and d[y][x + 1] == target_type and target_dict[(x + 1, y)][0] == weakest:
+                        target_dict[(x + 1, y)][0] -= (elfpow if is_elf else attack_power)
+                        if target_dict[(x + 1, y)][0] <= 0:
+                            del target_dict[(x + 1, y)]
+                            d[y][x + 1] = '.'
+                    elif y < height - 1 and d[y + 1][x] == target_type and target_dict[(x, y + 1)][0] == weakest:
+                        target_dict[(x, y + 1)][0] -= (elfpow if is_elf else attack_power)
+                        if target_dict[(x, y + 1)][0] <= 0:
+                            del target_dict[(x, y + 1)]
+                            d[y + 1][x] = '.'
 
                 else:
-                    up_dist = distance_to_target(d, width, height, x, y - 1, target_type)
-                    left_dist = distance_to_target(d, width, height, x - 1, y, target_type)
-                    right_dist = distance_to_target(d, width, height, x + 1, y, target_type)
-                    down_dist = distance_to_target(d, width, height, x, y + 1, target_type)
+                    goal = find_goal(d, width, height, x, y, target_type)
+                    if not goal:
+                        continue
+
+                    gx, gy = goal
+
+                    right_dist = get_distance(d, width, height, x + 1, y, gx, gy)
+                    down_dist = get_distance(d, width, height, x, y + 1, gx, gy)
+                    up_dist = get_distance(d, width, height, x, y - 1, gx, gy)
+                    left_dist = get_distance(d, width, height, x - 1, y, gx, gy)
 
                     closest_dist = min([up_dist, left_dist, right_dist, down_dist])
 
@@ -152,7 +259,7 @@ def solve(d, elfpow):
                         moving_dict[(x + 1, y)] = [hits, True]
                         d[y][x] = '.'
                         d[y][x + 1] = c
-                        newx += 1
+                        newx += 1                                        
                     elif down_dist == closest_dist:
                         hits, _ = elves[(x, y)] if is_elf else goblins[(x, y)]
                         del moving_dict[(x, y)]
@@ -190,22 +297,22 @@ def solve(d, elfpow):
                             weakest = min(weakest, target_dict[(newx, newy + 1)][0])
 
                         if newy > 0 and d[newy - 1][newx] == target_type and target_dict[(newx, newy - 1)][0] == weakest:
-                            target_dict[(newx, newy - 1)][0] -= (attack_power if c == 'G' else elfpow)
+                            target_dict[(newx, newy - 1)][0] -= (elfpow if is_elf else attack_power)
                             if target_dict[(newx, newy - 1)][0] <= 0:
                                 del target_dict[(newx, newy - 1)]
                                 d[newy - 1][newx] = '.'
                         elif newx > 0 and d[newy][newx - 1] == target_type and target_dict[(newx - 1, newy)][0] == weakest:
-                            target_dict[(newx - 1, newy)][0] -= (attack_power if c == 'G' else elfpow)
+                            target_dict[(newx - 1, newy)][0] -= (elfpow if is_elf else attack_power)
                             if target_dict[(newx - 1, newy)][0] <= 0:
                                 del target_dict[(newx - 1, newy)]
                                 d[newy][newx - 1] = '.'
                         elif newx < width - 1 and d[newy][newx + 1] == target_type and target_dict[(newx + 1, newy)][0] == weakest:
-                            target_dict[(newx + 1, newy)][0] -= (attack_power if c == 'G' else elfpow)
+                            target_dict[(newx + 1, newy)][0] -= (elfpow if is_elf else attack_power)
                             if target_dict[(newx + 1, newy)][0] <= 0:
                                 del target_dict[(newx + 1, newy)]
                                 d[newy][newx + 1] = '.'
-                        else:
-                            target_dict[(newx, newy + 1)][0] -= (attack_power if c == 'G' else elfpow)
+                        elif newy < height - 1 and d[newy + 1][newx] == target_type and target_dict[(newx, newy + 1)][0] == weakest:
+                            target_dict[(newx, newy + 1)][0] -= (elfpow if is_elf else attack_power)
                             if target_dict[(newx, newy + 1)][0] <= 0:
                                 del target_dict[(newx, newy + 1)]
                                 d[newy + 1][newx] = '.'
@@ -215,12 +322,12 @@ def solve(d, elfpow):
 
 def read_and_solve():
     from copy import deepcopy
-    with open('input_15_small.txt') as f:
+    with open('input_15.txt') as f:
         data = [list(line.rstrip()) for line in f]
-        elfpow = 3
+        elfpow = 4
         while True:
             score, success = solve(deepcopy(data), elfpow)
-            return score
+            print('intermediate', score, success)
             if success:
                 return score, elfpow
             elfpow += 1

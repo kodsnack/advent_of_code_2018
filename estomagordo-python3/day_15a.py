@@ -86,6 +86,11 @@ def find_goal(d, width, height, x, y, target):
 
     lowest = min(goals.values())
 
+    for sy in range(height):
+        for sx in range(width):
+            if (sx, sy) in goals and goals[(sx, sy)] == lowest:
+                return sx, sy
+
     if lowest == 10000:
         return None
 
@@ -164,6 +169,7 @@ def solve(d):
                 goblins[(x, y)] = [starting_hit_points, False]
 
     while True:
+        a = len(goblins)
         for _, elf in elves.items():
             elf[1] = False
         for _, goblin in goblins.items():
@@ -205,18 +211,7 @@ def solve(d):
                     if y < height - 1 and d[y + 1][x] == target_type:
                         weakest = min(weakest, target_dict[(x, y + 1)][0])
 
-
-                    if x < width - 1 and d[y][x + 1] == target_type and target_dict[(x + 1, y)][0] == weakest:
-                        target_dict[(x + 1, y)][0] -= attack_power
-                        if target_dict[(x + 1, y)][0] <= 0:
-                            del target_dict[(x + 1, y)]
-                            d[y][x + 1] = '.'
-                    elif y < height - 1 and d[y + 1][x] == target_type and target_dict[(x, y + 1)][0] == weakest:
-                        target_dict[(x, y + 1)][0] -= attack_power
-                        if target_dict[(x, y + 1)][0] <= 0:
-                            del target_dict[(x, y + 1)]
-                            d[y + 1][x] = '.'
-                    elif y > 0 and d[y - 1][x] == target_type and target_dict[(x, y - 1)][0] == weakest:
+                    if y > 0 and d[y - 1][x] == target_type and target_dict[(x, y - 1)][0] == weakest:
                         target_dict[(x, y - 1)][0] -= attack_power
                         if target_dict[(x, y - 1)][0] <= 0:
                             del target_dict[(x, y - 1)]
@@ -226,6 +221,16 @@ def solve(d):
                         if target_dict[(x - 1, y)][0] <= 0:
                             del target_dict[(x - 1, y)]
                             d[y][x - 1] = '.'
+                    elif x < width - 1 and d[y][x + 1] == target_type and target_dict[(x + 1, y)][0] == weakest:
+                        target_dict[(x + 1, y)][0] -= attack_power
+                        if target_dict[(x + 1, y)][0] <= 0:
+                            del target_dict[(x + 1, y)]
+                            d[y][x + 1] = '.'
+                    elif y < height - 1 and d[y + 1][x] == target_type and target_dict[(x, y + 1)][0] == weakest:
+                        target_dict[(x, y + 1)][0] -= attack_power
+                        if target_dict[(x, y + 1)][0] <= 0:
+                            del target_dict[(x, y + 1)]
+                            d[y + 1][x] = '.'
 
                 else:
                     goal = find_goal(d, width, height, x, y, target_type)
@@ -305,7 +310,7 @@ def solve(d):
                             if target_dict[(newx + 1, newy)][0] <= 0:
                                 del target_dict[(newx + 1, newy)]
                                 d[newy][newx + 1] = '.'
-                        else:
+                        elif newy < height - 1 and d[newy + 1][newx] == target_type and target_dict[(newx, newy + 1)][0] == weakest:
                             target_dict[(newx, newy + 1)][0] -= attack_power
                             if target_dict[(newx, newy + 1)][0] <= 0:
                                 del target_dict[(newx, newy + 1)]
@@ -315,7 +320,7 @@ def solve(d):
 
 
 def read_and_solve():
-    with open('input_15_small_4.txt') as f:
+    with open('input_15.txt') as f:
         data = [list(line.rstrip()) for line in f]
         return solve(data)
 
