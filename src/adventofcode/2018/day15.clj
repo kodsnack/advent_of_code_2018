@@ -156,14 +156,14 @@
 
 (defn navigate [state start-pos destinations]
   (let [[flood-map closests] (flood (-> state
-                                           (place-units)
-                                           (assoc-in start-pos 0)
-                                           )
-                                       [start-pos]
-                                       destinations
-                                       )
-           chosen-dest (first (sort closests))
-           ]
+                                        (place-units)
+                                        (assoc-in start-pos 0)
+                                        )
+                                    [start-pos]
+                                    destinations
+                                    )
+        chosen-dest (first (sort closests))
+        ]
     (if chosen-dest
       (first-step flood-map chosen-dest)
       )))
@@ -262,7 +262,7 @@
       (-> state
           (attack (first (sort-by #(:hp (unit-at state %)) possible-attacks)))
           (shift-unit identity)
-        )
+          )
       (if-let [chosen-step (choose-step state)
                ]
         (-> state
@@ -289,12 +289,12 @@
 
 (defn victory [state]
   (->> state
-    (all-units)
-    (map :type)
-    (set)
-    (count)
-    (= 1)
-    ))
+       (all-units)
+       (map :type)
+       (set)
+       (count)
+       (= 1)
+       ))
 
 (defn hpsum [state]
   (reduce + (map :hp (all-units state))))
@@ -328,7 +328,7 @@
   {:A (solve-a input-lines)
    :B (solve-b input-lines)
    }
-)
+  )
 
 (defn day-lines [] (adventofcode.2018.core/day-lines 15))
 (def states [(parse-example 0)])
