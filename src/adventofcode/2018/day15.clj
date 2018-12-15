@@ -116,60 +116,64 @@
 (defn unoccupied [map poss]
   (filter #(= \. (get-in map %)) poss))
 
-(defn flood [map heads destination]
-  (if (and (seq heads) (= \. (get-in map destination)))
-    (let [next-n (inc (get-in map (first heads)))
-          [new-map new-heads] (reduce (fn [[map new-heads] pos]
-                                        (reduce (fn [[map new-heads] new-pos]
-                                                  (if (= \. (get-in map new-pos))
-                                                    [(assoc-in map new-pos next-n) (conj new-heads new-pos)]
-                                                    [map new-heads]
+(defn flood [world heads destinations]
+  (if (or (some destinations heads) (empty? heads))
+    [world (keep destinations heads)]
+    (let [next-n (inc (get-in world (first heads)))
+          [new-map new-heads] (reduce (fn [[world new-heads] pos]
+                                        (reduce (fn [[world new-heads] new-pos]
+                                                  (if (= \. (get-in world new-pos))
+                                                    [(assoc-in world new-pos next-n) (conj new-heads new-pos)]
+                                                    [world new-heads]
                                                     ))
-                                                [map new-heads]
+                                                [world new-heads]
                                                 (adjacent pos)
                                                 ))
-                                      [map []]
+                                      [world []]
                                       heads
                                       )
           ]
-      (recur new-map new-heads destination)
+      (recur new-map new-heads destinations)
       )
-    [map (get-in map destination)]
     ))
 
-(defn first-step [flood-map destination]
+(defn find-path [flood-map destination path]
   (let [step (get-in flood-map destination)]
-    (if (= 1 step)
-      destination
+    (if (= 0 step)
+      path
       (recur flood-map
              (->> destination
                   (adjacent)
                   (filter #(= (dec step) (get-in flood-map %)))
                   (first)
                   )
+             (cons destination path)
              )
       )))
 
-(defn navigate [state start-pos target-pos]
-  (let [[flood-map min-steps] (flood (-> state
-                                          (place-units)
-                                          (assoc-in start-pos 0)
-                                          (assoc-in target-pos \.)
-                                          )
-                                      [start-pos]
-                                      target-pos
-                                      )
-        reachable (not= \. min-steps)
-        ]
-    (if reachable [(first-step flood-map target-pos) min-steps])))
+(defn first-step [flood-map destination]
+  (first (find-path flood-map destination ())))
+
+(defn navigate [state start-pos destinations]
+  (let [[flood-map closests] (flood (-> state
+                                           (place-units)
+                                           (assoc-in start-pos 0)
+                                           )
+                                       [start-pos]
+                                       destinations
+                                       )
+           chosen-dest (first (sort closests))
+           ]
+    (if chosen-dest
+      (first-step flood-map chosen-dest)
+      )))
 
 (defn print-navigation [state]
   (let [start-pos (:pos (first (:units state)))]
     (as-> state $
       (place-units $)
       (assoc-in $ start-pos 0)
-      (assoc-in $ [0 0] \.)
-      (flood $ [start-pos] [0 0])
+      (flood $ [start-pos] #{})
       (first $)
       (format-map $)
       (println $)
@@ -187,12 +191,8 @@
     (->> state
          (enemies)
          (mapcat (fn [unit] (unoccupied map-with-units (adjacent (:pos unit)))))
-         (map (fn [dest] [dest (navigate state (:pos unit) dest)]))
-         (filter #(not (nil? (second %))))
-         (sort-by (fn [[[d e] [[a b] c]]] [c d e a b]))
-         (first)
-         (second)
-         (first)
+         (set)
+         (navigate state (:pos unit))
          )))
 
 (defn all-units [state]
