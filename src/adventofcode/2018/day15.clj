@@ -103,6 +103,60 @@
           (concat (:moved-units state) (:units state))
           ))
 
+(defn adjacent [pos]
+  [(vec-add pos [-1 0])
+   (vec-add pos [0 -1])
+   (vec-add pos [0 1])
+   (vec-add pos [1 0])
+   ])
+
+(defn flood [map heads destination]
+  (if (and (seq heads) (= \. (get-in map destination)))
+    (let [next-n (inc (get-in map (first heads)))
+          [new-map new-heads] (reduce (fn [[map new-heads] pos]
+                                        (reduce (fn [[map new-heads] new-pos]
+                                                  (if (= \. (get-in map new-pos))
+                                                    [(assoc-in map new-pos next-n) (conj new-heads new-pos)]
+                                                    [map new-heads]
+                                                    ))
+                                                [map new-heads]
+                                                (adjacent pos)
+                                                ))
+                                      [map []]
+                                      heads
+                                      )
+          ]
+      (recur new-map new-heads destination)
+      )
+    [map (get-in map destination)]
+    ))
+
+(defn first-step [flood-map destination]
+  (let [step (get-in flood-map destination)]
+    (if (= 1 step)
+      destination
+      (recur flood-map
+             (->> destination
+                  (adjacent)
+                  (filter #(= (dec step) (get-in flood-map %)))
+                  (first)
+                  )
+             )
+      )))
+
+(defn navigate [state start-pos target-pos]
+  (let [[flood-map min-steps] (flood (-> state
+                                          (place-units)
+                                          (assoc-in start-pos 0)
+                                          (assoc-in target-pos \.)
+                                          )
+                                      [start-pos]
+                                      target-pos
+                                      )
+        reachable (not= \. min-steps)
+        ]
+    (if reachable (first-step flood-map target-pos))))
+
 (defn move-unit [state]
   (assoc state
          :units (pop (:units state))
