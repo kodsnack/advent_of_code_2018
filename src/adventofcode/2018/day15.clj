@@ -68,16 +68,17 @@
 (defn parse-example [i]
   (parse-state (clojure.string/split-lines (:map (examples i)))))
 
-(defn format-state [state]
-  (->> (reduce (fn [lines {[y x] :pos type :type}]
-                 (update-in lines [y x] (fn [_] type))
-                 )
-               (:map state)
-               (concat (:moved-units state) (:units state))
-               )
+(defn format-map [map]
+  (->> map
        (map-indexed (fn [i line]
                       (format "%3d %s" i (clojure.string/join line))))
        (clojure.string/join \newline)
+       ))
+
+(defn format-state [state]
+  (->> state
+       (place-units)
+       (format-map)
        ))
 
 (defn print-state [state]
@@ -93,6 +94,14 @@
 
 (defn vec-add [& vectors]
   (apply mapv + vectors))
+
+(defn place-units [state]
+  (reduce (fn [lines {[y x] :pos type :type}]
+            (update-in lines [y x] (fn [_] type))
+            )
+          (:map state)
+          (concat (:moved-units state) (:units state))
+          ))
 
 (defn move-unit [state]
   (assoc state
