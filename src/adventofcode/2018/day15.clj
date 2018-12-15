@@ -179,11 +179,6 @@
       (println $)
       )))
 
-(defn abs [x] (if (< x 0) (- x) x))
-
-(defn unit-dist [u1 u2]
-  (reduce + (map abs (vec-sub (:pos u1) (:pos u2)))))
-
 (defn choose-step [state]
   (let [unit (first (:units state))
         map-with-units (place-units state)
@@ -307,9 +302,6 @@
 
 (defn outcome [state]
   (* (:rounds state) (hpsum state)))
-
-(defn flip [[y x]]
-  [x y])
 
 (defn finish [states]
   (->> (last states)
