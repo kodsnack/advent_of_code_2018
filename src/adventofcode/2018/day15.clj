@@ -179,6 +179,16 @@
       (println $)
       )))
 
+(defn all-units [state]
+  (concat (:units state) (:moved-units state)))
+
+(defn other-units [state]
+  (concat (pop (:units state)) (:moved-units state)))
+
+(defn enemies [state]
+  (filter #(not= (:type (first (:units state))) (:type %))
+          (other-units state)))
+
 (defn choose-step [state]
   (let [unit (first (:units state))
         map-with-units (place-units state)
@@ -189,16 +199,6 @@
          (set)
          (navigate state (:pos unit))
          )))
-
-(defn all-units [state]
-  (concat (:units state) (:moved-units state)))
-
-(defn other-units [state]
-  (concat (pop (:units state)) (:moved-units state)))
-
-(defn enemies [state]
-  (filter #(not= (:type (first (:units state))) (:type %))
-          (other-units state)))
 
 (defn unit-at [state pos]
   (->> state
