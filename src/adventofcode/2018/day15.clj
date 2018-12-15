@@ -277,13 +277,12 @@
 
 (defn step [state]
   (if (seq (:units state))
-    (as-> state $
-      (move-unit $)
-      (if (seq (:units $))
-        $
-        (assoc $
-               :rounds (inc (:rounds $))
-               :units (apply list (sort-by :pos (:moved-units $)))
+    (let [updated (move-unit state)]
+      (if (seq (:units updated))
+        updated
+        (assoc updated
+               :rounds (inc (:rounds updated))
+               :units (apply list (sort-by :pos (:moved-units updated)))
                :moved-units []
                )
         ))))
