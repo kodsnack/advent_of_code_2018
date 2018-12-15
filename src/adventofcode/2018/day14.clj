@@ -37,13 +37,11 @@
 (defn solve-b [target-seq]
   (let [target-length (count target-seq)
         suffix-length (inc target-length)
-        equals-target #(= target-seq %)
         contains-target (fn [{scoreboard :board}]
-                          (as-> scoreboard $
-                               (subvec $ (- (count $) suffix-length))
-                               (partition target-length 1 $)
-                               (some equals-target $)
-                               ))
+                          (or
+                           (= target-seq (subvec scoreboard (- (count scoreboard) target-length)))
+                           (= target-seq (subvec scoreboard (- (count scoreboard) suffix-length) (dec (count scoreboard))))
+                           ))
         ]
     (->> {:board [3 7] :elfi1 0 :elfi2 1}
          (iterate step)
