@@ -85,10 +85,10 @@
   (println "Round" (:rounds state))
   (println (format-state state))
   (println "Units:")
-  (doseq [unit (sort-by :pos (:units state))]
-    (println unit))
-  (println "Moved:")
   (doseq [unit (:moved-units state)]
+    (println unit))
+  (println (first (:units state)) " <--")
+  (doseq [unit (rest (:units state))]
     (println unit))
   )
 
