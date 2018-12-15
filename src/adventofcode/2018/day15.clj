@@ -75,6 +75,14 @@
        (clojure.string/join \newline)
        ))
 
+(defn place-units [state]
+  (reduce (fn [lines {[y x] :pos type :type}]
+            (update-in lines [y x] (fn [_] type))
+            )
+          (:map state)
+          (concat (:moved-units state) (:units state))
+          ))
+
 (defn format-state [state]
   (->> state
        (place-units)
@@ -94,14 +102,8 @@
 
 (defn vec-add [& vectors]
   (apply mapv + vectors))
-
-(defn place-units [state]
-  (reduce (fn [lines {[y x] :pos type :type}]
-            (update-in lines [y x] (fn [_] type))
-            )
-          (:map state)
-          (concat (:moved-units state) (:units state))
-          ))
+(defn vec-sub [& vectors]
+  (apply mapv - vectors))
 
 (defn adjacent [pos]
   [(vec-add pos [-1 0])
@@ -109,6 +111,9 @@
    (vec-add pos [0 1])
    (vec-add pos [1 0])
    ])
+
+(defn unoccupied [map poss]
+  (filter #(= \. (get-in map %)) poss))
 
 (defn flood [map heads destination]
   (if (and (seq heads) (= \. (get-in map destination)))
@@ -155,28 +160,176 @@
                                       )
         reachable (not= \. min-steps)
         ]
-    (if reachable (first-step flood-map target-pos))))
+    (if reachable [(first-step flood-map target-pos) min-steps])))
 
-(defn move-unit [state]
+(defn print-navigation [state]
+  (let [start-pos (:pos (first (:units state)))]
+    (as-> state $
+      (place-units $)
+      (assoc-in $ start-pos 0)
+      (assoc-in $ [0 0] \.)
+      (flood $ [start-pos] [0 0])
+      (first $)
+      (map (fn [row] (map (fn [c] (if (number? c) (mod c 10) c)) row)) $)
+      (format-map $)
+      (println $)
+      )))
+
+(defn abs [x] (if (< x 0) (- x) x))
+
+(defn unit-dist [u1 u2]
+  (reduce + (map abs (vec-sub (:pos u1) (:pos u2)))))
+
+(defn choose-step [state]
+  (let [unit (first (:units state))
+        map-with-units (place-units state)
+        ]
+    (->> state
+         (enemies)
+         (mapcat (fn [unit] (unoccupied map-with-units (adjacent (:pos unit)))))
+         (map (fn [dest] [dest (navigate state (:pos unit) dest)]))
+         (filter #(not (nil? (second %))))
+         (sort-by (fn [[[d e] [[a b] c]]] [c d e a b]))
+         (first)
+         (second)
+         (first)
+         )))
+
+(defn all-units [state]
+  (concat (:units state) (:moved-units state)))
+
+(defn other-units [state]
+  (concat (pop (:units state)) (:moved-units state)))
+
+(defn enemies [state]
+  (filter #(not= (:type (first (:units state))) (:type %))
+          (other-units state)))
+
+(defn unit-at [state pos]
+  (->> state
+       (all-units)
+       (filter #(= pos (:pos %)))
+       (first)
+       ))
+
+(defn can-attack [state]
+  (let [unit (first (:units state))
+        ]
+    (->> unit
+         (:pos)
+         (adjacent)
+         (filter (set (map :pos (enemies state))))
+         (sort)
+         )))
+
+(defn damage-if-target [pos power unit]
+  (if (= pos (:pos unit))
+    (update unit :hp #(- % power))
+    unit
+    ))
+
+(defn attack [state target-pos]
+  (let [unit (first (:units state))
+        power (:power unit)
+        ]
+    (as-> state $
+      (update $ :units (fn [units]
+                         (apply list (map #(damage-if-target target-pos power %) units))))
+      (update $ :moved-units (fn [units]
+                               (mapv #(damage-if-target target-pos power %) units)))
+      (update $ :units (fn [units]
+                         (apply list (filter #(> (:hp %) 0) units))))
+      (update $ :moved-units (fn [units]
+                         (apply vector (filter #(> (:hp %) 0) units))))
+      )))
+
+(defn shift-unit [state f]
   (assoc state
          :units (pop (:units state))
-         :moved-units (conj (:moved-units state) (first (:units state)))
-   ))
+         :moved-units (conj (:moved-units state) (f (first (:units state))))
+         )
+  )
+
+(defn attack-after-move [state]
+  (let [possible-attacks (can-attack state)
+        ]
+    (if (seq possible-attacks)
+      (attack state (first (sort-by #(:hp (unit-at state %)) possible-attacks)))
+      state
+      )
+    ))
+
+(defn move-unit [state]
+  (let [unit (first (:units state))
+        possible-attacks (can-attack state)
+        ]
+    (if (seq possible-attacks)
+      (as-> state $
+        (attack $ (first (sort-by #(:hp (unit-at state %)) possible-attacks)))
+        (shift-unit $ identity)
+        )
+      (if-let [chosen-step (choose-step state)
+               ]
+        (as-> state $
+          (update $ :units (fn [units] (apply list (assoc (first units) :pos chosen-step) (pop units))))
+          (attack-after-move $)
+          (shift-unit $ identity)
+          )
+        (shift-unit state identity)
+        )
+      )
+    ))
 
 (defn step [state]
   (if (seq (:units state))
-    (move-unit state)
-    (assoc state
-           :rounds (inc (:rounds state))
-           :units (apply list (:moved-units state))
-           :moved-units []
-           )
+    (as-> state $
+      (move-unit $)
+      (if (seq (:units $))
+        $
+        (assoc $
+               :rounds (inc (:rounds $))
+               :units (apply list (sort-by :pos (:moved-units $)))
+               :moved-units []
+               )
+        ))))
+
+(defn victory [state]
+  (->> state
+    (all-units)
+    (map :type)
+    (set)
+    (count)
+    (= 1)
     ))
+
+(defn hpsum [state]
+  (reduce + (map :hp (all-units state))))
+
+(defn outcome [state]
+  (* (:rounds state) (hpsum state)))
 
 (defn flip [[y x]]
   [x y])
 
-(defn solve-a [lines] ())
+(defn finish [states]
+  (->> (last states)
+       (iterate step)
+       (map (fn [s] (do (print-state s) s)))
+       (reductions conj [])
+       (filter #(victory (last %)))
+       (first)
+       (concat states)
+       (apply vector)
+       ))
+
+(defn solve-a [lines]
+  (->> lines
+       (parse-state)
+       (vector)
+       (finish)
+       (last)
+       (outcome)
+       ))
 
 (defn solve-b [lines] ())
 
@@ -186,9 +339,10 @@
    }
 )
 
-(defn day-lines [] (adventofcode.2018.core/day-lines 13))
+(defn day-lines [] (adventofcode.2018.core/day-lines 15))
 (def states [(parse-example 0)])
-(defn start-example [i] (def states [(parse-example i)]) (show-state))
 (defn show-state [] (print-state (last states)))
+(defn start-day-lines [] (def states [(parse-state (day-lines))]) (show-state))
+(defn start-example [i] (def states [(parse-example i)]) (show-state))
 (defn n [] (def states (conj states (step (last states)))) (show-state))
 (defn p [] (def states (pop states)) (show-state))
