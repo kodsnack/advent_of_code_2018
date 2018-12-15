@@ -32,38 +32,38 @@
                        (update m (dec (count m)) #(conj % ch)))))
 
 (defn append-unit [state ch]
-  (as-> state $
-    (update $ :units (fn [units]
+  (-> state
+      (update :units (fn [units]
                        (conj units {:type ch
                                     :pos [(dec (count (:map state))) (count (last (:map state)))]
                                     :hp 200
                                     :power 3
                                     })
                        ))
-    (append-cell $ \.)
-    ))
+      (append-cell \.)
+      ))
 
 (defn parse-state [lines]
   (as-> lines $
-       (reduce (fn [state line]
-                 (reduce (fn [state ch]
-                           (case ch
-                             (\E \G) (append-unit state ch)
-                             (append-cell state ch)
-                             ))
-                         (update state :map (fn [m] (conj m [])))
-                         line
-                         ))
-               {
-                :units []
-                :moved-units []
-                :map []
-                :rounds 0
-                }
-               $
-               )
-       (update $ :units #(apply list %))
-       ))
+    (reduce (fn [state line]
+              (reduce (fn [state ch]
+                        (case ch
+                          (\E \G) (append-unit state ch)
+                          (append-cell state ch)
+                          ))
+                      (update state :map (fn [m] (conj m [])))
+                      line
+                      ))
+            {
+             :units []
+             :moved-units []
+             :map []
+             :rounds 0
+             }
+            $
+            )
+    (update $ :units #(apply list %))
+    ))
 
 (defn parse-example [i]
   (parse-state (clojure.string/split-lines (:map (examples i)))))
@@ -170,14 +170,14 @@
 
 (defn print-navigation [state]
   (let [start-pos (:pos (first (:units state)))]
-    (as-> state $
-      (place-units $)
-      (assoc-in $ start-pos 0)
-      (flood $ [start-pos] #{})
-      (first $)
-      (format-map $)
-      (println $)
-      )))
+    (-> state
+        (place-units)
+        (assoc-in start-pos 0)
+        (flood [start-pos] #{})
+        (first)
+        (format-map)
+        (println)
+        )))
 
 (defn all-units [state]
   (concat (:units state) (:moved-units state)))
@@ -227,16 +227,16 @@
   (let [unit (first (:units state))
         power (:power unit)
         ]
-    (as-> state $
-      (update $ :units (fn [units]
+    (-> state
+        (update :units (fn [units]
                          (apply list (map #(damage-if-target target-pos power %) units))))
-      (update $ :moved-units (fn [units]
+        (update :moved-units (fn [units]
                                (mapv #(damage-if-target target-pos power %) units)))
-      (update $ :units (fn [units]
+        (update :units (fn [units]
                          (apply list (filter #(> (:hp %) 0) units))))
-      (update $ :moved-units (fn [units]
-                         (apply vector (filter #(> (:hp %) 0) units))))
-      )))
+        (update :moved-units (fn [units]
+                               (apply vector (filter #(> (:hp %) 0) units))))
+        )))
 
 (defn shift-unit [state f]
   (assoc state
@@ -259,17 +259,17 @@
         possible-attacks (can-attack state)
         ]
     (if (seq possible-attacks)
-      (as-> state $
-        (attack $ (first (sort-by #(:hp (unit-at state %)) possible-attacks)))
-        (shift-unit $ identity)
+      (-> state
+          (attack (first (sort-by #(:hp (unit-at state %)) possible-attacks)))
+          (shift-unit identity)
         )
       (if-let [chosen-step (choose-step state)
                ]
-        (as-> state $
-          (update $ :units (fn [units] (apply list (assoc (first units) :pos chosen-step) (pop units))))
-          (attack-after-move $)
-          (shift-unit $ identity)
-          )
+        (-> state
+            (update :units (fn [units] (apply list (assoc (first units) :pos chosen-step) (pop units))))
+            (attack-after-move)
+            (shift-unit identity)
+            )
         (shift-unit state identity)
         )
       )
