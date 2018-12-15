@@ -23,15 +23,15 @@
 (def step (comp move-elves expand-scoreboard))
 
 (defn solve-a [num-steps]
-  (->> {:board [3 7] :elfi1 0 :elfi2 1}
-       (iterate step)
+  (as-> {:board [3 7] :elfi1 0 :elfi2 1} $
+       (iterate step $)
        (drop-while (fn [{scoreboard :board}]
-                     (< (count scoreboard) (+ 10 num-steps))))
-       (first)
-       (:board)
-       (drop num-steps)
-       (take 10)
-       (clojure.string/join)
+                     (< (count scoreboard) (+ 10 num-steps)))
+                   $)
+       (first $)
+       (:board $)
+       (subvec $ num-steps (+ num-steps 10))
+       (clojure.string/join $)
    ))
 
 (defn solve-b [target-seq]
