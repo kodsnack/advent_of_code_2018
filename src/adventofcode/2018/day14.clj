@@ -8,16 +8,16 @@
       [scoresum]
       )))
 
-(defn expand-scoreboard [{scoreboard :board elfi1 :elfi1 elfi2 :elfi2}]
-  {:board (into scoreboard (new-recipes (scoreboard elfi1) (scoreboard elfi2)))
+(defn expand-scoreboard [{:keys [board elfi1 elfi2]}]
+  {:board (into board (new-recipes (board elfi1) (board elfi2)))
    :elfi1 elfi1
    :elfi2 elfi2
    })
 
-(defn move-elves [{scoreboard :board elfi1 :elfi1 elfi2 :elfi2}]
-  {:board scoreboard
-   :elfi1 (mod (+ elfi1 (inc (scoreboard elfi1))) (count scoreboard))
-   :elfi2 (mod (+ elfi2 (inc (scoreboard elfi2))) (count scoreboard))
+(defn move-elves [{:keys [board elfi1 elfi2]}]
+  {:board board
+   :elfi1 (mod (+ elfi1 (inc (board elfi1))) (count board))
+   :elfi2 (mod (+ elfi2 (inc (board elfi2))) (count board))
    })
 
 (def step (comp move-elves expand-scoreboard))
