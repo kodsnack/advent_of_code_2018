@@ -253,21 +253,7 @@ def solve(d, elfpow):
                     newx = x
                     newy = y
 
-                    if right_dist == closest_dist:
-                        hits, _ = elves[(x, y)] if is_elf else goblins[(x, y)]
-                        del moving_dict[(x, y)]
-                        moving_dict[(x + 1, y)] = [hits, True]
-                        d[y][x] = '.'
-                        d[y][x + 1] = c
-                        newx += 1                                        
-                    elif down_dist == closest_dist:
-                        hits, _ = elves[(x, y)] if is_elf else goblins[(x, y)]
-                        del moving_dict[(x, y)]
-                        moving_dict[(x, y + 1)] = [hits, True]
-                        d[y][x] = '.'
-                        d[y + 1][x] = c
-                        newy += 1
-                    elif up_dist == closest_dist:
+                    if up_dist == closest_dist:
                         hits, _ = elves[(x, y)] if is_elf else goblins[(x, y)]
                         del moving_dict[(x, y)]
                         moving_dict[(x, y - 1)] = [hits, True]
@@ -281,6 +267,20 @@ def solve(d, elfpow):
                         d[y][x] = '.'
                         d[y][x  - 1] = c
                         newx -= 1
+                    elif right_dist == closest_dist:
+                        hits, _ = elves[(x, y)] if is_elf else goblins[(x, y)]
+                        del moving_dict[(x, y)]
+                        moving_dict[(x + 1, y)] = [hits, True]
+                        d[y][x] = '.'
+                        d[y][x + 1] = c
+                        newx += 1                                        
+                    elif down_dist == closest_dist:
+                        hits, _ = elves[(x, y)] if is_elf else goblins[(x, y)]
+                        del moving_dict[(x, y)]
+                        moving_dict[(x, y + 1)] = [hits, True]
+                        d[y][x] = '.'
+                        d[y + 1][x] = c
+                        newy += 1
 
                     possible_targets = get_neighbours(newx, newy, width, height)
                     targets = [p for p in possible_targets if ((p[0], p[1]) in goblins and is_elf) or ((p[0], p[1]) in elves and not is_elf)]
@@ -327,9 +327,8 @@ def read_and_solve():
         elfpow = 4
         while True:
             score, success = solve(deepcopy(data), elfpow)
-            print('intermediate', score, success)
             if success:
-                return score, elfpow
+                return score
             elfpow += 1
 
 if __name__ == '__main__':
