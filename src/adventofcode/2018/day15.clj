@@ -68,8 +68,9 @@
 (defn parse-example [i]
   (parse-state (clojure.string/split-lines (:map (examples i)))))
 
-(defn format-map [map]
-  (->> map
+(defn format-map [world]
+  (->> world
+       (map (fn [row] (map (fn [c] (if (number? c) (mod c 10) c)) row)))
        (map-indexed (fn [i line]
                       (format "%3d %s" i (clojure.string/join line))))
        (clojure.string/join \newline)
@@ -170,7 +171,6 @@
       (assoc-in $ [0 0] \.)
       (flood $ [start-pos] [0 0])
       (first $)
-      (map (fn [row] (map (fn [c] (if (number? c) (mod c 10) c)) row)) $)
       (format-map $)
       (println $)
       )))
