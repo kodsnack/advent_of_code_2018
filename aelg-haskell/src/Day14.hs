@@ -10,14 +10,18 @@ import           Data.Char
 parse :: [String] -> Int
 parse = read . head
 
+mmod a b
+  | a >= b = mmod (a - b) b
+  | otherwise = a
+
 addRecipe a b xs = (anew, bnew, new)
   where
     ar = score a
     br = score b
     score c = ord (S.index xs (S.length xs - c - 1)) - ord '0'
     new = S.fromList (reverse $ show (ar + br)) S.>< xs
-    anew = (a + ar + 1) `mod` S.length new
-    bnew = (b + br + 1) `mod` S.length new
+    anew = (a + ar + 1) `mmod` S.length new
+    bnew = (b + br + 1) `mmod` S.length new
 
 addWhile :: (S.Seq Char -> Bool) -> S.Seq Char -> S.Seq Char
 addWhile f = go 0 1
@@ -42,7 +46,7 @@ doubleCheck l i x
     foundString = show i `isInfixOf` recipes
     (ans, _) = B.breakSubstring (B.pack (show i)) (B.pack recipes)
 
-solve2 i = show $ doubleCheck 2 i (S.fromList "37")
+solve2 i = show $ doubleCheck 21000000 i (S.fromList "37")
 
 solve :: [String] -> (String, String)
 solve = parse ^>> solve1 &&& solve2
