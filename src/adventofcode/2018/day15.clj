@@ -91,12 +91,6 @@
           (concat (:moved-units state) (:units state))
           ))
 
-(defn format-state [state]
-  (->> state
-       (place-units)
-       (format-map)
-       ))
-
 (defn vec-add [& vectors]
   (apply mapv + vectors))
 (defn vec-sub [& vectors]
@@ -285,14 +279,6 @@
 (defn outcome [state]
   (* (:rounds state) (hpsum state)))
 
-(defn print-path [state]
-  (as-> state $
-    (choose-path $)
-    (plot-path (place-units state) $)
-    (format-map $)
-    (println $)
-    ))
-
 (defn print-navigation [state]
   (let [start-pos (:pos (first (:units state)))]
     (-> state
@@ -304,12 +290,16 @@
         (println)
         )))
 
+(defn format-state [state]
+  (cond-> state
+    true (place-units)
+    (empty? (can-attack state)) (plot-path (choose-path state))
+    true (format-map)
+    ))
+
 (defn print-state [state]
   (println "Round" (:rounds state))
-  (if (seq (can-attack state))
-    (println (format-state state))
-    (print-path state)
-    )
+  (println (format-state state))
   (println "Units:")
   (doseq [unit (:moved-units state)]
     (println unit))
