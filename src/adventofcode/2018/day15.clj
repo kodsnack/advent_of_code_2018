@@ -216,20 +216,24 @@
     unit
     ))
 
-(defn attack [state target-pos]
-  (let [unit (first (:units state))
-        power (:power unit)
-        ]
-    (-> state
-        (update :units (fn [units]
-                         (apply list (map #(damage-if-target target-pos power %) units))))
-        (update :moved-units (fn [units]
-                               (mapv #(damage-if-target target-pos power %) units)))
-        (update :units (fn [units]
-                         (apply list (filter #(> (:hp %) 0) units))))
-        (update :moved-units (fn [units]
-                               (apply vector (filter #(> (:hp %) 0) units))))
-        )))
+(defn attack [state]
+  (if-let [possible-attacks (seq (can-attack state))]
+    (let [target-pos (first (sort-by #(:hp (unit-at state %)) possible-attacks))
+          unit (first (:units state))
+          power (:power unit)
+          ]
+      (-> state
+          (update :units (fn [units]
+                           (apply list (map #(damage-if-target target-pos power %) units))))
+          (update :moved-units (fn [units]
+                                 (mapv #(damage-if-target target-pos power %) units)))
+          (update :units (fn [units]
+                           (apply list (filter #(> (:hp %) 0) units))))
+          (update :moved-units (fn [units]
+                                 (apply vector (filter #(> (:hp %) 0) units))))
+          ))
+    state
+    ))
 
 (defn shift-unit [state f]
   (assoc state
@@ -238,29 +242,20 @@
          )
   )
 
-(defn attack-after-move [state]
-  (let [possible-attacks (can-attack state)
-        ]
-    (if (seq possible-attacks)
-      (attack state (first (sort-by #(:hp (unit-at state %)) possible-attacks)))
-      state
-      )
-    ))
-
 (defn move-unit [state]
   (let [unit (first (:units state))
         possible-attacks (can-attack state)
         ]
     (if (seq possible-attacks)
       (-> state
-          (attack (first (sort-by #(:hp (unit-at state %)) possible-attacks)))
+          (attack)
           (shift-unit identity)
           )
       (if-let [chosen-step (choose-step state)
                ]
         (-> state
             (update :units (fn [units] (apply list (assoc (first units) :pos chosen-step) (pop units))))
-            (attack-after-move)
+            (attack)
             (shift-unit identity)
             )
         (shift-unit state identity)
