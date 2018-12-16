@@ -219,7 +219,7 @@
 (defn attack [state]
   (if-let [possible-attacks (seq (can-attack state))]
     (let [target-pos (->> possible-attacks
-                          (sort-by #(:hp (unit-at state %)))
+                          (sort-by (fn [[y x]] [(:hp (unit-at state [y x])) y x]))
                           (first)
                           )
           power (:power (first (:units state)))
