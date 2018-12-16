@@ -246,7 +246,11 @@
     (attack state)
     (if-let [chosen-step (choose-step state)]
       (-> state
-          (update :units (fn [units] (apply list (assoc (first units) :pos chosen-step) (pop units))))
+          (update :units (fn [units]
+                           (apply list
+                                  (assoc (first units) :pos chosen-step)
+                                  (pop units)
+                                  )))
           (attack)
           )
       state
@@ -261,8 +265,7 @@
                :rounds (inc (:rounds updated))
                :units (apply list (sort-by :pos (:moved-units updated)))
                :moved-units []
-               )
-        ))))
+               )))))
 
 (defn victory [state]
   (->> state
