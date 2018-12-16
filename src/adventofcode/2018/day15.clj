@@ -243,22 +243,18 @@
 
 (defn move-unit [state]
   (if-let [possible-attacks (seq (can-attack state))]
-    (-> state
-        (attack)
-        (shift-unit)
-        )
+    (attack state)
     (if-let [chosen-step (choose-step state)]
       (-> state
           (update :units (fn [units] (apply list (assoc (first units) :pos chosen-step) (pop units))))
           (attack)
-          (shift-unit)
           )
-      (shift-unit state)
+      state
       )))
 
 (defn step [state]
   (if (seq (:units state))
-    (let [updated (move-unit state)]
+    (let [updated (shift-unit (move-unit state))]
       (if (seq (:units updated))
         updated
         (assoc updated
