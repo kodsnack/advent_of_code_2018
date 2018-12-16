@@ -337,13 +337,15 @@
       ))
   )
 
+(defn elf? [unit] (= \E (:type unit)))
+
 (defn simulate [start-state elf-power output]
   (-> start-state
       (update :units (fn [units]
                        (->> units
                             (map (fn [unit]
                                    (cond-> unit
-                                     (= \E (:type unit)) (assoc :power elf-power))))
+                                     (elf? unit) (assoc :power elf-power))))
                             (apply list)
                             )))
       (vector)
