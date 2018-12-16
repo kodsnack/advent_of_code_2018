@@ -235,26 +235,25 @@
     state
     ))
 
-(defn shift-unit [state f]
+(defn shift-unit [state]
   (assoc state
          :units (pop (:units state))
-         :moved-units (conj (:moved-units state) (f (first (:units state))))
-         )
-  )
+         :moved-units (conj (:moved-units state) (first (:units state)))
+         ))
 
 (defn move-unit [state]
   (if-let [possible-attacks (seq (can-attack state))]
     (-> state
         (attack)
-        (shift-unit identity)
+        (shift-unit)
         )
     (if-let [chosen-step (choose-step state)]
       (-> state
           (update :units (fn [units] (apply list (assoc (first units) :pos chosen-step) (pop units))))
           (attack)
-          (shift-unit identity)
+          (shift-unit)
           )
-      (shift-unit state identity)
+      (shift-unit state)
       )))
 
 (defn step [state]
