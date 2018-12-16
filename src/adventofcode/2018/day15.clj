@@ -92,7 +92,10 @@
 
 (defn print-state [state]
   (println "Round" (:rounds state))
-  (println (format-state state))
+  (if (seq (can-attack state))
+    (println (format-state state))
+    (print-path state)
+    )
   (println "Units:")
   (doseq [unit (:moved-units state)]
     (println unit))
@@ -150,6 +153,22 @@
              (cons destination path)
              )
       )))
+
+(defn plot-path [world path]
+  (reduce (fn [world step]
+            (assoc-in world step \+)
+            )
+          world
+          path
+  ))
+
+(defn print-path [state]
+  (as-> state $
+    (choose-path $)
+    (plot-path (place-units state) $)
+    (format-map $)
+    (println $)
+    ))
 
 (defn navigate [state start-pos destinations]
   (let [[flood-map closests] (flood (-> state
