@@ -128,19 +128,33 @@
       )
     ))
 
-(defn find-path [flood-map destination path]
-  (let [step (get-in flood-map destination)]
+(defn find-path [flood-map paths]
+  (let [step (get-in flood-map (first (first paths)))
+        eliminate-duplicates (fn [paths]
+                               (->> paths
+                                    (sort-by first)
+                                    (partition-by first)
+                                    (map first)
+                                    ))
+        ]
     (if (= 0 step)
-      path
+      (->> paths
+           (map rest)
+           (sort-by first)
+           (first)
+           )
       (recur flood-map
-             (->> destination
-                  (adjacent)
-                  (filter #(= (dec step) (get-in flood-map %)))
-                  (first)
-                  )
-             (cons destination path)
-             )
-      )))
+             (->> paths
+                  (mapcat (fn [path]
+                            (map #(cons % path)
+                                 (->> path
+                                      (first)
+                                      (adjacent)
+                                      (filter #(= (dec step) (get-in flood-map %)))
+                                      ))))
+                  (eliminate-duplicates)
+                  (apply vector)
+                  )))))
 
 (defn plot-path [world path]
   (reduce (fn [world step]
@@ -161,7 +175,7 @@
         chosen-dest (first (sort closests))
         ]
     (if chosen-dest
-      (find-path flood-map chosen-dest ())
+      (find-path flood-map [(list chosen-dest)])
       )))
 
 (defn all-units [state]
