@@ -219,8 +219,7 @@
 (defn attack [state]
   (if-let [possible-attacks (seq (can-attack state))]
     (let [target-pos (first (sort-by #(:hp (unit-at state %)) possible-attacks))
-          unit (first (:units state))
-          power (:power unit)
+          power (:power (first (:units state)))
           ]
       (-> state
           (update :units (fn [units]
