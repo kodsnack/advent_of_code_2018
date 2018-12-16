@@ -96,20 +96,6 @@
        (format-map)
        ))
 
-(defn print-state [state]
-  (println "Round" (:rounds state))
-  (if (seq (can-attack state))
-    (println (format-state state))
-    (print-path state)
-    )
-  (println "Units:")
-  (doseq [unit (:moved-units state)]
-    (println unit))
-  (println (first (:units state)) " <--")
-  (doseq [unit (rest (:units state))]
-    (println unit))
-  )
-
 (defn vec-add [& vectors]
   (apply mapv + vectors))
 (defn vec-sub [& vectors]
@@ -168,14 +154,6 @@
           path
   ))
 
-(defn print-path [state]
-  (as-> state $
-    (choose-path $)
-    (plot-path (place-units state) $)
-    (format-map $)
-    (println $)
-    ))
-
 (defn navigate [state start-pos destinations]
   (let [[flood-map closests] (flood (-> state
                                         (place-units)
@@ -189,17 +167,6 @@
     (if chosen-dest
       (find-path flood-map chosen-dest ())
       )))
-
-(defn print-navigation [state]
-  (let [start-pos (:pos (first (:units state)))]
-    (-> state
-        (place-units)
-        (assoc-in start-pos 0)
-        (flood [start-pos] #{})
-        (first)
-        (format-map)
-        (println)
-        )))
 
 (defn all-units [state]
   (concat (:units state) (:moved-units state)))
@@ -326,6 +293,39 @@
 
 (defn outcome [state]
   (* (:rounds state) (hpsum state)))
+
+(defn print-path [state]
+  (as-> state $
+    (choose-path $)
+    (plot-path (place-units state) $)
+    (format-map $)
+    (println $)
+    ))
+
+(defn print-navigation [state]
+  (let [start-pos (:pos (first (:units state)))]
+    (-> state
+        (place-units)
+        (assoc-in start-pos 0)
+        (flood [start-pos] #{})
+        (first)
+        (format-map)
+        (println)
+        )))
+
+(defn print-state [state]
+  (println "Round" (:rounds state))
+  (if (seq (can-attack state))
+    (println (format-state state))
+    (print-path state)
+    )
+  (println "Units:")
+  (doseq [unit (:moved-units state)]
+    (println unit))
+  (println (first (:units state)) " <--")
+  (doseq [unit (rest (:units state))]
+    (println unit))
+  )
 
 (defn finish
   ([states] (finish states true))
