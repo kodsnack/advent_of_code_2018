@@ -337,12 +337,24 @@
       ))
   )
 
+(defn simulate [start-state elf-power output]
+  (-> start-state
+      (update :units (fn [units]
+                       (->> units
+                            (map (fn [unit]
+                                   (cond-> unit
+                                     (= \E (:type unit)) (assoc :power elf-power))))
+                            (apply list)
+                            )))
+      (vector)
+      (finish output)
+      (last)
+      ))
+
 (defn solve-a [lines]
-  (->> lines
+  (-> lines
        (parse-state)
-       (vector)
-       (finish)
-       (last)
+       (simulate 3 false)
        (outcome)
        ))
 
