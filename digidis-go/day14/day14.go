@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"time"
 )
@@ -9,6 +8,7 @@ import (
 var (
 	inputA = 890691
 	inputB = []byte{8, 9, 0, 6, 9, 1}
+	scores = make([]byte, 2, 30000000)
 )
 
 func main() {
@@ -19,26 +19,45 @@ func main() {
 	}()
 
 	a, b := 0, 1
-	scores := []byte{3, 7}
-	lastTarget := inputB[len(inputB)-1]
+	scores[0] = 3
+	scores[1] = 7
+	match := 0
 
-	doneA, doneB := false, false
-
-	for !doneA || !doneB {
+	// This assumes that pattern inputB is found after inputA digits
+	for {
 		n := scores[a] + scores[b]
 		if n < 10 {
 			scores = append(scores, n)
-			if n == lastTarget {
-				doneB = checkTarget(scores, inputB)
+			if n == inputB[match] {
+				match++
+				if match == len(inputB) {
+					fmt.Println("Found target after", len(scores)-len(inputB))
+					break
+				}
+			} else {
+				match = 0
 			}
 		} else {
 			scores = append(scores, 1)
-			if lastTarget == 1 {
-				doneB = checkTarget(scores, inputB)
+			if 1 == inputB[match] {
+				match++
+				if match == len(inputB) {
+					fmt.Println("Found target after", len(scores)-len(inputB))
+					break
+				}
+			} else {
+				match = 0
 			}
+
 			scores = append(scores, n-10)
-			if n-10 == lastTarget {
-				doneB = checkTarget(scores, inputB)
+			if n == inputB[match] {
+				match++
+				if match == len(inputB) {
+					fmt.Println("Found target after", len(scores)-len(inputB))
+					break
+				}
+			} else {
+				match = 0
 			}
 		}
 
@@ -51,18 +70,7 @@ func main() {
 			b = b % len(scores)
 		}
 
-		if len(scores) > inputA+10 {
-			doneA = true
-		}
 	}
-
 	fmt.Println(scores[inputA : inputA+10])
-}
 
-func checkTarget(scores, target []byte) bool {
-	if len(scores) >= len(target) && bytes.Equal(scores[len(scores)-len(target):], target) {
-		fmt.Println("Found target after", len(scores)-len(target))
-		return true
-	}
-	return false
 }
