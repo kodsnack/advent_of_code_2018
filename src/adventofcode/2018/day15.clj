@@ -339,6 +339,17 @@
 
 (defn elf? [unit] (= \E (:type unit)))
 
+(defn elves-win? [state]
+  (and (victory state)
+       (every? elf? (all-units state))
+       ))
+
+(defn perfect-victory? [start-state end-state]
+  (and (elves-win? end-state)
+       (= (count (filter elf? (all-units start-state)))
+          (count (filter elf? (all-units end-state)))
+          )))
+
 (defn simulate [start-state elf-power output]
   (-> start-state
       (update :units (fn [units]
@@ -360,7 +371,26 @@
        (outcome)
        ))
 
-(defn solve-b [lines] ())
+(defn find-min-elf-power [base-state]
+  (loop [min-str 4
+         max-str 200
+         ]
+    (if (= max-str min-str)
+      max-str
+      (let [elf-power (int (/ (+ max-str min-str) 2))
+            end-state (simulate base-state elf-power false)
+            ]
+        (if (perfect-victory? base-state end-state)
+          (recur min-str elf-power)
+          (recur (inc elf-power) max-str)
+          )))))
+
+(defn solve-b [lines]
+  (let [base-state (parse-state lines)
+        min-power (find-min-elf-power base-state)
+        ]
+    (outcome (simulate base-state min-power false))
+    ))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
