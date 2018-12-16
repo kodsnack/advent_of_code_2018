@@ -371,6 +371,6 @@
       [(outcome $) (= (:outcome example) (outcome $))]
       (println $)
       )))
-(defn run-a [] (def states (finish [(parse-state (day-lines))])) (outcome (last states)))
+(defn run-a ([] (run-a true)) ([output] (def states (finish [(parse-state (day-lines))] output)) (outcome (last states))))
 (defn n [] (def states (conj states (step (last states)))) (show-state))
 (defn p [] (def states (pop states)) (show-state))
