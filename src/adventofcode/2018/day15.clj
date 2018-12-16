@@ -243,9 +243,7 @@
   )
 
 (defn move-unit [state]
-  (let [unit (first (:units state))
-        possible-attacks (can-attack state)
-        ]
+  (let [possible-attacks (can-attack state)]
     (if (seq possible-attacks)
       (-> state
           (attack)
