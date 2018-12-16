@@ -223,20 +223,17 @@
                           (first)
                           )
           power (:power (first (:units state)))
+          damage (partial damage-if-target target-pos power)
+          remove-dead (partial filter #(> (:hp %) 0))
+          damage-targeted (fn [units]
+                            (->> units
+                                 (map damage)
+                                 (remove-dead)
+                                 ))
           ]
       (-> state
-          (update :units (fn [units]
-                           (->> units
-                             (map #(damage-if-target target-pos power %))
-                             (filter #(> (:hp %) 0))
-                             (apply list)
-                             )))
-          (update :moved-units (fn [units]
-                                 (->> units
-                                      (mapv #(damage-if-target target-pos power %))
-                                      (filter #(> (:hp %) 0))
-                                      (apply vector)
-                                      )))
+          (update :units (comp #(apply list %) damage-targeted))
+          (update :moved-units (comp #(apply vector %) damage-targeted))
           ))
     state
     ))
