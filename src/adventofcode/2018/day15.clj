@@ -16,6 +16,12 @@
     :rounds 54, :winner :goblins, :hp 536, :outcome 28944}
    {:map "#########\n#G......#\n#.E.#...#\n#..##..G#\n#...##..#\n#...#...#\n#.G...G.#\n#.....G.#\n#########"
     :rounds 20, :winner :goblins, :hp 937, :outcome 18746}
+   {:map "#######\n#E....#\n#.....#\n#.....#\n#.....#\n#....G#\n#######"}
+   {:map "#######\n#....E#\n#.....#\n#.....#\n#.....#\n#G....#\n#######"}
+   {:map "#######\n#G....#\n#.....#\n#.....#\n#.....#\n#....E#\n#######"}
+   {:map "#######\n#....G#\n#.....#\n#.....#\n#.....#\n#E....#\n#######"}
+   {:map "#######\n#G...G#\n#.....#\n#.....#\n#.....#\n#..E..#\n#######"}
+   {:map "#######\n#G....#\n#.###.#\n#.#...#\n###.#.#\n#E....#\n#######"}
    ])
 
 (defn format-example [s]
@@ -354,5 +360,7 @@
 (defn show-state [] (print-state (last states)))
 (defn start-day-lines [] (def states [(parse-state (day-lines))]) (show-state))
 (defn start-example [i] (def states [(parse-example i)]) (show-state))
+(defn run-example [i] (def states (finish [(parse-example i)])))
+(defn run-a [] (def states (finish [(parse-state (day-lines))])))
 (defn n [] (def states (conj states (step (last states)))) (show-state))
 (defn p [] (def states (pop states)) (show-state))
