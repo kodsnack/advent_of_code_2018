@@ -327,16 +327,19 @@
 (defn outcome [state]
   (* (:rounds state) (hpsum state)))
 
-(defn finish [states]
-  (->> (last states)
-       (iterate step)
-       (map (fn [s] (do (print-state s) s)))
-       (reductions conj [])
-       (filter #(victory (last %)))
-       (first)
-       (concat states)
-       (apply vector)
-       ))
+(defn finish
+  ([states] (finish states true))
+  ([states output]
+    (cond->> (last states)
+      true (iterate step)
+      output (map (fn [s] (do (print-state s) s)))
+      true (reductions conj [])
+      true (filter #(victory (last %)))
+      true (first)
+      true (concat states)
+      true (apply vector)
+      ))
+  )
 
 (defn solve-a [lines]
   (->> lines
@@ -360,7 +363,18 @@
 (defn show-state [] (print-state (last states)))
 (defn start-day-lines [] (def states [(parse-state (day-lines))]) (show-state))
 (defn start-example [i] (def states [(parse-example i)]) (show-state))
-(defn run-example [i] (def states (finish [(parse-example i)])))
-(defn run-a [] (def states (finish [(parse-state (day-lines))])))
+(defn run-example [i] (def states (finish [(parse-example i)])) [(outcome (last states)) (= (outcome (last states)) (:outcome (examples i)))])
+(defn run-examples []
+  (doseq [example (filter :outcome examples)]
+    (as-> example $
+      (:map $)
+      (clojure.string/split-lines $)
+      (parse-state $)
+      (finish [$] false)
+      (last $)
+      [(outcome $) (= (:outcome example) (outcome $))]
+      (println $)
+      )))
+(defn run-a [] (def states (finish [(parse-state (day-lines))])) (outcome (last states)))
 (defn n [] (def states (conj states (step (last states)))) (show-state))
 (defn p [] (def states (pop states)) (show-state))
