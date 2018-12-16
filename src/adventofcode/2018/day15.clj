@@ -223,13 +223,17 @@
           ]
       (-> state
           (update :units (fn [units]
-                           (apply list (map #(damage-if-target target-pos power %) units))))
+                           (->> units
+                             (map #(damage-if-target target-pos power %))
+                             (filter #(> (:hp %) 0))
+                             (apply list)
+                             )))
           (update :moved-units (fn [units]
-                                 (mapv #(damage-if-target target-pos power %) units)))
-          (update :units (fn [units]
-                           (apply list (filter #(> (:hp %) 0) units))))
-          (update :moved-units (fn [units]
-                                 (apply vector (filter #(> (:hp %) 0) units))))
+                                 (->> units
+                                      (mapv #(damage-if-target target-pos power %))
+                                      (filter #(> (:hp %) 0))
+                                      (apply vector)
+                                      )))
           ))
     state
     ))
