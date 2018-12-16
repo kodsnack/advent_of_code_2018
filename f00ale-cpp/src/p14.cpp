@@ -70,8 +70,10 @@ int main() {
         rcps.push_back(n%10);
         seq = updateseq(seq, n%10);
 
-        e1 = (e1 + 1 + rcps[e1]) % rcps.size();
-        e2 = (e2 + 1 + rcps[e2]) % rcps.size();
+        e1 += 1 + rcps[e1];
+        while(e1 >= (int)rcps.size()) e1 -= rcps.size();
+        e2 += 1 + rcps[e2];
+        while(e2 >= (int)rcps.size()) e2 -= rcps.size();
 
         if(!ans2 && seq == input) ans2 = rcps.size()-inputlen;
     }
