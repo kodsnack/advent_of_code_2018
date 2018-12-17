@@ -1,5 +1,6 @@
 from aocbase import readInput
 import re
+from collections import deque
 
 inp = readInput()
 inp2='''x=495, y=2..7
@@ -58,69 +59,66 @@ def drawGround(mnx, mny, mxx, mxy, d):
                 print('.',end='')
         print()
 
+def calculateScore(d, countMoving):
+    mny, mxy = 10000, 0
+    for (x, y), c in d.items():
+        if c == '#':
+            mny = min(y, mny)
+            mxy = max(y, mxy)
+    sm = 0
+    for (x, y), c in d.items():
+        if y < mny or y > mxy:
+            continue
+        if c == '~' or (countMoving and c == '|'):
+            sm += 1
+    return sm
+
+def spreadStill(d, x, y, q):
+    while (x,y) in d and d[(x, y)] == '|' and (x, y+1) in d and d[(x, y+1)] in '#~':
+        x -= 1
+    if (x, y) not in d or d[(x, y)] != '#' or (x, y+1) not in d or d[(x, y+1)] not in '#~':
+        return
+    xx = x + 1
+    while (xx, y) in d and d[(xx, y)] == '|' and (xx, y+1) in d and d[(xx, y+1)] in '#~':
+        xx += 1
+    if (xx, y) not in d or d[(xx, y)] != '#' or (xx, y+1) not in d or d[(xx, y+1)] not in '#~':
+        return
+    for i in range(x+1, xx):
+        d[(i, y)] = '~'
+        if (i, y-1) in d and d[(i, y-1)] == '|':
+            q.append((i, y-1))
+
 def spread(mnx, mny, mxx, mxy, d):
-    i = 0
     changed = True
     lastd = d
-    while changed:
-        changed = False
-        newd = dict()
-        for (x, y), c in lastd.items():
-            if c == '+':
-                if (x,y+1) not in d and mnx<=x<=mxx and mny<y+1<=mxy:
-                    newd[(x,y+1)] = '|'
-                    changed = True
-            if c == '|':
-                if (x,y+1) not in d:
-                    if mnx<=x<=mxx and mny<y+1<=mxy:
-                        newd[(x,y+1)] = '|'
-                        changed = True
-                elif (x,y+1) in d and d[(x,y+1)] in '~#':
-                    if (x-1,y) not in d:
-                        if mnx<=x-1<=mxx and mny<y<=mxy:
-                            newd[(x-1,y)] = '|'
-                            changed = True
-                    if (x+1,y) not in d:
-                        if mnx<=x+1<=mxx and mny<y<=mxy:
-                            newd[(x+1,y)] = '|'
-                            changed = True
-        d.update(newd)
-        if len(newd) > 0:
-            starty = min(min(map(lambda x:x[1], newd.keys())),min(map(lambda x:x[1], lastd.keys())))-1
-            endy = max(max(map(lambda x:x[1], newd.keys())), max(map(lambda x:x[1], lastd.keys())))+2
-            for y in range(starty, endy):
-                start = False
-                startX = True
-                for x in range(mnx, mxx+1):
-                    if ((x,y) in d and d[(x,y)] == '|' and 
-                        (x-1, y) in d and d[(x-1, y)] == '#' and
-                        (x, y+1) in d and d[(x, y+1)] in '#~'):
-                        start = True
-                        startX = x
-                    elif (start and
-                        (x,y) in d and d[(x,y)] == '|' and 
-                        (x, y+1) in d and d[(x, y+1)] in '#~'):
-                        pass
-                    elif (start and
-                        (x,y) in d and d[(x,y)] == '#'):
-                        for xx in range(startX, x):
-                            d[(xx,y)] = '~'
-                            if (xx,y-1) in d and d[(xx,y-1)]=='|':
-                                newd[(xx,y-1)] = d[(xx,y-1)]
-                            changed = True
-                        start = False
-                    else:
-                        start = False
-        lastd = newd
-        if i%1000==0:
-            print(i, list(d.values()).count('|')+list(d.values()).count('~'))
-        i+=1
-    drawGround(mnx, mny, mxx, mxy, d)
-    return list(d.values()).count('|')+list(d.values()).count('~'), list(d.values()).count('~')
+    q = deque()
+    q.append((500, 0))
+    while len(q) > 0:
+        x, y = q.popleft()
+        c = d[(x, y)]
+        if c == '+':
+            if (x,y+1) not in d and y+1 <= mxy:
+                d[(x, y+1)] = '|'
+                q.append((x, y+1))
+        if c == '|':
+            if (x,y+1) not in d:
+                if y+1 <= mxy:
+                    d[(x,y+1)] = '|'
+                    q.append((x, y+1))
+            elif (x,y+1) in d and d[(x,y+1)] in '~#':
+                if (x-1,y) not in d:
+                    d[(x-1,y)] = '|'
+                    q.append((x-1, y))
+                else:
+                    spreadStill(d, x, y, q)
+                if (x+1,y) not in d:
+                    d[(x+1,y)] = '|'
+                    q.append((x+1, y))
+                else:
+                    spreadStill(d, x, y, q)
 
 l = parse(inp)
 d, mnx, mny, mxx, mxy = createGround(l)
-#drawGround(mnx, mny, mxx, mxy, d)
-print(spread(mnx, mny, mxx, mxy, d))
-#print("Solution to day 17 part 1:",17.1)
-#print("Solution to day 17 part 2:",17.2)
+spread(mnx, mny, mxx, mxy, d)
+print("Solution to day 17 part 1:",calculateScore(d, True))
+print("Solution to day 17 part 2:",calculateScore(d, False))
