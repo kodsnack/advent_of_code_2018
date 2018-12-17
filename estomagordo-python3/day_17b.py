@@ -1,36 +1,5 @@
 import re
 
-def print_state(clay, resting, reached):
-    min_x = 10000
-    max_x = -10000
-    min_y = 10000
-    max_y = -10000
-
-    for collection in (resting, reached):
-        for x, y in collection:
-            min_x = min(min_x, x)
-            max_x = max(max_x, x)
-            min_y = min(min_y, y)
-            max_y = max(max_y, y)
-
-    with open('17_display.txt', 'w') as f:    
-        for y in range(min_y - 1, max_y + 1):
-            line = []
-            for x in range(min_x - 1, max_x + 1):
-                if x == 500 and y == 0:
-                    line.append('+')
-                elif (x, y) in clay:
-                    line.append('#')
-                elif (x, y) in resting:
-                    line.append('~')
-                elif (x, y) in reached:
-                    line.append('|')
-                else:
-                    line.append('.')
-            f.write(''.join(line))
-            f.write('\n')
-    
-    print(min_x, max_x, min_y, max_y)
 
 def solve(d):
     pattern = re.compile('\d+')
