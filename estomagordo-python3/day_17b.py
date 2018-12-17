@@ -69,7 +69,7 @@ def solve(d):
 
         return new_starts
 
-    for _ in range(2652):
+    while True::
         number = len(reached)
         new_starts = set(starts)
         for x, y in starts:
