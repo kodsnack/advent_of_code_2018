@@ -95,6 +95,13 @@ module List = struct
     | [] -> failwith "a non-empty list is required"
     | x :: xs -> search x xs
 
+  let remove x xs =
+    let rec loop xs' = function
+      | [] -> xs' |> List.rev
+      | y :: ys when y = x -> loop xs' ys
+      | y :: ys -> loop (y :: xs') ys
+    in loop [] xs
+
 end
 
 module Map = struct
