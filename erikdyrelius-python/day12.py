@@ -17,33 +17,48 @@ def parseInput(inp):
         lookup[pattern[0]] = pattern[2]
     return first, lookup
 
-startingPattern, lookup = parseInput(inp)
-
-cache = {}
-print(lookup)
-s = startingPattern
-left = 0
-sm1 = 0
-for i in range(1,5000):
-    s1 = '....' + s + '....'
-    s3 = []
+def generation(current, lookup):
+    s1 = '....' + current + '....'
+    ret = []
     for j in range(len(s1)-4):
-        s2 = s1[j:j+5]
-        s3.append(lookup[s2])
-    s = ''.join(s3)
-    left -= 2
-    s1 = s.strip('.')
-    left += s.find(s1)
-    s = s1
+        ret.append(lookup[s1[j:j+5]])
+    ref = ''.join(ret)
+    ret = ref.strip()
+    return ret, ref.find(ret)-2
+
+def potSum(current, left):
     sm = 0
-    l = left
-    for c in s:
+    for c in current:
         if c=='#':
             sm += left
         left += 1
-    left = l
-    print(i, sm, sm-sm1, (50000000000-i)*(sm-sm1)+sm)
-    sm1 = sm
+    return sm
+    
+def twentyGen(current, lookup):
+    left = 0
+    for i in range(20):
+        current, deltaLeft = generation(current, lookup)
+        left += deltaLeft
+    return potSum(current, left)
 
-print("Solution to day 12 part 1: {}".format(sm))
-print("Solution to day 12 part 2: {}".format('12.2'))
+def manyGen(current, lookup, n):
+    left = 0
+    gen = 0
+    oldSm = 0
+    oldSmDiff = 0
+    while True:
+        current, deltaLeft = generation(current, lookup)
+        left += deltaLeft
+        sm = potSum(current, left)
+        gen += 1
+        if sm-oldSm == oldSmDiff:
+            return (50000000000-gen)*(sm-oldSm)+sm
+        oldSmDiff = sm-oldSm
+        oldSm = sm
+
+startingPattern, lookup = parseInput(inp)
+
+print("Solution to day 12 part 1: {}".format(twentyGen(startingPattern, 
+                                                       lookup)))
+print("Solution to day 12 part 2: {}".format(manyGen(startingPattern, 
+                                                     lookup, 50000000000)))
