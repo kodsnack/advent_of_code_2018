@@ -13,8 +13,8 @@ genGrid f (minX, minY, maxX, maxY) = map (map f) (line <$> [minY .. maxY])
     line y = map (, y) [minX..maxX]
 
 
-bfs :: Ord k => (k -> [k]) -> k -> M.Map k Int
-bfs gen start = snd . head . dropWhile (not . Q.null . fst) $ iterate go (add [start] 0 Q.empty, M.empty)
+bfs :: Ord k => (k -> [k]) -> [k] -> M.Map k Int
+bfs gen start = snd . head . dropWhile (not . Q.null . fst) $ iterate go (add start 0 Q.empty, M.empty)
   where
     add k w = Q.pushList (zip (repeat w) k)
     go (q, lengths)

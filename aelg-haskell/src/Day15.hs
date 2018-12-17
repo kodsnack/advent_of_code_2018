@@ -62,7 +62,7 @@ runMove (room, creatures) (Just creature@(Creature race hp _ pos)) = attack newC
     (newCreature, doMove) = bestMove targetTile creature (room, creatures)
     targetTiles = S.fromList . concatMap (adjacent . _pos) . filter ((/= race) . _race) $ M.elems creatures
     targetTile = listToMaybe . sortOn snd . M.toList $ M.restrictKeys shortestPaths targetTiles
-    shortestPaths = U.bfs moves pos
+    shortestPaths = U.bfs moves [pos]
     moves pos = filter go (adjacent pos)
       where
         go pos = isNothing (M.lookup pos creatures) && (Open == room M.! pos)
@@ -93,7 +93,7 @@ bestMove (Just (targetTile, w)) creature (room, creatures) = (newCreature ,(room
           | otherwise = acc
           where 
             shortestPath = M.lookup targetTile shortestPaths
-            shortestPaths = U.bfs moves pos
+            shortestPaths = U.bfs moves [pos]
             moves pos = filter taken (adjacent pos)
             newCreature = creature{ _pos = pos}
             update pos = M.insert pos newCreature $  M.delete (_pos creature) creatures
