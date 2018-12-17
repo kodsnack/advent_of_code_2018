@@ -47,7 +47,7 @@ run maxY m atRest
   where
     solidAndAtRest = S.union m atRest
     flowing = M.keys $ U.bfs (flow maxY solidAndAtRest) [(500, 0)]
-    newAtRest = map fst . filter snd . map (settled solidAndAtRest) $ flowing
+    newAtRest = map fst . filter snd . U.parallel . map (settled solidAndAtRest) $ flowing
     nextAtRest = S.union atRest . S.fromList $ newAtRest
 
 calc m = (maxY, minY, run maxY m S.empty)

@@ -12,8 +12,7 @@ data Queue a = Queue { inbox :: [a], outbox :: [a] } deriving Show
 
 push v (Queue a b) = Queue (v:a) b
 
-pushList (x:xs) q = push x (pushList xs q)
-pushList [] q = q
+pushList xs q = foldr push q xs
 
 pop (Queue [] []) = (Nothing, Queue [] [])
 pop (Queue inb (v:outb)) = (Just v, Queue inb outb)
