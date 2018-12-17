@@ -40,10 +40,17 @@ def createGround(l):
                 mxx = max(x, mxx)
                 mxy = max(y, mxy)
     d[(500,0)] = '+'
-    return d, mnx, mny, mxx, mxy
+    return d, mnx-1, mny, mxx+1, mxy
 
 def drawGround(mnx, mny, mxx, mxy, d):
     for y in range(mny,mxy+1):
+        if y%50 == 0:
+            for dig in range(3,-1,-1):
+                print("     ",end='')
+                for x in range(mnx, mxx+1):
+                    print(x//10**dig % 10, end='')
+                print()
+        print("{:04d}".format(y), end=' ')
         for x in range(mnx, mxx+1):
             if (x,y) in d:
                 print(d[(x,y)], end='')
@@ -54,10 +61,11 @@ def drawGround(mnx, mny, mxx, mxy, d):
 def spread(mnx, mny, mxx, mxy, d):
     i = 0
     changed = True
+    lastd = d
     while changed:
         changed = False
         newd = dict()
-        for (x, y), c in d.items():
+        for (x, y), c in lastd.items():
             if c == '+':
                 if (x,y+1) not in d and mnx<=x<=mxx and mny<y+1<=mxy:
                     newd[(x,y+1)] = '|'
@@ -76,37 +84,43 @@ def spread(mnx, mny, mxx, mxy, d):
                         if mnx<=x+1<=mxx and mny<y<=mxy:
                             newd[(x+1,y)] = '|'
                             changed = True
-        for y in range(mny, mxy+1):
-            start = False
-            startX = True
-            for x in range(mnx, mxx+1):
-                if ((x,y) in d and d[(x,y)] == '|' and 
-                    (x-1, y) in d and d[(x-1, y)] == '#' and
-                    (x, y+1) in d and d[(x, y+1)] in '#~'):
-                    start = True
-                    startX = x
-                elif (start and
-                      (x,y) in d and d[(x,y)] == '|' and 
-                      (x, y+1) in d and d[(x, y+1)] in '#~'):
-                    pass
-                elif (start and
-                      (x,y) in d and d[(x,y)] == '#'):
-                    for xx in range(startX, x):
-                        d[(xx,y)] = '~'
-                        changed = True
-                    start = False
-                else:
-                    start = False
         d.update(newd)
+        if len(newd) > 0:
+            starty = min(min(map(lambda x:x[1], newd.keys())),min(map(lambda x:x[1], lastd.keys())))-1
+            endy = max(max(map(lambda x:x[1], newd.keys())), max(map(lambda x:x[1], lastd.keys())))+2
+            for y in range(starty, endy):
+                start = False
+                startX = True
+                for x in range(mnx, mxx+1):
+                    if ((x,y) in d and d[(x,y)] == '|' and 
+                        (x-1, y) in d and d[(x-1, y)] == '#' and
+                        (x, y+1) in d and d[(x, y+1)] in '#~'):
+                        start = True
+                        startX = x
+                    elif (start and
+                        (x,y) in d and d[(x,y)] == '|' and 
+                        (x, y+1) in d and d[(x, y+1)] in '#~'):
+                        pass
+                    elif (start and
+                        (x,y) in d and d[(x,y)] == '#'):
+                        for xx in range(startX, x):
+                            d[(xx,y)] = '~'
+                            if (xx,y-1) in d and d[(xx,y-1)]=='|':
+                                newd[(xx,y-1)] = d[(xx,y-1)]
+                            changed = True
+                        start = False
+                    else:
+                        start = False
+        lastd = newd
         if i%1000==0:
-            drawGround(mnx, mny, mxx, mxy, d)
+            print(i, list(d.values()).count('|')+list(d.values()).count('~'))
         i+=1
     drawGround(mnx, mny, mxx, mxy, d)
-    return list(d.values()).count('|')+list(d.values()).count('~')
+    return list(d.values()).count('|')+list(d.values()).count('~'), list(d.values()).count('~')
 
 l = parse(inp)
 d, mnx, mny, mxx, mxy = createGround(l)
-drawGround(mnx, mny, mxx, mxy, d)
+#drawGround(mnx, mny, mxx, mxy, d)
 print(spread(mnx, mny, mxx, mxy, d))
 #print("Solution to day 17 part 1:",17.1)
 #print("Solution to day 17 part 2:",17.2)
