@@ -1,5 +1,6 @@
 (ns adventofcode.2018.day11
-  (:require clojure.string))
+  (:require clojure.string
+            [adventofcode.2018.util :refer [grid]]))
 
 (defn grid-serial-number [lines] (read-string (first lines)))
 
@@ -17,18 +18,6 @@
     (keep-hundreds-digit)
     (+ (- 5))
     ))
-
-(defn cartprod [xs ys]
-  (for [x xs
-        y ys]
-    [x y]
-    ))
-
-(defn grid [minx-in maxx-ex miny-in maxy-ex]
-  (cartprod
-    (range minx-in maxx-ex)
-    (range miny-in maxy-ex)
-  ))
 
 (defn sqgrid [minx miny size]
   (grid minx (+ minx size) miny (+ miny size)))
