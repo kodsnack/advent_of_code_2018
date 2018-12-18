@@ -300,7 +300,6 @@ namespace day18
             map = ReadInput();
             //PrintMap(map);
             //Console.WriteLine();
-            char[,] lastMap;
             int iMax = 1000000000;
             bool done = false;
             int iter = 0;
