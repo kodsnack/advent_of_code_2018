@@ -142,7 +142,16 @@ y=13, x=498..504")
        (count-tiles)
        ))
 
-(defn solve-b [lines] ())
+(defn solve-b [lines]
+  (->> lines
+       (parse-world)
+       (start)
+       (iterate step)
+       (filter finished?)
+       (first)
+       (:settled)
+       (count)
+       ))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
