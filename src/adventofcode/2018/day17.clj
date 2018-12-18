@@ -83,11 +83,11 @@ y=13, x=498..504")
         set-to-add-to (if settling :settled :visited)
         ]
     (cond-> state
-      true (update set-to-add-to #(add-xs % y (concat left-safe-xs right-safe-xs)))
+      true (update set-to-add-to #(add-xs % y (concat left-safe-xs
+                                                      right-safe-xs
+                                                      (remove nil? [left-unsafe-x right-unsafe-x]))))
       left-unsafe-x (update :falls #(conj % [left-unsafe-x y]))
-      left-unsafe-x (update :visited #(conj % [left-unsafe-x y]))
       right-unsafe-x (update :falls #(conj % [right-unsafe-x y]))
-      right-unsafe-x (update :visited #(conj % [right-unsafe-x y]))
       )))
 
 (defn finished? [state] (empty? (:falls state)))
