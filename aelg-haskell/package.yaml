@@ -27,7 +27,7 @@ dependencies:
 - bytestring
 - case-insensitive
 - containers
-- parallel-io
+- parallel
 - directory
 
 library:

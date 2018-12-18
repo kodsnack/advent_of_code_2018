@@ -7,19 +7,18 @@ module Queue
   ) where
 
 import           Prelude hiding (null)
-import qualified Data.Sequence as S
 
+data Queue a = Queue { inbox :: [a], outbox :: [a] } deriving Show
 
-newtype Queue a = Queue (S.Seq a) deriving Show
+push v (Queue a b) = Queue (v:a) b
 
-push v (Queue q) = Queue (q S.:|> v)
+pushList xs q = foldr push q xs
 
-pushList (x:xs) (Queue q) = push x (pushList xs (Queue q))
-pushList [] q = q
+pop (Queue [] []) = (Nothing, Queue [] [])
+pop (Queue inb (v:outb)) = (Just v, Queue inb outb)
+pop (Queue inb []) = pop (Queue [] (reverse inb))
 
-pop (Queue (v S.:<| q)) = (Just v, Queue q)
-pop (Queue S.Empty) = (Nothing, Queue S.Empty)
+null (Queue [] []) = True
+null _ = False
 
-null (Queue q) = S.null q
-
-empty = Queue S.empty
+empty = Queue [] []
