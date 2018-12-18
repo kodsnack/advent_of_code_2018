@@ -13,3 +13,7 @@
    (range minx-in maxx-ex)
    (range miny-in maxy-ex)
    ))
+
+(defn transpose [& colls]
+  (apply map vector colls)
+  )
