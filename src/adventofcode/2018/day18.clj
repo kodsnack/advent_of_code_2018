@@ -24,12 +24,12 @@
        ))
 
 (defn adjacent [state [y x :as pos]]
-  (->> (grid (dec y) (+ 2 y) (dec x) (+ 2 x))
+  (->> (grid (max 0 (dec y))
+             (min (count state) (+ 2 y))
+             (max 0 (dec x))
+             (min (count (first state)) (+ 2 x))
+             )
        (filter #(not= pos %))
-       (filter (fn [[y _]] (<= 0 y)))
-       (filter (fn [[y _]] (< y (count state))))
-       (filter (fn [[_ x]] (<= 0 x)))
-       (filter (fn [[_ x]] (< x (count (first state)))))
        ))
 
 (defn count-adjacent [state type pos]
