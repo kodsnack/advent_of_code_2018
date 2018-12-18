@@ -42,15 +42,15 @@
 
 (defn update-cell [state pos]
   (case (get-in state pos)
-        \. (if (<= 3 (count-adjacent state \| pos)) \| \.)
-        \| (if (<= 3 (count-adjacent state \# pos)) \# \|)
-        \# (if (and (<= 1 (count-adjacent state \# pos))
-                    (<= 1 (count-adjacent state \| pos))
-                    )
-             \#
-             \.
-             )
-        ))
+    \. (if (<= 3 (count-adjacent state \| pos)) \| \.)
+    \| (if (<= 3 (count-adjacent state \# pos)) \# \|)
+    \# (if (and (<= 1 (count-adjacent state \# pos))
+                (<= 1 (count-adjacent state \| pos))
+                )
+         \#
+         \.
+         )
+    ))
 
 (defn step [state]
   (->> (grid 0 (count state) 0 (count (first state)))
