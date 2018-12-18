@@ -107,7 +107,7 @@ y=13, x=498..504")
   (->> (concat visited settled)
        (distinct)
        (count)
-   ))
+       ))
 
 (defn format-state [{:keys [falls settled visited world]}]
   (let [[x y] (last falls)
