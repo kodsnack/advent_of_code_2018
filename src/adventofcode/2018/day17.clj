@@ -165,7 +165,7 @@ y=13, x=498..504")
   (def states (pop states))
   (show-state))
 (defn animate
-  ([] (animate 100))
+  ([] (animate 30))
   ([dt]
    (while true
      (n)
