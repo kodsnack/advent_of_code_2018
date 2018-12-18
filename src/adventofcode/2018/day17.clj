@@ -141,17 +141,17 @@ y=13, x=498..504")
        (first)
        ))
 
-(defn solve-a [lines]
-  (count-tiles (compute lines)))
+(defn solve-a [result]
+  (count-tiles result))
 
-(defn solve-b [lines]
-  (count (:settled (compute lines))))
+(defn solve-b [result]
+  (count (:settled result)))
 
 (defn run [input-lines & args]
-  {:A (solve-a input-lines)
-   :B (solve-b input-lines)
-   }
-  )
+  (let [result (compute input-lines)]
+    {:A (solve-a result)
+     :B (solve-b result)
+     }))
 
 (defn day-lines [] (adventofcode.2018.core/day-lines 17))
 (def states [])
