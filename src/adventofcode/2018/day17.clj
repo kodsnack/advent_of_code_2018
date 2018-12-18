@@ -64,21 +64,18 @@ y=13, x=498..504")
     (if-let [last-safe-x (last safe-xs)]
       (let [first-unsafe-x (f last-safe-x)]
         (if (blocked? state [first-unsafe-x y])
-          [safe-xs nil]
-          [safe-xs first-unsafe-x]
+          [safe-xs ()]
+          [safe-xs [first-unsafe-x]]
           ))
-      [() nil]
+      [() ()]
       )))
 
-(defn move-left [state pos] (move state dec pos))
-(defn move-right [state pos] (move state inc pos))
-
 (defn move-both [state pos]
-  (let [[left-safe-xs left-unsafe-x] (move-left state pos)
-        [right-safe-xs right-unsafe-x] (move-right state pos)
-        ]
-    [(concat left-safe-xs right-safe-xs) (remove nil? [left-unsafe-x right-unsafe-x])]
-  ))
+  (->> [dec inc]
+       (map #(move state % pos))
+       (apply map concat)
+       (map #(remove nil? %))
+       ))
 
 (defn add-xs [xys y new-xs]
   (apply conj xys (map #(vector % y) new-xs)))
