@@ -35,7 +35,8 @@
 (defn count-adjacent [state type pos]
   (->> pos
        (adjacent state)
-       (filter #(= type (get-in state %)))
+       (map #(get-in state %))
+       (filter #(= type %))
        (count)
        ))
 
