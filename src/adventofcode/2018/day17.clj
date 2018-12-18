@@ -85,8 +85,7 @@ y=13, x=498..504")
 
 (defn sweep [state [_ y :as pos]]
   (let [[safe-xs unsafe-xs] (move-both state pos)
-        settling (empty? unsafe-xs)
-        set-to-add-to (if settling :settled :visited)
+        set-to-add-to (if (empty? unsafe-xs) :settled :visited)
         ]
     (-> state
       (update set-to-add-to #(add-xs % y (concat safe-xs unsafe-xs)))
