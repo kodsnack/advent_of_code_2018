@@ -68,6 +68,24 @@
        (apply *)
        ))
 
+(defn simulate [steps history state]
+  (if (= steps 0)
+    state
+    (if-let [match-index (first
+                          (keep-indexed
+                           (fn [i hist-state]
+                             (if (= state hist-state) i nil))
+                           history
+                           ))
+             ]
+      (let [loop-length (inc match-index)
+            steps-left (mod steps loop-length)
+            ]
+        (recur steps-left () state)
+        )
+      (recur (dec steps) (cons state history) (step state))
+      )))
+
 (defn solve-a [lines]
   (->> lines
        (parse-state)
@@ -77,7 +95,12 @@
        (resource-value)
        ))
 
-(defn solve-b [lines] ())
+(defn solve-b [lines]
+  (->> lines
+       (parse-state)
+       (simulate 1000000000 ())
+       (resource-value)
+       ))
 
 (defn run [input-lines & args]
   { :A (solve-a input-lines)
