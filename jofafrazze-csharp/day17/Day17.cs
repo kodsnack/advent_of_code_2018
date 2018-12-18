@@ -70,11 +70,9 @@ namespace day17
     {
         static char[,] map;
         static Position mapWell = new Position();
-        static HashSet<Position> clay = new HashSet<Position>();
 
         static char[,] ReadInput()
         {
-            clay.Clear();
             List<Tuple<Position, Position>> lines = new List<Tuple<Position, Position>>();
             Regex regex = new Regex(@"^([xy])=(\d+), [xy]=(\d+)\.+(\d+)");
             string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\input.txt");
@@ -128,7 +126,6 @@ namespace day17
                     {
                         p.y = y - yOrigo;
                         data[p.x, p.y] = '#';
-                        clay.Add(p);
                     }
                 }
                 else
@@ -138,7 +135,6 @@ namespace day17
                     {
                         p.x = x - xOrigo;
                         data[p.x, p.y] = '#';
-                        clay.Add(p);
                     }
                 }
             }
@@ -310,6 +306,11 @@ namespace day17
                     }
                 }
             }
+            // TBD - Won't work, will use full map, and we want to skip the first firstRow rows.
+            //var dictionary = map.Cast<char>().ToList().GroupBy(x => x).Select(x => new { a = x.Key, b = x.Count() }).ToDictionary(x => x.a, x => x.b);
+            //int flowing = dictionary['|'];
+            //int resting = dictionary['~'];
+            //int water = flowing + resting;
             int water = 0;
             int resting = 0;
             for (int y = firstRow; y < height; y++)
