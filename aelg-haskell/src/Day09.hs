@@ -3,6 +3,7 @@ module Day09 ( solve ) where
 import           Control.Arrow
 import qualified Data.Map.Strict as M
 import qualified Data.Sequence as S
+import           Data.Maybe
 import           Text.ParserCombinators.ReadP
 import qualified Parsing as P
 
@@ -15,21 +16,21 @@ parseRule = do
 
 parse = head . map (P.run parseRule)
 
+rotate i s = back S.>< front
+  where
+    (front, back) = S.splitAt (i `mod` S.length s) s
+
 play (nPlayers, lastPoint) = go (S.singleton 0) 1 M.empty
  where
-   go :: S.Seq Int -> Int -> M.Map Int Int -> M.Map Int Int
    go placed value points
      | value > lastPoint = points
      | value `rem` 23 == 0 = go newPlaced (value + 1) newPoints
-     | otherwise = go (value S.<| S.drop 2 placed S.>< S.take 2 placed) (value + 1) points
+     | otherwise = go (value S.<| rotate 2 placed) (value + 1) points
      where
-       lastSeven = S.drop (S.length placed - 7) placed
-       win = S.index lastSeven 0 + value
-       frontSeven = S.take (S.length placed - 7) placed
-       newPlaced = (S.drop 1 lastSeven) S.>< frontSeven
-       curPlayer = (value - 1) `rem` nPlayers
+       (win S.:<| newPlaced) = rotate (-7) placed
+       curPlayer = (value-1) `mod` nPlayers
        newPoints = M.alter addWin curPlayer points
-       addWin = maybe (Just win) (Just . (win +))
+       addWin = Just . (win + value +) . fromMaybe 0
 
 solve1 = show . maximum . play
 

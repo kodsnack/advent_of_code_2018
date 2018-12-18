@@ -12,7 +12,19 @@ namespace day10
     {
         public int x;
         public int y;
+
+        public Point(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+
+        public static Point operator +(Point p1, Point p2)
+        {
+            return new Point(p1.x + p2.x, p1.y + p2.y);
+        }
     }
+
     public struct Vector
     {
         public Point pos;
@@ -36,10 +48,8 @@ namespace day10
                     GroupCollection groups = matches[0].Groups;
                     Vector v = new Vector();
                     int i = 1;
-                    v.pos.x = int.Parse(groups[i++].Value);
-                    v.pos.y = int.Parse(groups[i++].Value);
-                    v.speed.x = int.Parse(groups[i++].Value);
-                    v.speed.y = int.Parse(groups[i++].Value);
+                    v.pos = new Point(int.Parse(groups[i++].Value), int.Parse(groups[i++].Value));
+                    v.speed = new Point(int.Parse(groups[i++].Value), int.Parse(groups[i++].Value));
                     vectors.Add(v);
                 }
             }
@@ -51,8 +61,7 @@ namespace day10
             for (int i = 0; i < vectors.Count; i++)
             {
                 Vector v = vectors[i];
-                v.pos.x += v.speed.x;
-                v.pos.y += v.speed.y;
+                v.pos += v.speed;
                 vectors[i] = v;
             }
         }
