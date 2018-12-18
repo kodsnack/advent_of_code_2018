@@ -73,21 +73,24 @@ y=13, x=498..504")
 (defn move-left [state pos] (move state dec pos))
 (defn move-right [state pos] (move state inc pos))
 
+(defn move-both [state pos]
+  (let [[left-safe-xs left-unsafe-x] (move-left state pos)
+        [right-safe-xs right-unsafe-x] (move-right state pos)
+        ]
+    [(concat left-safe-xs right-safe-xs) (remove nil? [left-unsafe-x right-unsafe-x])]
+  ))
+
 (defn add-xs [xys y new-xs]
   (apply conj xys (map #(vector % y) new-xs)))
 
 (defn sweep [state [_ y :as pos]]
-  (let [[left-safe-xs left-unsafe-x] (move-left state pos)
-        [right-safe-xs right-unsafe-x] (move-right state pos)
-        settling (not (or left-unsafe-x right-unsafe-x))
+  (let [[safe-xs unsafe-xs] (move-both state pos)
+        settling (empty? unsafe-xs)
         set-to-add-to (if settling :settled :visited)
         ]
-    (cond-> state
-      true (update set-to-add-to #(add-xs % y (concat left-safe-xs
-                                                      right-safe-xs
-                                                      (remove nil? [left-unsafe-x right-unsafe-x]))))
-      left-unsafe-x (update :falls #(conj % [left-unsafe-x y]))
-      right-unsafe-x (update :falls #(conj % [right-unsafe-x y]))
+    (-> state
+      (update set-to-add-to #(add-xs % y (concat safe-xs unsafe-xs)))
+      (update :falls #(add-xs % y unsafe-xs))
       )))
 
 (defn finished? [state] (empty? (:falls state)))
