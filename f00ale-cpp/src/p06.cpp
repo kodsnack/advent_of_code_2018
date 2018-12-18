@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <tuple>
+#include <climits>
+#include <algorithm>
 
 int main() {
     int ans1 = 0;
@@ -68,7 +70,7 @@ int main() {
             int mi = 0;
             bool tie = false;
             int tot_d = 0;
-            for(int i = 0; i < input.size(); i++) {
+            for(int i = 0; i < (int)input.size(); i++) {
                 const auto [x0,y0] = input[i];
                 int dx = abs(x-x0);
                 int dy = abs(y-y0);

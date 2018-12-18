@@ -12,14 +12,11 @@ import qualified Parsing as P
 data Claim = Claim Int Int Int Int Int deriving Show
 
 claim :: ReadP Claim
-claim = do 
-  claim <- Claim <$> (char '#' >> P.integer) 
-                 <*> (string " @ " >> P.integer) 
-                 <*> (char ',' >> P.integer) 
-                 <*> (string ": " >> P.integer)
-                 <*> (char 'x' >> P.integer)
-  eof
-  return claim
+claim = Claim <$> (char '#' >> P.integer)
+               <*> (string " @ " >> P.integer)
+               <*> (char ',' >> P.integer)
+               <*> (string ": " >> P.integer)
+               <*> (char 'x' >> P.integerAnd eof)
 
 parse = map $ P.run claim 
 

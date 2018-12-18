@@ -15,12 +15,8 @@ data Point = Point {x :: Int, y :: Int} deriving (Show, Eq, Ord)
 
 data BoundingBox = BoundingBox Int Int Int Int deriving Show
 
-parsePoint = do 
-  x <- P.integer
-  string ", "
-  y <- P.integer
-  eof
-  return $ Point x y
+parsePoint =
+  Point <$> P.integerAnd (string ", ") <*> P.integerAnd eof
 
 parse = zip [0..] . map (P.run parsePoint)
 
@@ -50,7 +46,7 @@ inBoundingBox (BoundingBox left top right bottom) = map head . group . sort $
 
 
 -- ughh!
-solve1 ps = show . snd . last . filter filterFinite .  sortOn snd . map (\x -> (head x, length x)) . group . sort $  allClosest
+solve1 ps = show . snd . last . filter filterFinite .  sortOn snd . map (head &&& length) . group . sort $  allClosest
   where
     filterFinite (n, p) = n `elem` map fst finiteAreas
     allClosest = mapMaybe (closest ps) ib

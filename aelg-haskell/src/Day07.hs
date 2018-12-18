@@ -18,6 +18,8 @@ parseEdge = do
 
 parse = map (P.run parseEdge)
 
+notIn x = not . (`elem` x)
+
 solve1 g = show . reverse $ go unsorted [] g
   where 
     unsorted = nub . foldMap (\(b,a) -> [b,a]) $ g
@@ -26,7 +28,7 @@ solve1 g = show . reverse $ go unsorted [] g
     go unsorted sorted g = go nextUnsorted nextSorted nextG
       where
         allAfter = map snd g
-        ready = filter (not . (`elem` allAfter)) unsorted
+        ready = filter (notIn allAfter) unsorted
         next = minimum ready
         nextG = filter ((/=) next . fst) g
         nextUnsorted = filter (/= next) unsorted
@@ -39,14 +41,14 @@ solve2 g = show $ go 0 [] unsorted [] g
     go time workers unsorted sorted g = go nextTime nextWorkers nextUnsorted nextSorted nextG
       where
         allAfter = map snd g
-        ready = sort $ filter (not . (`elem` allAfter)) unsorted
+        ready = sort $ filter (notIn allAfter) unsorted
         nextG = filter ((/=) nextDone . fst) g
         nextSorted = nextDone : sorted
-        nextUnsorted = filter (not . (`elem` nextDone : map fst nextWorkers)) unsorted
+        nextUnsorted = filter (notIn (nextDone : map fst nextWorkers)) unsorted
         (nextTime, nextDone, nextWorkers) = work time workers ready
         work time workers ready
           | null ready || length workers == 5 = (nextTime, nextDone, tail workers)
-          | otherwise = work time (newWorkers) (tail ready)
+          | otherwise = work time newWorkers (tail ready)
           where
             (nextDone, nextTime) = head workers
             newWorker = (head ready, time + 61 + (ord (head ready) - ord 'A'))

@@ -1,6 +1,7 @@
 module Template ( solve ) where
 
 import           Control.Arrow
+import           Control.Monad
 import           Data.List
 import           Data.Monoid
 import qualified Data.Map.Strict as M
@@ -9,6 +10,7 @@ import           Data.Maybe
 import           Data.Char
 import           Text.ParserCombinators.ReadP
 import qualified Parsing as P
+import qualified Utils as U
 
 parse = id
 

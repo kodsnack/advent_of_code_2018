@@ -25,25 +25,18 @@ parseLine = InputLine <$> parseTimeStamp <*> parseAction
 
 parseTimeStamp = do
   char '['
-  year <- P.integer
-  char '-'
-  month <- P.integer
-  char '-'
-  day <- P.integer
-  char ' '
-  hour <- P.integer
-  char ':'
-  minute <- P.integer
-  string "] "
+  year <- P.integerAnd $ char '-'
+  month <- P.integerAnd $ char '-'
+  day <- P.integerAnd $ char ' '
+  hour <- P.integerAnd $ char ':'
+  minute <- P.integerAnd $ string "] "
   return $ Timestamp year month day hour minute
 
 parseAction = parseGuard <++ parseWakes <++ parseSleeps
 
 parseGuard = do
   string "Guard #"
-  guard <- P.integer
-  string " begins shift"
-  eof
+  guard <- P.integerAnd $ string " begins shift" >> eof
   return $ GuardShift guard
 
 parseWakes = string "wakes up" >> eof >> return Wakes

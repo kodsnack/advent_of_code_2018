@@ -1,0 +1,18 @@
+```python
+
+# define a function to add a list of numbers to a running total
+def drift(x):
+    freq = 0
+    for el in x:
+        freq += el
+    return freq
+
+# use input to read the freq drifts (cut and paste in), convert to integers and put in a list
+listx = list(map(int, input().split()))
+
+# print(listx)
+
+#do the math
+print(drift(listx))
+
+```

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <climits>
 
 int main() {
     int ans1 = 0;
@@ -10,8 +11,6 @@ int main() {
 
     {
         bool done = false;
-        int num = 0;
-        bool have_num = false;
 
         while (!done) {
             char c;
@@ -57,7 +56,7 @@ int main() {
 
     for(char c = 'a'; c <= 'z'; c++) {
         auto out = calc(reduced, c);
-        auto tmp = out.length();
+        int tmp = out.length();
         if(tmp < ans2) ans2 = tmp;
     }
 

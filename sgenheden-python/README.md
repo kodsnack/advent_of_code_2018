@@ -4,6 +4,7 @@
 * python3 (developed with 3.6)
 * numpy
 * scipy
+* blist
 
 
 ## Usage
