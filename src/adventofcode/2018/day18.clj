@@ -62,8 +62,8 @@
 (defn resource-value [state]
   (->> state
        (apply concat)
-       (map (fn [c] [(= c \|) (= c \#)]))
-       (reduce (fn [[treesum lumbsum] [tree lumb]] [(+ treesum (if tree 1 0)) (+ lumbsum (if lumb 1 0))])
+       (map (fn [c] [(if (= c \|) 1 0) (if (= c \#) 1 0)]))
+       (reduce (fn [[treesum lumbsum] [tree lumb]] [(+ treesum tree) (+ lumbsum lumb)])
                [0 0]
                )
        (apply *)
