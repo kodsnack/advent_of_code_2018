@@ -132,26 +132,20 @@ y=13, x=498..504")
          ((fn [s] (clojure.string/join \newline [s (format "x=%d y=%d falls=%d visited=%d settled=%d" x y (count falls) (count visited) (count settled))])))
          )))
 
-(defn solve-a [lines]
+(defn compute [lines]
   (->> lines
        (parse-world)
        (start)
        (iterate step)
        (filter finished?)
        (first)
-       (count-tiles)
        ))
 
+(defn solve-a [lines]
+  (count-tiles (compute lines)))
+
 (defn solve-b [lines]
-  (->> lines
-       (parse-world)
-       (start)
-       (iterate step)
-       (filter finished?)
-       (first)
-       (:settled)
-       (count)
-       ))
+  (count (:settled (compute lines))))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
