@@ -1,0 +1,63 @@
+  : goto label1 (17)
+01: r4 := 1
+02: r2 := 1
+03: if r3 == r2 * r4:
+  :    r0 += 4
+08: r2++
+09: if r2 <= r3
+11:    goto 03
+12: r4 += 1
+13: if r3 <= r4
+15:    goto 02
+16: r1 := 257 -> END
+17: label1:
+17: r3 += 2
+  : r3 := r3^2
+  : r3 *= 19
+  : r3 *= 11
+  : r5 += 7
+  : r5 *= 22
+  : r5 += 18
+  : r3 += r5
+  : goto 26+r0
+26: goto 1
+27: r5 := (27*28 + 29)*30*14*32 = 10550400
+  : r3 += 10550400
+  : r0 := 0
+  : goto 1
+
+
+    00: addi 1 16 1 -- ip:=ip+17
+    01: seti 1 4 4
+    02: seti 1 1 2     r2 := 1
+    03: mulr 4 2 5     r5 := r2 * r4
+    04: eqrr 5 3 5     r5 := r3 == r5
+    05: addr 5 1 1     ip := ip(5) + r5
+    06: addi 1 1 1     ip := ip(6) + 1 goto label2
+    07: addr 4 0 0     reg[0] += 4
+    08: addi 2 1 2     label2: reg[2] := reg[2] + 1
+    09: gtrr 2 3 5
+    10: addr 1 5 1
+    11: seti 2 4 1
+    12: addi 4 1 4
+    13: gtrr 4 3 5
+    14: addr 5 1 1
+    15: seti 1 1 1
+    16: mulr 1 1 1
+    17: addi 3 2 3 -- label1: reg[3] += 2
+    18: mulr 3 3 3            reg[3] := reg[3]**2
+    19: mulr 1 3 3            reg[3] := reg[3]*ip(19)
+    20: muli 3 11 3           reg[3] := reg[3]*11
+    21: addi 5 7 5            reg[5] := reg[5] + 7
+    22: mulr 5 1 5            reg[5] := reg[5] * ip(22)
+    23: addi 5 18 5           reg[5] := reg[5] + 18
+    24: addr 3 5 3            reg[3] := reg[3] + reg[5]
+    25: addr 1 0 1            ip := ip + reg[1]
+    26: seti 0 7 1            ip := 1
+    27: setr 1 3 5
+    28: mulr 5 1 5
+    29: addr 1 5 5
+    30: mulr 1 5 5
+    31: muli 5 14 5
+    32: mulr 5 1 5
+    33: addr 3 5 3
