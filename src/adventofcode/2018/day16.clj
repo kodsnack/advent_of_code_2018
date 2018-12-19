@@ -61,7 +61,7 @@
           :bani (opri bit-and)
           :borr (oprr bit-or)
           :bori (opri bit-or)
-          :setr (oprr (fn [A B] A))
+          :setr (opri (fn [A B] A))
           :seti (fn [registers inst] (assoc registers (:C inst) (:A inst)))
           :gtir (opir (boolf >))
           :gtri (opri (boolf >))
