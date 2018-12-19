@@ -24,18 +24,9 @@ namespace day19
             input2 = i2;
             output = u;
         }
-        public int A
-        {
-            get { return input1; }
-        }
-        public int B
-        {
-            get { return input2; }
-        }
-        public int C
-        {
-            get { return output; }
-        }
+        public int A    { get { return input1; } }
+        public int B    { get { return input2; } }
+        public int C    { get { return output; } }
     }
 
     public struct Memory : IEquatable<Memory>
@@ -123,17 +114,8 @@ namespace day19
     public abstract class Instruction
     {
         private int opcode;
-        public Instruction(int op)
-        {
-            opcode = op;
-        }
-        public int Opcode
-        {
-            get
-            {
-                return opcode;
-            }
-        }
+        public Instruction(int op) { opcode = op; }
+        public int Opcode { get { return opcode; } }
         public abstract void Execute(InstructionBits i, ref Memory m);
     }
 
@@ -154,7 +136,6 @@ namespace day19
             m[i.C] = m[i.A] + i.B;
         }
     }
-
     public class Mulr : Instruction
     {
         public Mulr(int op) : base(op) { }
@@ -171,7 +152,6 @@ namespace day19
             m[i.C] = m[i.A] * i.B;
         }
     }
-
     public class Banr : Instruction
     {
         public Banr(int op) : base(op) { }
@@ -188,7 +168,6 @@ namespace day19
             m[i.C] = m[i.A] & i.B;
         }
     }
-
     public class Borr : Instruction
     {
         public Borr(int op) : base(op) { }
@@ -205,7 +184,6 @@ namespace day19
             m[i.C] = m[i.A] | i.B;
         }
     }
-
     public class Setr : Instruction
     {
         public Setr(int op) : base(op) { }
@@ -222,7 +200,6 @@ namespace day19
             m[i.C] = i.A;
         }
     }
-
     public class Gtir : Instruction
     {
         public Gtir(int op) : base(op) { }
@@ -247,7 +224,6 @@ namespace day19
             m[i.C] = (m[i.A] > m[i.B]) ? 1 : 0;
         }
     }
-
     public class Eqir : Instruction
     {
         public Eqir(int op) : base(op) { }
@@ -287,18 +263,13 @@ namespace day19
             string line = reader.ReadLine();
             string s = new string(line.Where(Char.IsDigit).ToArray());
             ipRegister = int.Parse(s);
-            Regex regex = new Regex(@"^([a-z]+) (\d+) (\d+) (\d+)");
             while ((line = reader.ReadLine()) != null)
             {
-                MatchCollection matches = regex.Matches(line);
-                if (matches.Count > 0)
-                {
-                    GroupCollection groups = matches[0].Groups;
-                    int i = 1;
-                    int opcode = opcodeDictionary[groups[i++].Value];
-                    InstructionBits bits = new InstructionBits(opcode, int.Parse(groups[i++].Value), int.Parse(groups[i++].Value), int.Parse(groups[i++].Value));
-                    instructions.Add(bits);
-                }
+                int i = 0;
+                string[] v = line.Split(' ');
+                int opcode = opcodes[v[i++]];
+                InstructionBits bits = new InstructionBits(opcode, int.Parse(v[i++]), int.Parse(v[i++]), int.Parse(v[i++]));
+                instructions.Add(bits);
             }
             return instructions;
         }
@@ -323,16 +294,14 @@ namespace day19
             new Eqrr(6),
         };
 
-        static public readonly Dictionary<string, int> opcodeDictionary =
+        static public readonly Dictionary<string, int> opcodes =
             executableInstructions.ToDictionary(x => x.GetType().Name.ToLower(), x => x.Opcode);
+
+        static Dictionary<int, Instruction> instructions = 
+            executableInstructions.ToDictionary(x => x.Opcode, x => x);
 
         static void PartA()
         {
-            Dictionary<int, Instruction> instructions = new Dictionary<int, Instruction>();
-            foreach (Instruction i in executableInstructions)
-            {
-                instructions[i.Opcode] = i;
-            }
             List<InstructionBits> testProgram = ReadInput();
             Memory memory = new Memory();
             int ip = 0;
