@@ -315,6 +315,8 @@ namespace day19
             Console.WriteLine("Part A: Result is " + memory[0] + ".");
         }
 
+        // Calculation using a single loop [O(n)] that does what the Device 
+        // assembler loops does [O(n*n)]
         static int ExecuteDeviceProgramCalculation(int d)
         {
             int a = 0;
@@ -328,6 +330,10 @@ namespace day19
 
         static void PartB()
         {
+            // Parsing the Device assembler program and setting:
+            // a = reg 0, b = reg 1, d = reg 3, x = reg 4 and y = reg 5
+            // gives the following program
+
             int a = 0;
             int b = 0;
             int d = 0;
@@ -354,6 +360,8 @@ namespace day19
             b *= 32;
             d += b;
 
+            // Device calculation loops in assembly/C-like code, O(n*n)
+            //
             //x = 1;
             //Addr1:
             //y = 1;
@@ -371,6 +379,8 @@ namespace day19
             //if (b == 0)
             //    goto Addr1;
 
+            // Device calculation loops in C code, still O(n*n)
+            //
             //for (x = 1; x <= d; x++)
             //    for (y = 1; y <= d; y++)
             //        if (x * y == d)
