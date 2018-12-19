@@ -33,6 +33,6 @@ class Day2Test extends TestCase
     public function testSecondPartSolution()
     {
         $aoc = new Day2();
-        $this->assertEquals(73272, $aoc->secondPart());
+        $this->assertEquals('vtnikorkulbfejvyznqgdxpaw', $aoc->secondPart());
     }
 }
