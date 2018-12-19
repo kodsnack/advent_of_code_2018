@@ -12,21 +12,28 @@
      }
     ))
 
-(defn parse-samples [lines]
-  (->> lines
-       (map clojure.string/trim)
-       (filter (comp not empty?))
-       (partition-by #(clojure.string/starts-with? % "Before"))
-       (partition 2)
-       (map #(apply concat %))
-       (map #(take 3 %))
-       (map (fn [[before-line inst-line after-line]]
-              {:before (parse-registers (second (clojure.string/split before-line #":\s*")))
-               :inst (parse-inst inst-line)
-               :after (parse-registers (second (clojure.string/split after-line #":\s*")))
-               }
-              ))
-       ))
+(defn parse-samples-and-program [lines]
+  (let [[samples [last-sample]] (->> lines
+                                   (map clojure.string/trim)
+                                   (filter (comp not empty?))
+                                   (partition-by #(clojure.string/starts-with? % "Before"))
+                                   (partition 2)
+                                   (map #(apply concat %))
+                                   (split-with #(>= 3 (count %)))
+                                   )
+        [last-sample program] (split-at 3 last-sample)
+        ]
+    [
+     (map (fn [[before-line inst-line after-line]]
+            {:before (parse-registers (second (clojure.string/split before-line #":\s*")))
+             :inst (parse-inst inst-line)
+             :after (parse-registers (second (clojure.string/split after-line #":\s*")))
+             }
+            )
+          (conj samples last-sample)
+          )
+     (map parse-inst program)
+     ]))
 
 (defn oprr [f]
   (fn [registers {:keys [A B C]}]
@@ -73,16 +80,90 @@
        (count)
        ))
 
+(defn initial-hypotheses []
+  (->> (range 0 16)
+       (map (fn [i] [i (set (keys ops))]))
+       (into {})
+       ))
+
+(defn reduce-hypotheses [hypotheses [sample & samples]]
+  (if (nil? sample)
+    hypotheses
+    (let [op-results (map (fn [[sym op]]
+                            {:sym sym
+                             :result (op (:before sample) (:inst sample))
+                             })
+                          ops
+                          )
+          possible-ops (->> op-results
+                            (filter #(= (:result %) (:after sample)))
+                            (map :sym)
+                            (set)
+                            )
+          updated-hypotheses (update hypotheses (:op (:inst sample))
+                                     #(set (filter possible-ops %)))
+          ]
+      (recur updated-hypotheses samples)
+      )))
+
+(defn remove-hypothesis [[opcode opsym] hypotheses]
+  (->> hypotheses
+       (filter #(not= opcode (first %)))
+       (map (fn [[oc syms]]
+              [oc (disj syms opsym)]
+              ))
+       ))
+
+(defn find-hypothesis-with-only-one-sym [hypotheses]
+  (let [{found true other-hypotheses false} (group-by (comp #(= 1 %) count second) hypotheses)]
+    (if found
+      (let [[[opcode opsyms]] found]
+        [opcode (first opsyms)]
+        ))))
+
+(defn conclude-opcodes [conclusion hypotheses]
+  (if (empty? hypotheses)
+    conclusion
+    (let [[opcode opsym] (find-hypothesis-with-only-one-sym hypotheses)]
+      (recur
+       (assoc conclusion opcode opsym)
+       (remove-hypothesis [opcode opsym] hypotheses)
+       ))))
+
+(defn initial-state []
+  {:registers [0 0 0 0]
+   })
+
+(defn execute-instruction [state inst opcodes]
+  (update state :registers #((ops (opcodes (:op inst))) % inst))
+  )
+
+(defn run-program [state [inst & program] opcodes]
+  (if (nil? inst)
+    state
+    (recur (execute-instruction state inst opcodes) program opcodes)
+    ))
+
 (defn solve-a [lines]
   (->> lines
-       (parse-samples)
+       (parse-samples-and-program)
+       (first)
        (map compare-sample)
        (filter #(>= % 3))
        (count)
        ))
 
-(defn solve-b [result]
-  ())
+(defn solve-b [lines]
+  (let [[samples program] (parse-samples-and-program lines)
+        opcodes (->> samples
+                     (reduce-hypotheses (initial-hypotheses))
+                     (conclude-opcodes {})
+                     )
+        ]
+    (->> (run-program (initial-state) program opcodes)
+         (:registers)
+         (first)
+     )))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
