@@ -92,7 +92,7 @@ def run(ip, prog, reg=[0]*6):
         instr[0](instr, reg)
         reg[ip] += 1
         if reg[ip] == 1:
-            return reg[3]
+            return max(reg)
         if reg[ip] < 0 or reg[ip] >= len(prog):
             break
 
@@ -112,4 +112,4 @@ def calcResult(n):
 instr, ip = parse(inp)
 
 print("Solution to day 19 part 1:",calcResult(run(ip, instr)))
-print("Solution to day 19 part 2:",run(ip, instr, [1, 0, 0, 0, 0, 0]))
+print("Solution to day 19 part 2:",calcResult(run(ip, instr, [1, 0, 0, 0, 0, 0])))
