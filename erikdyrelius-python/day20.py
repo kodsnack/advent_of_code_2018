@@ -3,7 +3,7 @@ from aocbase import readInput
 direction = {'N':(0, -1), 'E':(1, 0), 'S':(0, 1), 'W':(-1, 0)}
 
 def parse(s, dist, x, y):
-    while s != "":
+    while len(s) > 0:
         if s[0] in direction:
             nxtX, nxtY = (x + direction[s[0]][0], y + direction[s[0]][1])
             dist[nxtX, nxtY] = min(dist[x, y]+1, dist.get((nxtX, nxtY), 10**9))
@@ -18,7 +18,7 @@ def parse(s, dist, x, y):
         elif s[0] in ')$|':
             return s
         s = s[1:]
-    return s
+    return dist
 
 d = dict()
 inp = readInput()
