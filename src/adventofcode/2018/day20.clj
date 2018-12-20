@@ -69,8 +69,16 @@
        (max-dist)
        ))
 
-(defn solve-b [result]
-  ())
+(defn solve-b [lines]
+  (->> lines
+       (first)
+       (start)
+       (traverse)
+       (:distmap)
+       (vals)
+       (filter #(>= % 1000))
+       (count)
+       ))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
