@@ -2,6 +2,9 @@
   (:require [clojure.string])
 )
 
+(defmacro as->> [alias & forms]
+  `(as-> ~(last forms) ~alias ~@(butlast forms)))
+
 (defn cartprod [xs ys]
   (for [x xs
         y ys]
