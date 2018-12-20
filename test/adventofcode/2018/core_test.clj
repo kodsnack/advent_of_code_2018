@@ -16,7 +16,7 @@
   4  { :A 102688, :B 56901 }
   5  { :A 11108, :B 5094 }
   6  { :A nil, :B nil }
-  7  { :A nil, :B nil }
+  7  { :A "CQSWKZFJONPBEUMXADLYIGVRHT", :B 914 }
   8  { :A nil, :B nil }
   9  { :A nil, :B nil }
   10 { :A nil, :B nil }
