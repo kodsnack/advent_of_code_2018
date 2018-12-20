@@ -2,7 +2,7 @@ from aocbase import readInput
 
 direction = {'N':(0, -1), 'E':(1, 0), 'S':(0, 1), 'W':(-1, 0)}
 
-def parse(s, dist, x, y):
+def parse(s, dist=dict(), x=0, y=0):
     while len(s) > 0:
         if s[0] in direction:
             nxtX, nxtY = (x + direction[s[0]][0], y + direction[s[0]][1])
@@ -20,8 +20,7 @@ def parse(s, dist, x, y):
         s = s[1:]
     return dist
 
-d = dict()
 inp = readInput()
-parse(inp, d, 0, 0)
+d = parse(inp)
 print("Solution to day 20 part 1:",max(d.values()))
 print("Solution to day 20 part 2:",len(list(filter(lambda x:x>=1000, d.values()))))
