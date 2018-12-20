@@ -101,13 +101,23 @@
   nil
   )
 
-(defn format-state [program state]
+(defn format-program [program]
   (->> program
        (:instructions)
        (map-indexed (fn [i inst]
+                      (str i " " inst)
+                      ))
+       (clojure.string/join \newline)
+       ))
+
+(defn format-state [program state]
+  (->> program
+       (format-program)
+       (clojure.string/split-lines)
+       (map-indexed (fn [i line]
                       (if (= i (:ip state))
-                        (str i " " inst " <--")
-                        (str i " " inst)
+                        (str line " <--")
+                        (str line)
                         )))
        (clojure.string/join \newline)
        (str state \newline)
