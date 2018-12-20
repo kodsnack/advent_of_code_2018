@@ -69,10 +69,13 @@
         (update $ :ip inc)
         )))
 
+(defn halted? [program state]
+  (not (contains? (:instructions program) (:ip state))))
+
 (defn run-program [program state]
-  (if (get (:instructions program) (:ip state))
-    (recur program (step program state))
+  (if (halted? program state)
     state
+    (recur program (step program state))
     ))
 
 (defn solve-a [lines]
