@@ -87,7 +87,12 @@
        ))
 
 (defn solve-b [lines]
-  ())
+  (-> lines
+      (parse-program)
+      (run-program (assoc-in (initial-state) [:registers 0] 1))
+      (:registers)
+      (first)
+      ))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
