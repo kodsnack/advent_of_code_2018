@@ -18,19 +18,7 @@ Step F must be finished before step E can begin.")
           lines
           ))
 
-(defn start [dependencies]
-  {:completed []
-   :remaining (->> dependencies
-                   (vals)
-                   (apply concat)
-                   (reduce (fn [deps task]
-                             (update deps task #(or % #{})))
-                           dependencies
-                           )
-                   )
-   })
-
-(defn start-timed [dependencies]
+(defn start-timed [num-workers dependencies]
   {:time 0
    :completed []
    :remaining (->> dependencies
@@ -41,33 +29,12 @@ Step F must be finished before step E can begin.")
                            dependencies
                            )
                    )
-   :workers {0 [nil 0]
-             1 [nil 0]
-             2 [nil 0]
-             3 [nil 0]
-             4 [nil 0]
-          }
+   :workers (reduce (fn [workers worker]
+                      (assoc workers worker [nil 0]))
+                    {}
+                    (range 0 num-workers)
+                    )
    })
-
-(defn step [state]
-  (let [next-task (->> state
-                       (:remaining)
-                       (filter (fn [[task prereqs]] (empty? prereqs)))
-                       (map first)
-                       (sort)
-                       (first)
-                       )
-        ]
-    (-> state
-        (update :completed #(conj % next-task))
-        (update :remaining #(dissoc % next-task))
-        (update :remaining (fn [remaining]
-                             (->> remaining
-                                  (map (fn [[task prereqs]]
-                                         [task (disj prereqs next-task)]))
-                                  (into {})
-                                  )))
-        )))
 
 (defn task-time [task]
   (+ 60 (- (int task) 64)))
@@ -140,24 +107,25 @@ Step F must be finished before step E can begin.")
        (every? (fn [[worker [task time-left]]] (nil? task)) (:workers state))
        ))
 
-(defn solve-a [lines]
+(defn solve [num-workers lines]
   (->> lines
        (parse-dependencies)
-       (start)
-       (iterate step)
+       (start-timed num-workers)
+       (iterate (partial timestep))
        (filter finished?)
        (first)
+       ))
+
+(defn solve-a [lines]
+  (->> lines
+       (solve 1)
        (:completed)
        (apply str)
        ))
 
 (defn solve-b [lines]
   (->> lines
-       (parse-dependencies)
-       (start-timed)
-       (iterate timestep)
-       (filter finished?)
-       (first)
+       (solve 5)
        (:time)
        ))
 
