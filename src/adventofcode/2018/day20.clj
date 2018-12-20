@@ -52,13 +52,6 @@
        (first)
        ))
 
-(defn max-dist [state]
-  (->> state
-       (:distmap)
-       (vals)
-       (apply max)
-       ))
-
 (defn format-state [state] (str state))
 
 (defn solve-a [lines]
@@ -66,7 +59,9 @@
        (first)
        (start)
        (traverse)
-       (max-dist)
+       (:distmap)
+       (vals)
+       (apply max)
        ))
 
 (defn solve-b [lines]
