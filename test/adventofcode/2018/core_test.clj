@@ -29,7 +29,7 @@
   17 { :A 35707, :B 29293 }
   18 { :A 646437, :B 208080 }
   19 { :A nil, :B nil }
-  20 { :A nil, :B nil }
+  20 { :A 3958, :B 8566 }
   21 { :A nil, :B nil }
   22 { :A nil, :B nil }
   23 { :A nil, :B nil }
