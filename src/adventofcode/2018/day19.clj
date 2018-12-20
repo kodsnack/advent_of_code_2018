@@ -94,6 +94,18 @@
    :B (solve-b input-lines)
    })
 
+(defn format-state [program state]
+  (->> program
+       (:instructions)
+       (map-indexed (fn [i inst]
+                      (if (= i (:ip state))
+                        (str i " " inst " <--")
+                        (str i " " inst)
+                        )))
+       (clojure.string/join \newline)
+       (str (last states) \newline)
+       ))
+
 (def example-input "#ip 0
 seti 5 0 1
 seti 6 0 2
@@ -105,18 +117,7 @@ seti 9 0 5")
 (defn day-lines [] (adventofcode.2018.core/day-lines 19))
 (def states [])
 (def program nil)
-(defn show-state []
-  (println (last states))
-  (->> program
-       (:instructions)
-       (map-indexed (fn [i inst]
-                      (println
-                       (if (= i (:ip (last states)))
-                         (str i " " inst " <--")
-                         (str i " " inst)
-                         ))))
-       (dorun)
-       ))
+(defn show-state [] (println (format-state program (last states))))
 (defn start [lines] (def program (parse-program lines)) (def states [(initial-state)]) (show-state))
 (defn start-day-lines [] (start (day-lines)))
 (defn start-example [] (start (clojure.string/split-lines example-input)))
