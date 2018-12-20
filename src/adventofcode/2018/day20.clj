@@ -11,10 +11,10 @@
            (update :pos-stack #(conj % pos))
            (assoc :regex regex)
            )
-    \| (-> state
-           (assoc :pos (first pos-stack))
-           (assoc :regex regex)
-           )
+    \| (assoc state
+              :pos (first pos-stack)
+              :regex regex
+              )
     \) (-> state
            (assoc :pos (first pos-stack))
            (update :pos-stack pop)
