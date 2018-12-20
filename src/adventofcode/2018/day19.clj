@@ -108,7 +108,7 @@
                         (str i " " inst)
                         )))
        (clojure.string/join \newline)
-       (str (last states) \newline)
+       (str state \newline)
        ))
 
 (def example-input "#ip 0
