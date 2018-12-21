@@ -1,0 +1,36 @@
+#ip 1
+
+ 0 seti 123 0 3          d := 123      (0x7b = 0b001111011)
+ 1 bani 3 456 3          d := d & 456 (0x1c8 = 0b111001000)
+ 2 eqri 3 72 3           d := d == 72  (0x48 = 0b001001000)
+ 3 addr 3 1 1              if not d == 1:
+ 4 seti 0 0 1                goto 1
+ 5 seti 0 9 3            d := 0                       => d := 0             => d := 0
+                                                                            => do:
+ 6 bori 3 65536 5        f := d | 65536 (0x10000)     => f := d | 0x10000   =>   f := d | 0x10000
+ 7 seti 15028787 4 3     d := 15028787                => d := 0xe55233      =>   d := 0xe55233
+                                                                            =>   while f >= 256:
+ 8 bani 5 255 2          c := f & 255                 => c := f mod 256     =>
+ 9 addr 3 2 3            d := d + c                   => d := d + c         =>     d := d + (f mod 256)
+10 bani 3 16777215 3     d := d & 16777215 (0xffffff) => d := d mod 2^24    =>     d := d mod 2^24
+11 muli 3 65899 3        d := d * 65899               => d := d * 65899     =>     d := d * 65899
+12 bani 3 16777215 3     d := d & 16677215 (0xffffff) => d := d mod 2^24    =>     d := d mod 2^24
+13 gtir 256 5 2          c := 256 > f                 => if f < 256:        =>
+14 addr 2 1 1            b := b + c                   =>   then: goto 16    =>
+15 addi 1 1 1            b := b + 1                   =>   else: goto 17    =>
+16 seti 27 3 1           b := 27                      =>   then: goto 28    =>
+17 seti 0 9 2            c := 0                       => c := 0             =>
+                                                                            =>
+18 addi 2 1 4            e := c + 1                   => e := c + 1         =>
+19 muli 4 256 4          e := e * 256                 => e := e << 8        =>
+20 gtrr 4 5 4            e := e > f                   => if e > f:          =>
+21 addr 4 1 1            b := b + e                   =>   then: goto 23    =>
+22 addi 1 1 1            b := b + 1                   =>   else: goto 24    =>
+23 seti 25 1 1           b := 25                      =>   then: goto 26    =>
+24 addi 2 1 2            c := c + 1                   =>   else: c++        =>
+25 seti 17 8 1           b := 17                      =>   else: goto 18    =>
+26 setr 2 4 5            f := c                       => f := c             =>     f := floor(f / 256)
+27 seti 7 3 1            b := 7                       => goto 8             =>
+28 eqrr 3 0 2            c := d == a                  => if d == a:         => while not d == a
+29 addr 2 1 1            b := b + c                   =>   then: halt       =>
+30 seti 5 3 1            b := 5                       =>   else: goto 6     =>
