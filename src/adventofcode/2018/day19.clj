@@ -62,11 +62,11 @@
   (let [ip (:ip state)
         inst ((:instructions program) ip)
         ]
-    (as-> state $
-        (assoc-in $ [:registers (:ip program)] ip)
-        (update $ :registers #((ops (:op inst)) % inst))
-        (assoc $ :ip ((:registers $) (:ip program)))
-        (update $ :ip inc)
+    (-> state
+        (assoc-in [:registers (:ip program)] ip)
+        (update :registers #((ops (:op inst)) % inst))
+        (as-> $ (assoc $ :ip ((:registers $) (:ip program))))
+        (update :ip inc)
         )))
 
 (defn halted? [program state]

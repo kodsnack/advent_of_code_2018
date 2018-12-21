@@ -1,5 +1,7 @@
 (ns adventofcode.2018.day13
-  (:require clojure.string))
+  (:require clojure.string
+            [adventofcode.2018.util :refer [as->>]]
+            ))
 
 (defn append-cell [state ch]
   (update state :map (fn [m]
@@ -203,11 +205,11 @@
 (def lines (day-lines))
 (def tick 0)
 (defn show-tick [tick]
-  (as-> lines $
-    (parse-state $)
-    (iterate update-state-remove-crashes $)
-    (nth $ tick)
-    (print-state $)
+  (->> lines
+    (parse-state)
+    (iterate update-state-remove-crashes)
+    (as->> $ (nth $ tick))
+    (print-state)
     ))
 (defn n [] (def tick (inc tick)) (show-tick tick))
 (defn p [] (def tick (dec tick)) (show-tick tick))

@@ -1,6 +1,7 @@
 (ns adventofcode.2018.day15
   (:require clojure.string
-            [clojure.spec.alpha :as spec]))
+            [adventofcode.2018.util :refer [as->>]]
+            ))
 
 (def examples
   [
@@ -52,7 +53,7 @@
       ))
 
 (defn parse-state [lines]
-  (as-> lines $
+  (->> lines
     (reduce (fn [state line]
               (reduce (fn [state ch]
                         (case ch
@@ -68,9 +69,8 @@
              :map []
              :rounds 0
              }
-            $
             )
-    (update $ :units #(apply list %))
+    (as->> $ (update $ :units #(apply list %)))
     ))
 
 (defn parse-example [i]
@@ -406,14 +406,14 @@
 (defn run-example [i] (def states (finish [(parse-example i)])) [(outcome (last states)) (= (outcome (last states)) (:outcome (examples i)))])
 (defn run-examples []
   (doseq [example (filter :outcome examples)]
-    (as-> example $
-      (:map $)
-      (clojure.string/split-lines $)
-      (parse-state $)
-      (finish [$] false)
-      (last $)
-      [(outcome $) (= (:outcome example) (outcome $))]
-      (println $)
+    (->> example
+      (:map)
+      (clojure.string/split-lines)
+      (parse-state)
+      (as->> $ (finish [$] false))
+      (last)
+      (as->> $ [(outcome $) (= (:outcome example) (outcome $))])
+      (println)
       )))
 (defn run-a ([] (run-a true)) ([output] (def states (finish [(parse-state (day-lines))] output)) (outcome (last states))))
 (defn n [] (def states (conj states (step (last states)))) (show-state))

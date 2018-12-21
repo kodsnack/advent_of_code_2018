@@ -1,5 +1,7 @@
 (ns adventofcode.2018.day12
-  (:require clojure.string))
+  (:require clojure.string
+            [adventofcode.2018.util :refer [as->>]]
+            ))
 
 (defn string-to-bools [state-string]
   (mapv #(= \# %) state-string))
@@ -27,12 +29,12 @@
 
 (defn parse-input [lines]
   {
-   :init (as-> lines $
-          (first $)
-          (clojure.string/split $ #": ")
-          (last $)
-          (string-to-bools $)
-          (bools-to-set 0 $)
+   :init (->> lines
+          (first)
+          (as->> $ (clojure.string/split $ #": "))
+          (last)
+          (string-to-bools)
+          (bools-to-set 0)
           )
    :updates (->> lines
               (drop 2)

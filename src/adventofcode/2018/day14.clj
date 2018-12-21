@@ -1,5 +1,7 @@
 (ns adventofcode.2018.day14
-  (:require clojure.string))
+  (:require clojure.string
+            [adventofcode.2018.util :refer [as->>]]
+            ))
 
 (defn new-recipes [score1 score2]
   (let [scoresum (+ score1 score2)]
@@ -23,15 +25,14 @@
 (def step (comp move-elves expand-scoreboard))
 
 (defn solve-a [num-steps]
-  (as-> {:board [3 7] :elfi1 0 :elfi2 1} $
-       (iterate step $)
+  (->> {:board [3 7] :elfi1 0 :elfi2 1}
+       (iterate step)
        (drop-while (fn [{scoreboard :board}]
-                     (< (count scoreboard) (+ 10 num-steps)))
-                   $)
-       (first $)
-       (:board $)
-       (subvec $ num-steps (+ num-steps 10))
-       (clojure.string/join $)
+                     (< (count scoreboard) (+ 10 num-steps))))
+       (first)
+       (:board)
+       (as->> $ (subvec $ num-steps (+ num-steps 10)))
+       (clojure.string/join)
    ))
 
 (defn solve-b [target-seq]
