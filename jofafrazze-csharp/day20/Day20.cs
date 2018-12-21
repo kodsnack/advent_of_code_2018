@@ -186,75 +186,130 @@ namespace day20
                 return children;
             }
 
-            Node ParseInput(string input)
+            int FindClosingParenthesis(string s, int start)
             {
-                int FindClosingParenthesis(string s, int start)
+                char[] delims = { '(', ')' };
+                int depth = 0;
+                int i = 0;
+                int index = start;
+                while ((i = s.IndexOfAny(delims, index)) > 0)
                 {
-                    char[] delims = { '(', ')' };
-                    int depth = 0;
-                    int i = 0;
-                    int index = start;
-                    while ((i = s.IndexOfAny(delims, index)) > 0)
+                    if (s[i] == '(')
                     {
-                        if (s[i] == '(')
-                        {
-                            depth++;
-                        }
-                        else
-                        {
-                            depth--;
-                            if (depth == 0)
-                            {
-                                return i;
-                            }
-                        }
-                        index = i + 1;
+                        depth++;
                     }
-                    return -1;
-                }
-                Node node = new Node();
-                string a = input;
-                int p1 = a.IndexOf('(');
-                int p2 = (p1 > 0) ? FindClosingParenthesis(a, p1) : -1;
-                if (p1 > 0)
-                {
-                    node.directions = a.Substring(0, p1);
-                    string ps = a.Substring(p1 + 1, p2 - p1 - 1);
-                    string suffix = a.Substring(p2 + 1);
-                    bool optional = false;
-                    List<string> children = FindChildren(ps, ref optional);
-                    foreach (string s in children)
+                    else
                     {
-                        Node n = ParseInput(s);
-                        n.optional = optional;
-                        node.children.Add(n);
-                        if (optional && (suffix.Length > 0))
+                        depth--;
+                        if (depth == 0)
                         {
-                            if (suffix[0] == '(')
-                            {
-                                if (suffix[suffix.Length - 1] != ')')
-                                {
-                                    int bug = 1;
-                                }
-                                suffix = suffix.Substring(1, suffix.Length - 2);
-                            }
-                            node.children.Add(ParseInput(suffix));
+                            return i;
                         }
                     }
+                    index = i + 1;
                 }
-                else
+                return -1;
+            }
+
+            List<string> SplitIntoSiblings(string input, ref bool firstOptional)
+            {
+                List<string> nodes = new List<string>();
+                char[] delims = { '(', ')', '|' };
+                int targetDepth = (input[0] == '(') ? 1 : 0;
+                int i, depth = 0;
+                int pos = 0;
+                int firstPos = pos;
+                int lastPos = input.Length - 1;
+                while ((i = input.IndexOfAny(delims, pos)) >= 0)
                 {
-                    node.directions = a;
-                    char[] delims = { '(', ')', '|' };
-                    if (a.IndexOfAny(delims) >= 0)
+                    if (input[i] == '|')
+                    {
+                        if (depth == targetDepth)
+                        {
+                            string tmp1 = input.Substring(firstPos, i - firstPos);
+                            nodes.Add(tmp1);
+                            firstPos = i + 1;
+                        }
+                    }
+                    else if (input[i] == '(')
+                    {
+                        depth++;
+                        if (depth == targetDepth)
+                        {
+                            firstPos = i + 1;
+                        }
+                    }
+                    else
+                    {
+                        depth--;
+                        if (depth == targetDepth - 1)
+                        {
+                            lastPos = i - 1;
+                            break;
+                        }
+                    }
+                    pos = i + 1;
+                }
+                firstOptional = firstPos > lastPos;
+                if (firstOptional)
+                {
+                    string tmp = input.Substring(firstPos + 1);
+                    if (tmp.Count(x => x == '(') != tmp.Count(x => x == ')'))
                     {
                         int bug = 1;
                     }
+                    nodes.Add(tmp);
+                }
+                else
+                {
+                    string tmp = input.Substring(firstPos, lastPos - firstPos + 1);
+                    if (tmp.Count(x => x == '(') != tmp.Count(x => x == ')'))
+                    {
+                        int bug = 1;
+                    }
+                    nodes.Add(tmp);
+                }
+                return nodes;
+            }
+
+            Node CreateNode(string input)
+            {
+                Node node = new Node();
+                string a = input;
+                int p1 = a.IndexOf('(');
+                if (p1 > 0)
+                {
+                    node.directions = a.Substring(0, p1);
+                    string b = a.Substring(p1);
+                    node.children = ParseInput(b);
+                }
+                else
+                {
+                    node.directions = input;
+                }
+                char[] delims = { '(', ')', '|' };
+                if (node.directions.IndexOfAny(delims) >= 0)
+                {
+                    int bug = 1;
                 }
                 return node;
             }
+            List<Node> ParseInput(string input)
+            {
+                List<Node> nodes = new List<Node>();
+                bool firstOptional = false;
+                List<string> nodeStrings = SplitIntoSiblings(input, ref firstOptional);
+                foreach (string s in nodeStrings)
+                {
+                    Node n = CreateNode(s);
+                    n.optional = firstOptional;
+                    firstOptional = false;
+                    nodes.Add(n);
+                }
+                return nodes;
+            }
 
-            Node mainNode = ParseInput(line);
+            Node mainNode = ParseInput(line).First();
             return mainNode;
         }
 
