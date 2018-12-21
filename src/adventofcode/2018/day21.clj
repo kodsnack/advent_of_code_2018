@@ -1,5 +1,7 @@
 (ns adventofcode.2018.day21
-  (:require clojure.string))
+  (:require clojure.string
+            [adventofcode.2018.util :refer [as->>]]
+            ))
 
 (defn parse-registers [line] (read-string line))
 (defn parse-inst [line]
@@ -58,6 +60,8 @@
    :registers [a 0 0 0 0 0]
    :ip 0
    :count 0
+   :register-3-values #{}
+   :register-3-values-vec []
    })
 
 (defn step [{:keys [program] :as state}]
@@ -91,8 +95,56 @@
        (as-> $ ($ 3))
        ))
 
+(defn run-one-cycle [state]
+  (let [state' (step state)]
+    (if (= 28 (:ip state'))
+      (-> state'
+          (update :register-3-values #(conj % (get-in state' [:registers 3])))
+          (update :register-3-values-vec #(conj % (get-in state' [:registers 3])))
+          )
+      (recur state')
+    )))
+
 (defn solve-b [lines]
-  ())
+  (->> lines
+      (parse-program)
+      (as->> $ (initial-state $ 0))
+      (iterate run-one-cycle)
+      (map-indexed vector)
+      (filter (fn [[cycle state]]
+                (println cycle (count (:register-3-values state)) (get-in state [:registers 3]))
+                (< (count (:register-3-values state)) cycle)
+                ))
+      (first)
+      ;; (as->> $ (get-in $ [:registers 3]))
+      ))
+
+
+
+(defn solve-b-2 []
+  (loop [d 0
+         exit-conditions {}
+         d-values []
+         loopnum 0
+         ]
+    (let [end-d (loop [f (bit-or d 0x10000)
+                       d 0xe55233
+                       ]
+                  (if (>= f 256)
+                    (let [d (+ d (mod f 256))
+                          d (bit-and d 0xffffff)
+                          d (* d 65899)
+                          d (bit-and d 0xffffff)
+                          f (int (/ f 256))
+                          ]
+                      (recur f d))
+                    d
+                    ))
+          ]
+      (if (contains? exit-conditions end-d)
+        [exit-conditions d-values]
+        (recur end-d (assoc exit-conditions end-d loopnum) (conj d-values end-d) (inc loopnum))
+        ))))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
@@ -111,7 +163,7 @@
                         (str i " " inst)
                         )))
        (clojure.string/join \newline)
-       (format "Count: %d\t ip: %d\n%s\n%s" (:count state) (:ip state) (:registers state))
+       (format "Count: %d\t ip: %d\n%s\n%s\n%s" (:count state) (:ip state) (:registers state) (:register-3-values state))
        ))
 
 (def example-input "#ip 0
