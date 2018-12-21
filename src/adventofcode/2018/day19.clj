@@ -96,8 +96,10 @@
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
-   :B (solve-b input-lines)
-   })
+   :B nil
+   }
+  nil
+  )
 
 (defn format-state [program state]
   (->> program
