@@ -34,10 +34,10 @@
           (string-to-bools $)
           (bools-to-set 0 $)
           )
-   :updates (as-> lines $
-              (drop 2 $)
-              (map #(clojure.string/split % #"\s*=>\s*") $)
-              (reduce (fn [result [from to]] (assoc result (string-to-bools from) (= "#" to))) {} $)
+   :updates (->> lines
+              (drop 2)
+              (map #(clojure.string/split % #"\s*=>\s*"))
+              (reduce (fn [result [from to]] (assoc result (string-to-bools from) (= "#" to))) {})
               )
    }
   )

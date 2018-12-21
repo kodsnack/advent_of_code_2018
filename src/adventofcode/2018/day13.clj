@@ -6,14 +6,14 @@
                        (update m (dec (count m)) #(conj % ch)))))
 
 (defn append-cart [state ch]
-  (as-> state $
-    (update $ :carts (fn [carts]
+  (-> state
+    (update :carts (fn [carts]
                        (conj carts {:dir ch
                                     :pos [(dec (count (:map state))) (count (last (:map state)))]
                                     :turn :left
                                     })
                        ))
-    (append-cell $ ({\> \-, \< \-, \^ \|, \v \|} ch))
+    (append-cell ({\> \-, \< \-, \^ \|, \v \|} ch))
     ))
 
 (defn parse-state [lines]
