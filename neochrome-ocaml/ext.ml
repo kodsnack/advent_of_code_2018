@@ -5,7 +5,7 @@ module Option = struct
 
   let is_none = function None -> true | _ -> false
   let is_some = function None -> false | _ -> true
-  
+
   let value = function
     | None -> raise (Invalid_argument "Must not be None")
     | Some x -> x
@@ -136,6 +136,7 @@ module Map = struct
   module type S = sig
     include Map.S
     val maxf: (key -> 'a -> 'b) -> 'a t -> key * 'a
+    val find_default : key -> 'a -> 'a t -> 'a
   end
 
   module Make (Ord: Map.OrderedType) : S with type key = Ord.t = struct
@@ -152,6 +153,11 @@ module Map = struct
       |> function
         | None -> failwith "no values"
         | Some (_,max) -> max
+
+    let find_default k d m =
+      match find_opt k m with
+      | None -> d
+      | Some x -> x
 
   end
 end
