@@ -103,6 +103,7 @@
 (defn start [cave]
   {:cave (expand-cave cave [0 0])
    :dijkstra (dijkstra/start [:torch [0 0]])
+   :target [:torch (:target cave)]
    })
 
 (defn expand-cave-if-needed [state [_ [y x]]]
@@ -164,7 +165,7 @@
                 (clojure.string/join \newline)
                 ))
   (println "Move counts:" (map (fn [[k v]] [k (count v)]) (:moves (:dijkstra state))))
-  (println "Goal cost:" (get-in state [:dijkstra :route-costs [:torch (:target (:cave state))]]))
+  (println "Goal cost:" (get-in state [:dijkstra :route-costs (:target state)]))
   )
 
 (defn show-state [cave n]
@@ -185,7 +186,7 @@
        (start)
        (iterate step)
        (some (fn [state]
-               (get-in state [:dijkstra :route-costs [:torch (:target (:cave state))]])))
+               (get-in state [:dijkstra :route-costs (:target state)])))
        ))
 
 (defn run [input-lines & args]
