@@ -102,7 +102,7 @@
        (filter #(can-enter? state %))
   ))
 
-(defn add-move [state move cost]
+(defn add-move [state next-moves move-cost move cost]
   (-> state
       (update :route-costs #(assoc % move cost))
       (update :moves (fn [moves]
@@ -119,14 +119,14 @@
                             )))
       ))
 
-(defn dijkstra-step [state cost move]
+(defn dijkstra-step [state next-moves move-cost cost move]
   (cond-> state
     true (update-in [:moves cost] #(disj % move))
 
     (not (and (contains? (:route-costs state) move)
               (<= ((:route-costs state) move) cost)
               ))
-    (add-move move cost)
+    (add-move next-moves move-cost move cost)
 
     true (update :moves remove-empty)
     ))
@@ -152,7 +152,7 @@
         ]
     (-> state
         (expand-cave-if-needed move)
-        (dijkstra-step cost move)
+        (dijkstra-step next-moves move-cost cost move)
         )))
 
 (defn format-cave [cave]
