@@ -1,4 +1,4 @@
-(ns adventofcode.2018.astar
+(ns adventofcode.2018.A*
   (:require [adventofcode.2018.util :refer [remove-empty]]
             ))
 
