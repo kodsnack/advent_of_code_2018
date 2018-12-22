@@ -12,7 +12,7 @@
                             (reduce (fn [moves new-move]
                                       (update moves
                                               (+ cost (move-cost move new-move))
-                                              #(conj (or % #{}) new-move)
+                                              #(conj (or % (sorted-set)) new-move)
                                               ))
                                     moves
                                     )
@@ -24,7 +24,7 @@
 
 (defn start [initial-move]
   {:route-costs {}
-   :moves {0 #{initial-move}}
+   :moves {0 (sorted-set initial-move)}
    })
 
 (defn step [state next-moves move-cost cost move]
