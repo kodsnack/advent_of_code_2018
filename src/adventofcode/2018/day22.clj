@@ -15,64 +15,70 @@
     (= [y x] target) 0
     (= 0 y) (* x 16807)
     (= 0 x) (* y 48271)
-    :else (* (erosion-level [y (dec x)]) (erosion-level [(dec y) x]))
+    :else (* (get-in erosion-level [y (dec x)]) (get-in erosion-level [(dec y) x]))
     ))
 
-(defn erosion-level [cave pos]
-  (mod (+ (:depth cave) (geoindex cave pos)) 20183))
+(defn erosion-level [cave [y x]]
+  (mod (+ (:depth cave) (get-in cave [:geoindex y x])) 20183))
 
-(defn region-type [cave pos]
-  (mod (get-in cave [:erosion-level pos]) 3))
+(defn region-type [cave [y x]]
+  (mod (get-in cave [:erosion-level y x]) 3))
 
-(defn add-cave-pos [cave pos]
-  (as-> cave $
-    (assoc-in $ [:geoindex pos] (geoindex $ pos))
-    (assoc-in $ [:erosion-level pos] (erosion-level $ pos))
-    (assoc-in $ [:type pos] (region-type $ pos))
-    ))
+(defn minimal-cave [cave]
+  (assoc cave
+         :geoindex []
+         :erosion-level []
+         :type []
+         ))
 
 (defn expand-cave-y [cave]
-  (let [y (inc (first (:maxpos cave)))
-        xs (range 0 (inc (second (:maxpos cave))))
-        ]
-    (->> xs
-         (map #(vector y %))
-         (reduce add-cave-pos cave)
-         (as->> $ (update-in $ [:maxpos 0] inc))
-         )))
+  (let [y (count (:type cave))]
+    (reduce (fn [cave x]
+              (as-> cave $
+                (update-in $ [:geoindex y] #(conj % (geoindex $ [y x])))
+                (update-in $ [:erosion-level y] #(conj % (erosion-level $ [y x])))
+                (update-in $ [:type y] #(conj % (region-type $ [y x])))
+                ))
+            (-> cave
+                (update :geoindex #(conj % []))
+                (update :erosion-level #(conj % []))
+                (update :type #(conj % []))
+                )
+            (range 0 (count (first (:type cave))))
+            )))
 
 (defn expand-cave-x [cave]
-  (let [ys (range 0 (inc (first (:maxpos cave))))
-        x (inc (second (:maxpos cave)))
-        ]
-    (->> ys
-         (map #(vector % x))
-         (reduce add-cave-pos cave)
-         (as->> $ (update-in $ [:maxpos 1] inc))
-         )))
+  (let [x (count (first (:type cave)))]
+    (reduce (fn [cave y]
+              (as-> cave $
+                (update-in $ [:geoindex y] #(conj % (geoindex $ [y x])))
+                (update-in $ [:erosion-level y] #(conj % (erosion-level $ [y x])))
+                (update-in $ [:type y] #(conj % (region-type $ [y x])))
+                ))
+            cave
+            (range 0 (count (:type cave)))
+            )
+    ))
 
-(defn compute-cave [{depth :depth [target-y target-x :as target] :target}]
-  (-> {:geoindex {}
-       :erosion-level {}
-       :type {}
-       :depth depth
-       :target target
-       :maxpos [0 0]
-       }
-      (add-cave-pos [0 0])
-      (as-> $ (iterate expand-cave-x $))
-      (nth target-x)
-      (as-> $ (iterate expand-cave-y $))
-      (nth (inc target-y))
+(defn expand-cave [cave [target-y target-x]]
+  (->> cave
+      (iterate expand-cave-y)
+      (filter #(= (count (:type %)) (inc target-y)))
+      (first)
+      (iterate expand-cave-x)
+      (filter #(= (count (first (:type %))) (inc target-x)))
+      (first)
       ))
+
+(defn compute-cave [{:keys [target] :as cave}]
+  (expand-cave (minimal-cave cave) target))
 
 (defn solve-a [lines]
   (->> lines
        (parse-input)
        (compute-cave)
        (:type)
-       (vals)
-       (apply +)
+       (reduce #(apply + %1 %2) 0)
        ))
 
 (defn solve-b [lines]
