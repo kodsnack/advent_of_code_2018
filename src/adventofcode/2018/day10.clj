@@ -83,30 +83,29 @@ position=<-3,  6> velocity=< 2, -1>")
     (* (- maxx minx) (- maxy miny))
     ))
 
-(defn solve-a [lines]
+(defn solve [lines]
   (->> lines
        (parse-input)
        (iterate step)
        (partition 2 1)
-       (some (fn [[st1 st2]]
+       (map-indexed vector)
+       (some (fn [[i [st1 st2]]]
                  (if (< (area st1) (area st2))
-                   st1
+                   [i st1]
                    nil
                    )))
-       (format-state)
        ))
 
-(defn solve-b [lines]
-  ())
-
 (defn run [input-lines & args]
-  {:A (solve-a input-lines)
-   :B (solve-b input-lines)
-   }
-  )
-
-(defn run-print []
-  (println (solve-a (day-lines)))
-  )
+  (let [[time message] (solve input-lines)]
+    {:A (format-state message)
+     :B time
+     }))
 
 (defn day-lines [] (adventofcode.2018.core/day-lines 10))
+(defn run-print []
+  (let [{:keys [A B]} (run (day-lines))]
+    (println A)
+    (println B)
+    ))
+
