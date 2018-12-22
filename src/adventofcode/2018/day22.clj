@@ -21,24 +21,50 @@
 (defn erosion-level [cave pos]
   (mod (+ (:depth cave) (geoindex cave pos)) 20183))
 
-(defn type [cave pos]
+(defn region-type [cave pos]
   (mod (get-in cave [:erosion-level pos]) 3))
 
+(defn add-cave-pos [cave pos]
+  (as-> cave $
+    (assoc-in $ [:geoindex pos] (geoindex $ pos))
+    (assoc-in $ [:erosion-level pos] (erosion-level $ pos))
+    (assoc-in $ [:type pos] (region-type $ pos))
+    ))
+
+(defn expand-cave-y [cave]
+  (let [y (inc (first (:maxpos cave)))
+        xs (range 0 (inc (second (:maxpos cave))))
+        ]
+    (->> xs
+         (map #(vector y %))
+         (reduce add-cave-pos cave)
+         (as->> $ (update-in $ [:maxpos 0] inc))
+         )))
+
+(defn expand-cave-x [cave]
+  (let [ys (range 0 (inc (first (:maxpos cave))))
+        x (inc (second (:maxpos cave)))
+        ]
+    (->> ys
+         (map #(vector % x))
+         (reduce add-cave-pos cave)
+         (as->> $ (update-in $ [:maxpos 1] inc))
+         )))
+
 (defn compute-cave [{depth :depth [target-y target-x :as target] :target}]
-  (->> (grid 0 (inc target-y) 0 (inc target-x))
-       (reduce (fn [cave pos]
-                 (as-> cave $
-                     (assoc-in $ [:geoindex pos] (geoindex $ pos))
-                     (assoc-in $ [:erosion-level pos] (erosion-level $ pos))
-                     (assoc-in $ [:type pos] (type $ pos))
-                     ))
-               {:geoindex {}
-                :erosion-level {}
-                :type {}
-                :depth depth
-                :target target
-                })
-       ))
+  (-> {:geoindex {}
+       :erosion-level {}
+       :type {}
+       :depth depth
+       :target target
+       :maxpos [0 0]
+       }
+      (add-cave-pos [0 0])
+      (as-> $ (iterate expand-cave-x $))
+      (nth target-x)
+      (as-> $ (iterate expand-cave-y $))
+      (nth (inc target-y))
+      ))
 
 (defn solve-a [lines]
   (->> lines
