@@ -1,6 +1,6 @@
 (ns adventofcode.2018.day15
   (:require clojure.string
-            [adventofcode.2018.util :refer [as->>]]
+            [adventofcode.2018.util :refer [as->> vec-add vec-sub]]
             ))
 
 (def examples
@@ -91,11 +91,6 @@
           (:map state)
           (concat (:moved-units state) (:units state))
           ))
-
-(defn vec-add [& vectors]
-  (apply mapv + vectors))
-(defn vec-sub [& vectors]
-  (apply mapv - vectors))
 
 (defn adjacent [pos]
   [(vec-add pos [-1 0])

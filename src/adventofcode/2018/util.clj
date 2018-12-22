@@ -20,3 +20,8 @@
 (defn transpose [& colls]
   (apply map vector colls)
   )
+
+(defn vec-add [& vectors]
+  (apply mapv + vectors))
+(defn vec-sub [& vectors]
+  (apply mapv - vectors))

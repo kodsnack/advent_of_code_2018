@@ -1,6 +1,6 @@
 (ns adventofcode.2018.day13
   (:require clojure.string
-            [adventofcode.2018.util :refer [as->>]]
+            [adventofcode.2018.util :refer [as->> vec-add]]
             ))
 
 (defn append-cell [state ch]
@@ -83,9 +83,6 @@
               \\ (if (#{\^ \v} dir) :left :right)
               \/ (if (#{\< \>} dir) :left :right)
               )))
-
-(defn vec-add [& vectors]
-  (apply mapv + vectors))
 
 (defn dir-to-dydx [dir]
   ({\v [1 0]
