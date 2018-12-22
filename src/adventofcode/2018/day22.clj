@@ -102,8 +102,7 @@
 
 (defn start [cave]
   {:cave (expand-cave cave [0 0])
-   :route-costs {}
-   :moves {0 #{[:torch [0 0]]}}
+   :dijkstra (dijkstra/start [:torch [0 0]])
    })
 
 (defn expand-cave-if-needed [state [_ [y x]]]
@@ -116,12 +115,12 @@
     ))
 
 (defn step [state]
-  (let [cost (apply min (keys (:moves state)))
-        move (first (get-in state [:moves cost]))
+  (let [cost (apply min (keys (:moves (:dijkstra state))))
+        move (first (get-in state [:dijkstra :moves cost]))
         ]
     (-> state
         (expand-cave-if-needed move)
-        (dijkstra/step next-moves move-cost cost move)
+        (as-> $ (update $ :dijkstra #(dijkstra/step % (fn [move] (next-moves $ move)) move-cost cost move)))
         )))
 
 (defn format-cave [cave]
@@ -144,7 +143,7 @@
   (->> (get-in state [:cave :type])
        (map-indexed (fn [y row]
                       (map-indexed (fn [x type]
-                                     (let [cost (get-in state [:route-costs [tool [y x]]])
+                                     (let [cost (get-in state [:dijkstra :route-costs [tool [y x]]])
                                            cost-digit (if cost (mod cost 10) ".")
                                            ]
                                        cost-digit
@@ -164,8 +163,8 @@
                 (apply map #(clojure.string/join "  " [%1 %2 %3]))
                 (clojure.string/join \newline)
                 ))
-  (println "Move counts:" (map (fn [[k v]] [k (count v)]) (:moves state)))
-  (println "Goal cost:" (get-in state [:route-costs [:torch (:target (:cave state))]]))
+  (println "Move counts:" (map (fn [[k v]] [k (count v)]) (:moves (:dijkstra state))))
+  (println "Goal cost:" (get-in state [:dijkstra :route-costs [:torch (:target (:cave state))]]))
   )
 
 (defn show-state [cave n]
@@ -186,7 +185,7 @@
        (start)
        (iterate step)
        (some (fn [state]
-               (get-in state [:route-costs [:torch (:target (:cave state))]])))
+               (get-in state [:dijkstra :route-costs [:torch (:target (:cave state))]])))
        ))
 
 (defn run [input-lines & args]

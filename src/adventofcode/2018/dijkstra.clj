@@ -7,7 +7,7 @@
       (update :route-costs #(assoc % move cost))
       (update :moves (fn [moves]
                        (->> move
-                            (next-moves state)
+                            (next-moves)
                             (remove #(contains? (:route-costs state) %))
                             (reduce (fn [moves new-move]
                                       (update moves
@@ -18,6 +18,11 @@
                                     )
                             )))
       ))
+
+(defn start [initial-move]
+  {:route-costs {}
+   :moves {0 #{initial-move}}
+   })
 
 (defn step [state next-moves move-cost cost move]
   (cond-> state
