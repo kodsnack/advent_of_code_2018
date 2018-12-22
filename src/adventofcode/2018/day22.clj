@@ -1,6 +1,6 @@
 (ns adventofcode.2018.day22
   (:require clojure.string
-            [adventofcode.2018.dijkstra :refer [step] :rename {step dijkstra-step}]
+            [adventofcode.2018.dijkstra :as dijkstra]
             [adventofcode.2018.util :refer [vec-add]]
             ))
 
@@ -121,7 +121,7 @@
         ]
     (-> state
         (expand-cave-if-needed move)
-        (dijkstra-step next-moves move-cost cost move)
+        (dijkstra/step next-moves move-cost cost move)
         )))
 
 (defn format-cave [cave]
