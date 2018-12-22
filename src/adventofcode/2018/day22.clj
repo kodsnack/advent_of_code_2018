@@ -165,7 +165,7 @@
                 (clojure.string/join \newline)
                 ))
   (println "Move counts:" (map (fn [[k v]] [k (count v)]) (:moves (:dijkstra state))))
-  (println "Goal cost:" (get-in state [:dijkstra :route-costs (:target state)]))
+  (println "Goal cost:" (dijkstra/get-cost (:dijkstra state) (:target state)))
   )
 
 (defn show-state [cave n]
@@ -186,7 +186,7 @@
        (start)
        (iterate step)
        (some (fn [state]
-               (get-in state [:dijkstra :route-costs (:target state)])))
+               (dijkstra/get-cost (:dijkstra state) (:target state))))
        ))
 
 (defn run [input-lines & args]

@@ -19,6 +19,9 @@
                             )))
       ))
 
+(defn get-cost [state move]
+  (get-in state [:route-costs move]))
+
 (defn start [initial-move]
   {:route-costs {}
    :moves {0 #{initial-move}}
