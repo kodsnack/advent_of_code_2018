@@ -73,6 +73,22 @@
 (defn compute-cave [{:keys [target] :as cave}]
   (expand-cave (minimal-cave cave) target))
 
+(defn format-cave [cave]
+  (->> cave
+       (:type)
+       (map (fn [row]
+              (map (fn [type]
+                     (case type
+                       0 \.
+                       1 \=
+                       2 \|
+                       ))
+                   row
+                   )))
+       (map clojure.string/join)
+       (clojure.string/join "\n")
+       ))
+
 (defn solve-a [lines]
   (->> lines
        (parse-input)
