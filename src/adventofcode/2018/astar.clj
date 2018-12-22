@@ -2,7 +2,7 @@
   (:require [adventofcode.2018.util :refer [remove-empty]]
             ))
 
-(defn add-move [state next-moves move-cost move cost]
+(defn add-move [state next-moves move-cost min-remaining-cost move cost]
   (-> state
       (update :route-costs #(assoc % move cost))
       (update :moves (fn [moves]
@@ -34,7 +34,7 @@
    :moves {0 (list initial-move)}
    })
 
-(defn step [state next-moves move-cost]
+(defn step [state next-moves move-cost min-remaining-cost]
   (let [[move cost] (next-move state)]
     (cond-> state
       true (update-in [:moves cost] pop)
@@ -42,7 +42,7 @@
       (not (and (contains? (:route-costs state) move)
                 (<= ((:route-costs state) move) cost)
                 ))
-      (add-move next-moves move-cost move cost)
+      (add-move next-moves move-cost min-remaining-cost move cost)
 
       true (update :moves remove-empty)
       )))
