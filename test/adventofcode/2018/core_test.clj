@@ -31,7 +31,7 @@
   19 { :A nil, :B nil }
   20 { :A 3958, :B 8566 }
   21 { :A nil, :B nil }
-  22 { :A nil, :B nil }
+  22 { :A 7380, :B 1013 }
   23 { :A nil, :B nil }
   24 { :A nil, :B nil }
   25 { :A nil, :B nil }
