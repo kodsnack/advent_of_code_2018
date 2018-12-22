@@ -1,6 +1,6 @@
 (ns adventofcode.2018.day22
   (:require clojure.string
-            [adventofcode.2018.util :refer [grid]]
+            [adventofcode.2018.util :refer [vec-add]]
             ))
 
 (defn parse-input [[depth-line target-line]]
@@ -73,6 +73,92 @@
 (defn compute-cave [{:keys [target] :as cave}]
   (expand-cave (minimal-cave cave) target))
 
+(defn can-enter? [state [tool [y x]]]
+  (case [(get-in state [:cave :type y x]) tool]
+    [0 :climb] true
+    [0 :torch] true
+    [0 :neith] false
+
+    [1 :climb] true
+    [1 :torch] false
+    [1 :neith] true
+
+    [2 :climb] false
+    [2 :torch] true
+    [2 :neith] true
+    ))
+
+(defn move-cost [[fromtool _] [totool _]]
+  (if (= fromtool totool) 1 7))
+
+(defn remove-empty [m]
+  (reduce dissoc m (filter #(empty? (m %)) (keys m))))
+
+(defn next-moves [state [tool pos]]
+  (->> [[-1 0] [0 -1] [1 0] [0 1]]
+       (map #(vec-add pos %))
+       (filter (fn [[y x]]
+                 (and (<= 0 y)
+                      (<= 0 x)
+                      )))
+       (map #(vector tool %))
+       (concat (map #(vector % pos) (remove #(= tool %) [:climb :torch :neith])))
+       (filter #(can-enter? state %))
+  ))
+
+(defn add-move [state move cost]
+  (-> state
+      (update :route-costs #(assoc % move cost))
+      (update :moves (fn [moves]
+                       (->> move
+                            (next-moves state)
+                            (remove #(contains? (:route-costs state) %))
+                            (reduce (fn [moves new-move]
+                                      (update moves
+                                              (+ cost (move-cost move new-move))
+                                              #(conj (or % #{}) new-move)
+                                              ))
+                                    moves
+                                    )
+                            )))
+      ))
+
+(defn dijkstra-step [state cost move]
+  (cond-> state
+    true (update-in [:moves cost] #(disj % move))
+
+    (not (and (contains? (:route-costs state) move)
+              (<= ((:route-costs state) move) cost)
+              ))
+    (add-move move cost)
+
+    true (update :moves remove-empty)
+    ))
+
+(defn start [cave]
+  {:cave (expand-cave cave [0 0])
+   :route-costs {}
+   :moves {0 #{[:torch [0 0]]}}
+   })
+
+(defn expand-cave-if-needed [state [_ [y x]]]
+  (cond-> state
+    (= y (dec (count (:type (:cave state)))))
+    (update :cave expand-cave-y)
+
+    (= x (dec (count (first (:type (:cave state))))))
+    (update :cave expand-cave-x)
+    ))
+
+(defn step [state]
+  (let [cost (apply min (keys (:moves state)))
+        move (first (get-in state [:moves cost]))
+        ]
+    (-> state
+        (expand-cave-if-needed move)
+        (dijkstra-step cost move)
+        )))
+
 (defn format-cave [cave]
   (->> cave
        (:type)
@@ -89,6 +175,37 @@
        (clojure.string/join "\n")
        ))
 
+(defn format-route-costs [state tool]
+  (->> (get-in state [:cave :type])
+       (map-indexed (fn [y row]
+                      (map-indexed (fn [x type]
+                                     (let [cost (get-in state [:route-costs [tool [y x]]])
+                                           cost-digit (if cost (mod cost 10) ".")
+                                           ]
+                                       cost-digit
+                                       ))
+                                   row
+                                   )))
+       (map clojure.string/join)
+       (clojure.string/join "\n")
+       ))
+
+(defn print-state [state]
+  (println (format-cave (:cave state)))
+  (println)
+  (println (->> [:climb :torch :neith]
+                (map #(format-route-costs state %))
+                (map clojure.string/split-lines)
+                (apply map #(clojure.string/join "  " [%1 %2 %3]))
+                (clojure.string/join \newline)
+                ))
+  (println "Move counts:" (map (fn [[k v]] [k (count v)]) (:moves state)))
+  (println "Goal cost:" (get-in state [:route-costs [:torch (:target (:cave state))]]))
+  )
+
+(defn show-state [cave n]
+  (print-state (nth (iterate step (start (minimal-cave cave))) n)))
+
 (defn solve-a [lines]
   (->> lines
        (parse-input)
@@ -98,7 +215,14 @@
        ))
 
 (defn solve-b [lines]
-  ())
+  (->> lines
+       (parse-input)
+       (minimal-cave)
+       (start)
+       (iterate step)
+       (some (fn [state]
+               (get-in state [:route-costs [:torch (:target (:cave state))]])))
+       ))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
