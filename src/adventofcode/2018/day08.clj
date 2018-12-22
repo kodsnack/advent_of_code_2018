@@ -31,6 +31,18 @@
     meta
     ))
 
+(defn node-value [node]
+  (if (empty? (get-children node))
+    (apply + (get-meta node))
+    (->> node
+         (get-meta)
+         (keep (fn [child-i]
+                (get (get-children node) (dec child-i))
+                ))
+         (map node-value)
+         (apply +)
+         )))
+
 (defn solve-a [lines]
   (->> lines
        (parse-input)
@@ -41,12 +53,14 @@
        ))
 
 (defn solve-b [lines]
-  ())
+  (->> lines
+       (parse-input)
+       (parse-tree)
+       (node-value)
+       ))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
    :B (solve-b input-lines)
    }
   )
-
-(defn day-lines [] (adventofcode.2018.core/day-lines 8))
