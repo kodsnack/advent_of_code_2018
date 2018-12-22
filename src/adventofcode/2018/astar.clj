@@ -8,7 +8,7 @@
       (update :moves (fn [moves]
                        (->> move
                             (next-moves)
-                            (remove #(contains? (:route-costs state) %))
+                            (remove (:route-costs state))
                             (reduce (fn [moves new-move]
                                       (let [new-cost (+ cost (move-cost move new-move))]
                                         (update moves
