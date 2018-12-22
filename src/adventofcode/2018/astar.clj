@@ -10,10 +10,11 @@
                             (next-moves)
                             (remove #(contains? (:route-costs state) %))
                             (reduce (fn [moves new-move]
-                                      (update moves
-                                              (+ cost (move-cost move new-move))
-                                              #(conj (or % ()) new-move)
-                                              ))
+                                      (let [new-cost (+ cost (move-cost move new-move))]
+                                        (update moves
+                                              (+ new-cost (min-remaining-cost new-move))
+                                              #(conj (or % ()) [new-cost new-move])
+                                              )))
                                     moves
                                     )
                             )))
@@ -23,21 +24,21 @@
   (get-in state [:route-costs move]))
 
 (defn next-move [state]
-  (let [min-cost (apply min (keys (:moves state)))
-        move (peek (get-in state [:moves min-cost]))
+  (let [est-cost (apply min (keys (:moves state)))
+        [min-cost move] (peek (get-in state [:moves est-cost]))
         ]
-    [move min-cost]
+    [move min-cost est-cost]
     ))
 
 (defn start [initial-move]
   {:route-costs {}
-   :moves {0 (list initial-move)}
+   :moves {0 (list [0 initial-move])}
    })
 
 (defn step [state next-moves move-cost min-remaining-cost]
-  (let [[move cost] (next-move state)]
+  (let [[move cost est-cost] (next-move state)]
     (cond-> state
-      true (update-in [:moves cost] pop)
+      true (update-in [:moves est-cost] pop)
 
       (not (and (contains? (:route-costs state) move)
                 (<= ((:route-costs state) move) cost)
