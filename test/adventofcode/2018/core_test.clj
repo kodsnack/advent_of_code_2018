@@ -18,7 +18,7 @@
   6  { :A nil, :B nil }
   7  { :A "CQSWKZFJONPBEUMXADLYIGVRHT", :B 914 }
   8  { :A 49426, :B 40688 }
-  9  { :A nil, :B nil }
+  9  { :A 367634, :B 3020072891 }
   10 { :A nil, :B nil }
   11 { :A "20,68", :B "231,273,16" }
   12 { :A 1991, :B 1100000000511 }
