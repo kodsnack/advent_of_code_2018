@@ -17,6 +17,9 @@
    (range miny-in maxy-ex)
    ))
 
+(defn remove-empty [m]
+  (reduce dissoc m (filter #(empty? (m %)) (keys m))))
+
 (defn transpose [& colls]
   (apply map vector colls)
   )

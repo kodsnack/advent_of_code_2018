@@ -1,5 +1,6 @@
 (ns adventofcode.2018.day22
   (:require clojure.string
+            [adventofcode.2018.dijkstra :refer [step] :rename {step dijkstra-step}]
             [adventofcode.2018.util :refer [vec-add]]
             ))
 
@@ -87,9 +88,6 @@
 (defn move-cost [[fromtool _] [totool _]]
   (if (= fromtool totool) 1 7))
 
-(defn remove-empty [m]
-  (reduce dissoc m (filter #(empty? (m %)) (keys m))))
-
 (defn next-moves [state [tool pos]]
   (->> [[-1 0] [0 -1] [1 0] [0 1]]
        (map #(vec-add pos %))
@@ -101,35 +99,6 @@
        (concat (map #(vector % pos) (remove #(= tool %) [:climb :torch :neith])))
        (filter #(can-enter? state %))
   ))
-
-(defn add-move [state next-moves move-cost move cost]
-  (-> state
-      (update :route-costs #(assoc % move cost))
-      (update :moves (fn [moves]
-                       (->> move
-                            (next-moves state)
-                            (remove #(contains? (:route-costs state) %))
-                            (reduce (fn [moves new-move]
-                                      (update moves
-                                              (+ cost (move-cost move new-move))
-                                              #(conj (or % #{}) new-move)
-                                              ))
-                                    moves
-                                    )
-                            )))
-      ))
-
-(defn dijkstra-step [state next-moves move-cost cost move]
-  (cond-> state
-    true (update-in [:moves cost] #(disj % move))
-
-    (not (and (contains? (:route-costs state) move)
-              (<= ((:route-costs state) move) cost)
-              ))
-    (add-move next-moves move-cost move cost)
-
-    true (update :moves remove-empty)
-    ))
 
 (defn start [cave]
   {:cave (expand-cave cave [0 0])
