@@ -2,6 +2,12 @@
   (:require [clojure.string])
 )
 
+(defn abs [x]
+  (if (< x 0)
+    (- x)
+    x
+    ))
+
 (defmacro as->> [alias & forms]
   `(as-> ~(last forms) ~alias ~@(butlast forms)))
 

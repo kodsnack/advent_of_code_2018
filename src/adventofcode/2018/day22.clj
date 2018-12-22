@@ -1,7 +1,7 @@
 (ns adventofcode.2018.day22
   (:require clojure.string
-            [adventofcode.2018.dijkstra :as dijkstra]
-            [adventofcode.2018.util :refer [vec-add]]
+            [adventofcode.2018.astar :as astar]
+            [adventofcode.2018.util :refer [abs vec-add vec-sub]]
             ))
 
 (defn parse-input [[depth-line target-line]]
@@ -88,6 +88,16 @@
 (defn move-cost [[fromtool _] [totool _]]
   (if (= fromtool totool) 1 7))
 
+(defn min-remaining-cost [state move]
+  (+
+   (->> (second move)
+        (vec-sub (second (:target state)))
+        (map abs)
+        (apply +)
+        )
+   (if (= (first move) (first (:target state))) 0 7)
+   ))
+
 (defn next-moves [state [tool pos]]
   (->> [[-1 0] [0 -1] [1 0] [0 1]]
        (map #(vec-add pos %))
@@ -102,7 +112,7 @@
 
 (defn start [cave]
   {:cave (expand-cave cave [0 0])
-   :dijkstra (dijkstra/start [:torch [0 0]])
+   :astar (astar/start [:torch [0 0]])
    :target [:torch (:target cave)]
    })
 
@@ -117,8 +127,13 @@
 
 (defn step [state]
   (-> state
-      (expand-cave-if-needed (first (dijkstra/next-move (:dijkstra state))))
-      (as-> $ (update $ :dijkstra #(dijkstra/step % (fn [move] (next-moves $ move)) move-cost)))
+      (expand-cave-if-needed (first (astar/next-move (:astar state))))
+      (as-> $ (update $ :astar (fn [astar-state]
+                                 (astar/step astar-state
+                                             (fn [move] (next-moves $ move))
+                                             move-cost
+                                             (partial min-remaining-cost $)
+                                             ))))
       ))
 
 (defn format-cave [cave]
@@ -141,7 +156,7 @@
   (->> (get-in state [:cave :type])
        (map-indexed (fn [y row]
                       (map-indexed (fn [x type]
-                                     (let [cost (get-in state [:dijkstra :route-costs [tool [y x]]])
+                                     (let [cost (get-in state [:astar :route-costs [tool [y x]]])
                                            cost-digit (if cost (mod cost 10) ".")
                                            ]
                                        cost-digit
@@ -161,8 +176,8 @@
                 (apply map #(clojure.string/join "  " [%1 %2 %3]))
                 (clojure.string/join \newline)
                 ))
-  (println "Move counts:" (map (fn [[k v]] [k (count v)]) (:moves (:dijkstra state))))
-  (println "Goal cost:" (dijkstra/get-cost (:dijkstra state) (:target state)))
+  (println "Move counts:" (map (fn [[k v]] [k (count v)]) (:moves (:astar state))))
+  (println "Goal cost:" (astar/get-cost (:astar state) (:target state)))
   )
 
 (defn show-state [cave n]
@@ -183,7 +198,7 @@
        (start)
        (iterate step)
        (some (fn [state]
-               (dijkstra/get-cost (:dijkstra state) (:target state))))
+               (astar/get-cost (:astar state) (:target state))))
        ))
 
 (defn run [input-lines & args]
