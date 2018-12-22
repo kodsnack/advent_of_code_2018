@@ -31,14 +31,16 @@
          :type []
          ))
 
+(defn add-cave-cell [cave y x]
+  (as-> cave $
+    (update-in $ [:geoindex y] #(conj % (geoindex $ [y x])))
+    (update-in $ [:erosion-level y] #(conj % (erosion-level $ [y x])))
+    (update-in $ [:type y] #(conj % (region-type $ [y x])))
+    ))
+
 (defn expand-cave-y [cave]
   (let [y (count (:type cave))]
-    (reduce (fn [cave x]
-              (as-> cave $
-                (update-in $ [:geoindex y] #(conj % (geoindex $ [y x])))
-                (update-in $ [:erosion-level y] #(conj % (erosion-level $ [y x])))
-                (update-in $ [:type y] #(conj % (region-type $ [y x])))
-                ))
+    (reduce #(add-cave-cell %1 y %2)
             (-> cave
                 (update :geoindex #(conj % []))
                 (update :erosion-level #(conj % []))
@@ -49,16 +51,10 @@
 
 (defn expand-cave-x [cave]
   (let [x (count (first (:type cave)))]
-    (reduce (fn [cave y]
-              (as-> cave $
-                (update-in $ [:geoindex y] #(conj % (geoindex $ [y x])))
-                (update-in $ [:erosion-level y] #(conj % (erosion-level $ [y x])))
-                (update-in $ [:type y] #(conj % (region-type $ [y x])))
-                ))
+    (reduce #(add-cave-cell %1 %2 x)
             cave
             (range 0 (count (:type cave)))
-            )
-    ))
+            )))
 
 (defn expand-cave [cave [target-y target-x]]
   (->> cave
