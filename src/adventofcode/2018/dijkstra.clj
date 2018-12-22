@@ -22,19 +22,27 @@
 (defn get-cost [state move]
   (get-in state [:route-costs move]))
 
+(defn next-move [state]
+  (let [min-cost (apply min (keys (:moves state)))
+        move (first (get-in state [:moves min-cost]))
+        ]
+    [move min-cost]
+    ))
+
 (defn start [initial-move]
   {:route-costs {}
    :moves {0 (sorted-set initial-move)}
    })
 
-(defn step [state next-moves move-cost cost move]
-  (cond-> state
-    true (update-in [:moves cost] #(disj % move))
+(defn step [state next-moves move-cost]
+  (let [[move cost] (next-move state)]
+    (cond-> state
+      true (update-in [:moves cost] #(disj % move))
 
-    (not (and (contains? (:route-costs state) move)
-              (<= ((:route-costs state) move) cost)
-              ))
-    (add-move next-moves move-cost move cost)
+      (not (and (contains? (:route-costs state) move)
+                (<= ((:route-costs state) move) cost)
+                ))
+      (add-move next-moves move-cost move cost)
 
-    true (update :moves remove-empty)
-    ))
+      true (update :moves remove-empty)
+      )))

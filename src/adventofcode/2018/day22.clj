@@ -116,13 +116,10 @@
     ))
 
 (defn step [state]
-  (let [cost (apply min (keys (:moves (:dijkstra state))))
-        move (first (get-in state [:dijkstra :moves cost]))
-        ]
-    (-> state
-        (expand-cave-if-needed move)
-        (as-> $ (update $ :dijkstra #(dijkstra/step % (fn [move] (next-moves $ move)) move-cost cost move)))
-        )))
+  (-> state
+      (expand-cave-if-needed (first (dijkstra/next-move (:dijkstra state))))
+      (as-> $ (update $ :dijkstra #(dijkstra/step % (fn [move] (next-moves $ move)) move-cost)))
+      ))
 
 (defn format-cave [cave]
   (->> cave
