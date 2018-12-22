@@ -78,9 +78,8 @@
       true (update :player #(mod (inc %) (:players state)))
       )))
 
-(defn solve-a [lines]
-  (->> lines
-       (parse-input)
+(defn solve [state]
+  (->> state
        (start)
        (iterate step)
        (filter (fn [state]
@@ -91,8 +90,18 @@
        (apply max)
        ))
 
+(defn solve-a [lines]
+  (->> lines
+       (parse-input)
+       (solve)
+       ))
+
 (defn solve-b [lines]
-  ())
+  (-> lines
+       (parse-input)
+       (update :last-marble #(* % 100))
+       (solve)
+       ))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
