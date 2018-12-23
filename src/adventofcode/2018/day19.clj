@@ -78,6 +78,13 @@
     (recur program (step program state))
     ))
 
+(defn solve-reverse-engineered [f]
+  (->> (range 1 (inc f))
+       (keep (fn [b]
+               (if (= 0 (mod f b)) b nil)))
+       (apply +)
+       ))
+
 (defn solve-a [lines]
   (-> lines
        (parse-program)
@@ -89,9 +96,13 @@
 (defn solve-b [lines]
   (-> lines
       (parse-program)
-      (run-program (assoc-in (initial-state) [:registers 0] 1))
-      (:registers)
+      (as-> $ (iterate (partial step $) (assoc-in (initial-state) [:registers 0] 1)))
+      (as-> $ (filter (fn ([state]
+                           (= 1 (:ip state))))
+                      $))
       (first)
+      (get-in [:registers 5])
+      (solve-reverse-engineered)
       ))
 
 (defn run [input-lines & args]
