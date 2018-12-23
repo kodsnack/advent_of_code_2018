@@ -106,10 +106,8 @@
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
-   :B nil
-   }
-  nil
-  )
+   :B (solve-b input-lines)
+   })
 
 (defn format-program [program]
   (->> program
