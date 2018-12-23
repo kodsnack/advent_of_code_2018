@@ -79,22 +79,6 @@
 (defn halted? [state]
   (not (contains? (:instructions (:program state)) (:ip state))))
 
-(defn run-program [state]
-  (if (halted? state)
-    state
-    (recur (step state))
-    ))
-
-(defn solve-a [lines]
-  (-> lines
-       (parse-program)
-       (update :instructions #(apply vector (drop-last 3 %)))
-       (initial-state 0)
-       (run-program)
-       (:registers)
-       (as-> $ ($ 3))
-       ))
-
 (defn run-one-cycle [state]
   (let [state' (step state)]
     (if (= 28 (:ip state'))
@@ -103,7 +87,17 @@
           (update :register-3-values-vec #(conj % (get-in state' [:registers 3])))
           )
       (recur state')
-    )))
+      )))
+
+(defn solve-a [lines]
+  (-> lines
+       (parse-program)
+       (update :instructions #(apply vector (drop-last 3 %)))
+       (initial-state 0)
+       (run-one-cycle)
+       (:registers)
+       (as-> $ ($ 3))
+       ))
 
 (defn solve-b [lines]
   (->> lines
@@ -118,8 +112,6 @@
       (first)
       ;; (as->> $ (get-in $ [:registers 3]))
       ))
-
-
 
 (defn solve-b-2 []
   (loop [d 0
