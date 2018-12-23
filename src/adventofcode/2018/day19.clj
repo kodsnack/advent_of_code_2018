@@ -93,7 +93,8 @@
                            (= 1 (:ip state))))
                       $))
       (first)
-      (get-in [:registers 5])
+      (:registers)
+      (as-> $ (apply max $))
       (divisors)
   ))
 
