@@ -1,20 +1,20 @@
 #ip 4
  0 addi 4 16 4  => goto 17          => goto 17            => goto 17
  1 seti 1 5 1   => b := 1           => b := 1             => b := 1
-                                                             for b in range(1, f + 1):
+                                                             for b in range(1, f + 2):
  2 seti 1 2 2   => c := 1           => c := 1             =>
-                                                               for c in range(1, f + 1):
+                                                               for c in range(1, f + 2):
  3 mulr 1 2 3   => d := b * c       => d := b * c         =>
  4 eqrr 3 5 3   => d := d == f      => if d == f:         =>     if b * c == f:
  5 addr 3 4 4   => if d goto 7      =>   a := a + b       =>       a := a + b
  6 addi 4 1 4   => goto 8           =>                    =>
  7 addr 1 0 0   => a := a + b       =>                    =>
  8 addi 2 1 2   => c := c + 1       => c := c + 1         =>
- 9 gtrr 2 5 3   => d = c == f       => if c == f:         =>
+ 9 gtrr 2 5 3   => d = c > f        => if c > f:          =>
 10 addr 4 3 4   => if d goto 12     =>   then goto 12     =>
 11 seti 2 7 4   => goto 3           => else: goto 3       =>
 12 addi 1 1 1   => b := b + 1       => b := b + 1         =>
-13 gtrr 1 5 3   => d = b == f       => if b == f:         =>
+13 gtrr 1 5 3   => d = b > f        => if b > f:          =>
 14 addr 3 4 4   => if d goto 16     =>   then: halt       =>
 15 seti 1 9 4   => goto 2           => else: goto 2       =>
 16 mulr 4 4 4   => halt             =>                    => halt
