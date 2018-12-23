@@ -34,3 +34,5 @@
   (apply mapv + vectors))
 (defn vec-sub [& vectors]
   (apply mapv - vectors))
+(defn vec-mul [k v]
+  (mapv #(* k %) v))
