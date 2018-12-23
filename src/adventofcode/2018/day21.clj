@@ -1,5 +1,7 @@
 (ns adventofcode.2018.day21
-  (:require clojure.string))
+  (:require clojure.string
+            [adventofcode.2018.util :refer [as->>]]
+            ))
 
 (defn parse-registers [line] (read-string line))
 (defn parse-inst [line]
@@ -58,6 +60,8 @@
    :registers [a 0 0 0 0 0]
    :ip 0
    :count 0
+   :register-3-values #{}
+   :register-3-values-vec []
    })
 
 (defn step [{:keys [program] :as state}]
@@ -75,31 +79,79 @@
 (defn halted? [state]
   (not (contains? (:instructions (:program state)) (:ip state))))
 
-(defn run-program [state]
-  (if (halted? state)
-    state
-    (recur (step state))
-    ))
+(defn run-one-cycle [state]
+  (let [state' (step state)]
+    (if (= 28 (:ip state'))
+      (-> state'
+          (update :register-3-values #(conj % (get-in state' [:registers 3])))
+          (update :register-3-values-vec #(conj % (get-in state' [:registers 3])))
+          )
+      (recur state')
+      )))
 
 (defn solve-a [lines]
   (-> lines
        (parse-program)
        (update :instructions #(apply vector (drop-last 3 %)))
        (initial-state 0)
-       (run-program)
+       (run-one-cycle)
        (:registers)
        (as-> $ ($ 3))
        ))
 
+(defn find-first-magic-value [program]
+  (->> program
+       (:instructions)
+       (filter #(= :seti (:op %)))
+       (map :A)
+       (apply max)
+       ))
+
+(defn find-second-magic-value [program]
+  (->> program
+       (:instructions)
+       (filter #(= :muli (:op %)))
+       (map :B)
+       (apply max)
+       ))
+
+(defn solve-b-reverse-engineered [magic1 magic2]
+  (loop [d 0
+         d-values #{}
+         d-values-vec []
+         ]
+    (let [end-d (loop [f (bit-or d 0x10000)
+                       d magic1
+                       ]
+                  (if (> f 0)
+                    (let [d (+ d (mod f 256))
+                          d (bit-and d 0xffffff)
+                          d (* d magic2)
+                          d (bit-and d 0xffffff)
+                          f (int (/ f 256))
+                          ]
+                      (recur f d))
+                    d
+                    ))
+          ]
+      (if (contains? d-values end-d)
+        [d-values d-values-vec]
+        (recur end-d (conj d-values end-d) (conj d-values-vec end-d))
+        ))))
+
 (defn solve-b [lines]
-  ())
+  (-> lines
+      (parse-program)
+      (as-> $ [(find-first-magic-value $) (find-second-magic-value $)])
+      (as-> $ (apply solve-b-reverse-engineered $))
+      (last)
+      (last)
+      ))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
-   :B nil
-   }
-  nil
-  )
+   :B (solve-b input-lines)
+   })
 
 (defn format-state [state]
   (->> state
@@ -111,7 +163,7 @@
                         (str i " " inst)
                         )))
        (clojure.string/join \newline)
-       (format "Count: %d\t ip: %d\n%s\n%s" (:count state) (:ip state) (:registers state))
+       (format "Count: %d\t ip: %d\n%s\n%s\n%s" (:count state) (:ip state) (:registers state) (:register-3-values state))
        ))
 
 (def example-input "#ip 0
