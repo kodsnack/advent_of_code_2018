@@ -1,5 +1,5 @@
 def solve(infection, immune):
-    while infection and immune:
+    while any(unit[0] for unit in infection) and any(unit[0] for unit in immune):
         infection.sort(key=lambda unit: [-unit[0] * unit[2], -unit[3]])
         immune.sort(key=lambda unit: [-unit[0] * unit[2], -unit[3]])
 
@@ -10,11 +10,13 @@ def solve(infection, immune):
         immune_targeting = []
 
         for i, unit in enumerate(infection):
+            if not unit[0]:
+                continue
             best = [0, 0, 0]
             best_index = -1
 
             for j, defender in enumerate(immune):
-                if immune_targeted[j]:
+                if immune_targeted[j] or not defender[0]:
                     continue
 
                 damage = unit[0] * unit[2]
@@ -40,11 +42,13 @@ def solve(infection, immune):
             immune_targeted[immune[best_index][-1]] = True
 
         for i, unit in enumerate(immune):
+            if not unit[0]:
+                continue
             best = 0
             best_index = -1
 
             for j, defender in enumerate(infection):
-                if infection_targeted[j]:
+                if infection_targeted[j] or not defender[0]:
                     continue
 
                 damage = unit[0] * unit[2]
@@ -76,11 +80,31 @@ def solve(infection, immune):
             
             infection_attacking = True
 
+            infection_attacker = -1
+            for i in range(infection_attacked, len(infection)):
+                found = False
+                for pair in infection_targeting:
+                    if pair[0] == i:
+                        found = True
+                if found:
+                    infection_attacker = i
+                    break
+
+            immune_attacker = -1
+            for i in range(immune_attacked, len(immune)):
+                found = False
+                for pair in immune_targeting:
+                    if pair[0] == i:
+                        found = True
+                if found:
+                    immune_attacker = i
+                    break
+
             if infection_attacked == len(infection_targeting):
                 infection_attacking = False
             elif immune_attacked < len(immune_targeting):
-                immune_initiative = immune[immune_attacked][3]
-                infection_initiative = infection[infection_attacked][3]
+                immune_initiative = -1 if immune_attacker == -1 else immune[immune_attacker][3]
+                infection_initiative = -1 if infection_attacker == -1 else infection[infection_attacker][3]
                 
                 if immune_initiative > infection_initiative:
                     infection_attacking = False
@@ -144,8 +168,8 @@ def solve(infection, immune):
 
                 immune_attacked += 1
         
-        immune = [unit for unit in immune if unit[0]]
-        infection = [unit for unit in infection if unit[0]]
+        # immune = [unit for unit in immune if unit[0]]
+        # infection = [unit for unit in infection if unit[0]]
 
     return sum(unit[0] for unit in immune) + sum(unit[0] for unit in infection)
 
