@@ -1,33 +1,49 @@
 def solve(infection, immune):
-    while any(unit[0] for unit in infection) and any(unit[0] for unit in immune):
-        infection.sort(key=lambda unit: [-unit[0] * unit[2], -unit[3]])
-        immune.sort(key=lambda unit: [-unit[0] * unit[2], -unit[3]])
+    # while any(unit[0] for unit in infection) and any(unit[0] for unit in immune):
+    while infection and immune:
+        # infection.sort(key=lambda unit: [-unit[0] * unit[2], -unit[3]])
+        # immune.sort(key=lambda unit: [-unit[0] * unit[2], -unit[3]])
 
-        infection_targeted = [False] * len(infection)
-        immune_targeted = [False] * len(immune)
+        # infection_targeted = [False] * len(infection)
+        # immune_targeted = [False] * len(immune)
 
         infection_targeting = []
         immune_targeting = []
 
-        for i, unit in enumerate(infection):
-            if not unit[0]:
-                continue
+        while True:
+            earliest = [-1, -1]
+            earliest_index = -1
+            
+            for i, unit in enumerate(infection):
+                if unit[-3]:
+                    continue
+
+                earliness = [unit[0] * unit[2], unit[3]]
+                if earliness > earliest:
+                    earliest = earliness
+                    earliest_index = i
+
+            if earliest_index == -1:
+                break
+
+            unit = infection[earliest_index]
+            
             best = [0, 0, 0]
             best_index = -1
-
-            for j, defender in enumerate(immune):
-                if immune_targeted[j] or not defender[0]:
+            
+            for j, target in enumerate(immune):
+                if target[-2]:
                     continue
 
                 damage = unit[0] * unit[2]
-                
-                if unit[4] in defender[5]:
+
+                if unit[4] in target[5]:
                     damage *= 2
-                elif unit[4] in defender[6]:
+                elif unit[4] in target[6]:
                     damage = 0
 
-                target_attack_power = defender[0] * defender[2]
-                target_initiative = defender[3]
+                target_attack_power = target[0] * target[2]
+                target_initiative = target[3]
 
                 target_package = [damage, target_attack_power, target_initiative]
 
@@ -35,97 +51,101 @@ def solve(infection, immune):
                     best = target_package
                     best_index = j
 
-            if best_index >= 0:
-                target = immune[best_index][-1]
-                infection_targeting.append((i, target))
+            if best_index == -1:
+                break
 
-            immune_targeted[immune[best_index][-1]] = True
+            infection_targeting.append((earliest_index, best_index))
 
-        for i, unit in enumerate(immune):
-            if not unit[0]:
-                continue
-            best = 0
+            infection[earliest_index][-3] = True
+            immune[best_index][-2] = True
+
+        while True:
+            earliest = [-1, -1]
+            earliest_index = -1
+            
+            for i, unit in enumerate(immune):
+                if unit[-3]:
+                    continue
+
+                earliness = [unit[0] * unit[2], unit[3]]
+                if earliness > earliest:
+                    earliest = earliness
+                    earliest_index = i
+
+            if earliest_index == -1:
+                break
+
+            unit = immune[earliest_index]
+            
+            best = [0, 0, 0]
             best_index = -1
-
-            for j, defender in enumerate(infection):
-                if infection_targeted[j] or not defender[0]:
+            
+            for j, target in enumerate(infection):
+                if target[-2]:
                     continue
 
                 damage = unit[0] * unit[2]
-                
-                if unit[4] in defender[5]:
+
+                if unit[4] in target[5]:
                     damage *= 2
-                elif unit[4] in defender[6]:
+                elif unit[4] in target[6]:
                     damage = 0
 
-                if damage > best:
-                    best = damage
+                target_attack_power = target[0] * target[2]
+                target_initiative = target[3]
+
+                target_package = [damage, target_attack_power, target_initiative]
+
+                if target_package > best:
+                    best = target_package
                     best_index = j
 
-            if best_index >= 0:
-                target = infection[best_index][-1]
-                immune_targeting.append((i, target))
+            if best_index == -1:
+                break
 
-            infection_targeted[infection[best_index][-1]] = True
+            immune_targeting.append((earliest_index, best_index))
 
-        infection.sort(key=lambda unit: -unit[3])
-        immune.sort(key=lambda unit: -unit[3])
+            immune[earliest_index][-3] = True
+            infection[best_index][-2] = True
 
         infection_attacked = 0
         immune_attacked = 0
 
-        while True:
-            if infection_attacked == len(infection) and immune_attacked == len(immune):
-                break
-            
-            infection_attacking = True
+        while infection_attacked < len(infection_targeting) or immune_attacked < len(immune_targeting):            
+            infection_initiative = -1
 
-            infection_attacker = -1
-            for i in range(infection_attacked, len(infection)):
-                found = False
-                for pair in infection_targeting:
-                    if pair[0] == i:
-                        found = True
-                if found:
-                    infection_attacker = i
-                    break
+            for unit in infection:
+                if unit[-1] or not unit[-3]:
+                    continue
 
-            immune_attacker = -1
-            for i in range(immune_attacked, len(immune)):
-                found = False
-                for pair in immune_targeting:
-                    if pair[0] == i:
-                        found = True
-                if found:
-                    immune_attacker = i
-                    break
+                if unit[3] > infection_initiative:
+                    infection_initiative = unit[3]
 
-            if infection_attacked == len(infection_targeting):
-                infection_attacking = False
-            elif immune_attacked < len(immune_targeting):
-                immune_initiative = -1 if immune_attacker == -1 else immune[immune_attacker][3]
-                infection_initiative = -1 if infection_attacker == -1 else infection[infection_attacker][3]
-                
-                if immune_initiative > infection_initiative:
-                    infection_attacking = False
+            immune_initiative = -1
 
-            if infection_attacking:
-                attacker = infection[infection_attacked]
-                ai = attacker[-1]
-                di = -1
+            for unit in immune:
+                if unit[-1] or not unit[-3]:
+                    continue
 
-                for pair in infection_targeting:
-                    if pair[0] == ai:
-                        di = pair[1]
+                if unit[3] > immune_initiative:
+                    immune_initiative = unit[3]
+
+            if infection_initiative > immune_initiative:
+                ai = -1
+                attacker = None
+
+                for i, unit in enumerate(infection):
+                    if unit[3] == infection_initiative:
+                        ai = i
+                        attacker = unit
                         break
-                
-                defender_index = -1
 
-                for i, def_possible in enumerate(immune):
-                    if def_possible[-1] == di:
-                        defender_index = i    
+                defender = None
 
-                defender = immune[defender_index]
+                for attacki, defendi in infection_targeting:
+                    if attacki == ai:
+                        defender = immune[defendi]
+                        break
 
                 damage = attacker[0] * attacker[2]
                 
@@ -136,25 +156,25 @@ def solve(infection, immune):
 
                 killing = min(defender[0], damage // defender[1])
                 defender[0] -= killing
+                attacker[-1] = True
 
                 infection_attacked += 1
             else:
-                attacker = immune[immune_attacked]
-                ai = attacker[-1]
-                di = -1
+                ai = -1
+                attacker = None
 
-                for pair in immune_targeting:
-                    if pair[0] == ai:
-                        di = pair[1]
+                for i, unit in enumerate(immune):
+                    if unit[3] == immune_initiative:
+                        ai = i
+                        attacker = unit
                         break
-                
-                defender_index = -1
 
-                for i, def_possible in enumerate(immune):
-                    if def_possible[-1] == di:
-                        defender_index = i    
+                defender = None
 
-                defender = infection[defender_index]
+                for attacki, defendi in immune_targeting:
+                    if attacki == ai:
+                        defender = infection[defendi]
+                        break
 
                 damage = attacker[0] * attacker[2]
                 
@@ -165,17 +185,27 @@ def solve(infection, immune):
 
                 killing = min(defender[0], damage // defender[1])
                 defender[0] -= killing
+                attacker[-1] = True
 
                 immune_attacked += 1
         
-        # immune = [unit for unit in immune if unit[0]]
-        # infection = [unit for unit in infection if unit[0]]
+        immune = [unit for unit in immune if unit[0]]
+        infection = [unit for unit in infection if unit[0]]
+
+        for unit in immune:
+            unit[-3] = False
+            unit[-2] = False
+            unit[-1] = False
+        for unit in infection:
+            unit[-3] = False
+            unit[-2] = False
+            unit[-1] = False
 
     return sum(unit[0] for unit in immune) + sum(unit[0] for unit in infection)
 
 
 def read_and_solve():
-    with open('input_24_small.txt') as f:
+    with open('input_24.txt') as f:
         immune = []
         infection = []
 
@@ -226,13 +256,11 @@ def read_and_solve():
                 if part[-1] == ')':
                     in_paren = False
 
-            unit = [number, hitpoints, damage, initiative, damage_type, weaknesses, immunities]
+            unit = [number, hitpoints, damage, initiative, damage_type, weaknesses, immunities, False, False, False]
             
             if in_infection:
-                unit.append(len(infection))
                 infection.append(unit)
             else:
-                unit.append(len(immune))
                 immune.append(unit)
         # print(infection)
         # print(immune)
