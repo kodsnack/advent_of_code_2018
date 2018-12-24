@@ -48,7 +48,7 @@ def drawCave(start, target):
 
 deltas = ((0,1,0), (1,0,0), (-1,0,0), (0,-1,0), 
           (0,0,1), (0,0,2))
-def calcCost(start, target):
+def calcCost(start, target, lim=False, maxCost=10**9):
     cost = dict()
     q = [(0, target[0], target[1], 1)]
     heapify(q)
@@ -61,6 +61,8 @@ def calcCost(start, target):
             return cost
         for delta in deltas:
             x2, y2, e2 = (x1+delta[0], y1+delta[1], (e1+delta[2])%3)
+            if lim and x2 > target[0]*2:
+                continue
             if x2 < 0 or y2 < 0:
                 continue
             if e2 == regionType(x2, y2):
@@ -69,8 +71,10 @@ def calcCost(start, target):
                 c2 = 7 + c1
             else:
                 c2 = 1 + c1
-            heappush(q, (c2, x2, y2, e2))
+            if c2+x2+y2 < maxCost:
+                heappush(q, (c2, x2, y2, e2))
     return cost
 print("Solution to day 22 part 1:", calcTotalRisk(start, target))
-cost = calcCost(start, target)
+cost = calcCost(start, target, lim=True)
+cost = calcCost(start, target, lim=False, maxCost=cost[0, 0, 1])
 print("Solution to day 22 part 2:", cost[0, 0, 1])
