@@ -34,11 +34,11 @@ namespace westerstrom
 		return container;
 	}
 
-	inline std::vector<int> splitNumbers(const std::string& line)
+	inline std::vector<int> splitNumbers(const std::string& line, bool signedNumbers=false)
 	{
 		using namespace std;
 		vector<int> ints;
-		regex re("\\D+");
+		regex re(signedNumbers ? "[^-\\d]+" : "\\D+");
 		transform(sregex_token_iterator(line.begin(), line.end(), re, -1), sregex_token_iterator(),
 		          back_inserter(ints), [](const auto& s) -> int {
 			          try
