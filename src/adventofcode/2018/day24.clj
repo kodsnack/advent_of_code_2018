@@ -140,8 +140,19 @@
        (cleanup-phase)
        ))
 
+(defn break-stalemate [states]
+  (->> states
+       (partition 2 1)
+       (map (fn [[state1 state2]]
+              (cond
+                (victory? state1) state1
+                (= state1 state2) {:units {}}
+                :else state1
+                )))
+       ))
+
 (defn victory? [state]
-  (= 1 (count (group-by :team (vals (:units state))))))
+  (> 2 (count (group-by :team (vals (:units state))))))
 
 (defn unitsum [state]
   (->> state
@@ -151,17 +162,60 @@
        (apply +)
        ))
 
+(defn boost [team amount state]
+  (update state :units (fn [units]
+                         (reduce (fn [units [id unit]]
+                                   (if (= team (:team unit))
+                                     (update-in units [id :dmg] #(+ % amount))
+                                     units
+                                     ))
+                                 units
+                                 units
+                                 ))))
+
+(defn immune-wins? [state]
+  (some #(= :immune (:team %)) (vals (:units state))))
+
+(defn simulate-boost [base-state boost-amount]
+  (->> base-state
+       (boost :immune boost-amount)
+       (iterate step)
+       (break-stalemate)
+       ;(map (fn [state] (pprint state) state))
+       (filter victory?)
+       (first)
+       ))
+
+(defn find-min-boost [base-state]
+  (loop [min-boost 0
+         max-boost (* (unitsum base-state) (apply max (map :hp (vals (:units base-state)))))
+         ]
+    (if (= max-boost min-boost)
+      max-boost
+      (let [boost-amount (int (/ (+ max-boost min-boost) 2))
+            end-state (simulate-boost base-state boost-amount)
+            ]
+        (if (immune-wins? end-state)
+          (recur min-boost boost-amount)
+          (recur (inc boost-amount) max-boost)
+          )))))
+
 (defn solve-a [lines]
   (->> lines
        (parse-input)
        (iterate step)
+       (break-stalemate)
        (filter victory?)
        (first)
        (unitsum)
        ))
 
 (defn solve-b [lines]
-  ())
+  (let [base-state (parse-input lines)
+        min-boost (find-min-boost base-state)
+        ]
+    (unitsum (simulate-boost base-state min-boost))
+    ))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
