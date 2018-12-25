@@ -17,6 +17,15 @@
     [x y]
     ))
 
+(defn first-fixpoint [f x]
+  (->> x
+       (iterate f)
+       (partition 2 1)
+       (drop-while #(apply not= %))
+       (first)
+       (first)
+       ))
+
 (defn grid [minx-in maxx-ex miny-in maxy-ex]
   (cartprod
    (range minx-in maxx-ex)

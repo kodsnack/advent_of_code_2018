@@ -1,17 +1,10 @@
 (ns adventofcode.2018.day05
-  (:require clojure.string))
+  (:require clojure.string
+            [adventofcode.2018.util :refer [first-fixpoint]]
+            ))
 
 (defn is-lowercase [c] (= (str c) (clojure.string/lower-case c)))
 (defn is-uppercase [c] (= (str c) (clojure.string/upper-case c)))
-
-(defn first-fixpoint [f x]
-  (->> x
-       (iterate f)
-       (partition 2 1)
-       (drop-while #(apply not= %))
-       (first)
-       (first)
-       ))
 
 (defn will-react [a b]
   (if (or (nil? a) (nil? b))
