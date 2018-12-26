@@ -95,17 +95,6 @@ namespace day20
         }
     }
 
-    public class Node
-    {
-        public string directions;
-        public bool optional;
-        public List<Node> children;
-        public Node()
-        {
-            children = new List<Node>();
-        }
-    }
-
     public class Map
     {
         public int width;
@@ -140,177 +129,12 @@ namespace day20
 
     class Day20
     {
-        static Map globalMap;
-
-        static Node ReadInput()
+        static string ReadInput()
         {
             string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"..\..\input.txt");
             StreamReader reader = File.OpenText(path);
             string line = reader.ReadLine();
-            line = line.Substring(1, line.Length - 2);
-
-            List<string> FindChildren(string s, ref bool optional)
-            {
-                List<string> children = new List<string>();
-                char[] delims = { '(', ')', '|' };
-                int i, depth = 0;
-                int pos = 0;
-                int branchPos = pos;
-                while((i = s.IndexOfAny(delims, pos)) > 0)
-                {
-                    if (s[i] == '|')
-                    {
-                        if (depth == 0)
-                        {
-                            string tmp1 = s.Substring(branchPos, i - branchPos);
-                            children.Add(tmp1);
-                            branchPos = i + 1;
-                        }
-                    }
-                    else if (s[i] == '(')
-                    {
-                        depth++;
-                    }
-                    else
-                    {
-                        depth--;
-                    }
-                    pos = i + 1;
-                }
-                optional = (s.Length == branchPos); // Ends in "|)"
-                if (!optional)
-                {
-                    string tmp = s.Substring(branchPos, s.Length - branchPos);
-                    children.Add(tmp);
-                }
-                return children;
-            }
-
-            int FindClosingParenthesis(string s, int start)
-            {
-                char[] delims = { '(', ')' };
-                int depth = 0;
-                int i = 0;
-                int index = start;
-                while ((i = s.IndexOfAny(delims, index)) > 0)
-                {
-                    if (s[i] == '(')
-                    {
-                        depth++;
-                    }
-                    else
-                    {
-                        depth--;
-                        if (depth == 0)
-                        {
-                            return i;
-                        }
-                    }
-                    index = i + 1;
-                }
-                return -1;
-            }
-
-            List<string> SplitIntoSiblings(string input, ref bool firstOptional)
-            {
-                List<string> nodes = new List<string>();
-                char[] delims = { '(', ')', '|' };
-                int targetDepth = (input[0] == '(') ? 1 : 0;
-                int i, depth = 0;
-                int pos = 0;
-                int firstPos = pos;
-                int lastPos = input.Length - 1;
-                while ((i = input.IndexOfAny(delims, pos)) >= 0)
-                {
-                    if (input[i] == '|')
-                    {
-                        if (depth == targetDepth)
-                        {
-                            string tmp1 = input.Substring(firstPos, i - firstPos);
-                            nodes.Add(tmp1);
-                            firstPos = i + 1;
-                        }
-                    }
-                    else if (input[i] == '(')
-                    {
-                        depth++;
-                        if (depth == targetDepth)
-                        {
-                            firstPos = i + 1;
-                        }
-                    }
-                    else
-                    {
-                        depth--;
-                        if (depth == targetDepth - 1)
-                        {
-                            lastPos = i - 1;
-                            break;
-                        }
-                    }
-                    pos = i + 1;
-                }
-                firstOptional = firstPos > lastPos;
-                if (firstOptional)
-                {
-                    string tmp = input.Substring(firstPos + 1);
-                    if (tmp.Count(x => x == '(') != tmp.Count(x => x == ')'))
-                    {
-                        int bug = 1;
-                    }
-                    nodes.Add(tmp);
-                }
-                else
-                {
-                    string tmp = input.Substring(firstPos, lastPos - firstPos + 1);
-                    if (tmp.Count(x => x == '(') != tmp.Count(x => x == ')'))
-                    {
-                        int bug = 1;
-                    }
-                    nodes.Add(tmp);
-                }
-                return nodes;
-            }
-
-            Node CreateNode(string input)
-            {
-                Node node = new Node();
-                string a = input;
-                int p1 = a.IndexOf('(');
-                if (p1 > 0)
-                {
-                    node.directions = a.Substring(0, p1);
-                    string b = a.Substring(p1);
-                    node.children = ParseInput(b);
-                }
-                else
-                {
-                    node.directions = input;
-                }
-                char[] delims = { '(', ')', '|' };
-                if (node.directions.IndexOfAny(delims) >= 0)
-                {
-                    int bug = 1;
-                }
-                return node;
-            }
-            List<Node> ParseInput(string input)
-            {
-                List<Node> nodes = new List<Node>();
-                bool firstOptional = false;
-                List<string> nodeStrings = SplitIntoSiblings(input, ref firstOptional);
-                foreach (string s in nodeStrings)
-                {
-                    Node n = CreateNode(s);
-                    n.optional = firstOptional;
-                    firstOptional = false;
-                    nodes.Add(n);
-                }
-                return nodes;
-            }
-
-            Node mainNode = ParseInput(line).First();
-            return mainNode;
+            return line.Substring(1, line.Length - 2);
         }
 
         static void PrintMap(Map m)
@@ -352,15 +176,18 @@ namespace day20
             { 'W', goLeft * 2 },
         };
 
-        static Map CreateMap(Node node)
+        static Map CreateMap(string regex)
         {
-            Position minPos = new Position();
-            Position maxPos = new Position();
-            Position startPos = new Position();
-            void WalkBranch(Node n, Position start, ref Position min, ref Position max)
+            Position min = new Position();
+            Position max = new Position();
+            Position pos = new Position();
+            Stack<Position> stack = new Stack<Position>();
+            foreach (char c in regex)
             {
-                Position pos = start;
-                foreach (char c in n.directions)
+                if (c == '(')       { stack.Push(pos); }
+                else if (c == '|')  { pos = stack.Peek(); }
+                else if (c == ')')  { pos = stack.Pop(); }
+                else
                 {
                     pos += tinyDirections[c];
                     if (pos.x < min.x) { min.x = pos.x; }
@@ -368,14 +195,9 @@ namespace day20
                     if (pos.x > max.x) { max.x = pos.x; }
                     if (pos.y > max.y) { max.y = pos.y; }
                 }
-                foreach (Node child in n.children)
-                {
-                    WalkBranch(child, pos, ref min, ref max);
-                }
             }
-            WalkBranch(node, startPos, ref minPos, ref maxPos);
-            Position dim = ((maxPos - minPos) + 1) * 2 + 1;
-            Position coord = (new Position() - minPos) * 2 + 1;
+            Position dim = ((max - min) + 1) * 2 + 1;
+            Position coord = (new Position() - min) * 2 + 1;
             Map map = new Map(dim.x, dim.y, coord, '?');
             void FillNeighbors(Position p, Map m)
             {
@@ -385,25 +207,23 @@ namespace day20
                 m[p + goDownLeft] = '#';
                 m[p + goDownRight] = '#';
             }
-            void PopulateMap(Node n, Position p, Map m)
+            pos = coord;
+            Position lastPos;
+            FillNeighbors(pos, map);
+            foreach (char c in regex)
             {
-                Position pos = p;
-                Position lastPos = pos;
-                FillNeighbors(pos, m);
-                foreach (char c in n.directions)
+                if (c == '(') { stack.Push(pos); }
+                else if (c == '|') { pos = stack.Peek(); }
+                else if (c == ')') { pos = stack.Pop(); }
+                else
                 {
-                    pos += walkDirections[c];
-                    FillNeighbors(pos, m);
-                    Position mid = (lastPos + pos) / 2;
-                    m[mid] = (mid.x == pos.x) ? '-' : '|';
                     lastPos = pos;
-                }
-                foreach (Node child in n.children)
-                {
-                    PopulateMap(child, pos, m);
+                    pos += walkDirections[c];
+                    FillNeighbors(pos, map);
+                    Position mid = (lastPos + pos) / 2;
+                    map[mid] = (mid.x == pos.x) ? '-' : '|';
                 }
             }
-            PopulateMap(node, map.start, map);
             map.map[map.start.x, map.start.y] = 'X';
             for (int i = 0; i < map.width * map.height; i++)
             {
@@ -415,24 +235,52 @@ namespace day20
             return map;
         }
 
-        static void PartA()
+        static Tuple<int, int> WalkTheMap(string regex)
         {
-            Node node = ReadInput();
-            globalMap = CreateMap(node);
-            PrintMap(globalMap);
-            Console.WriteLine("Part A: Result is " + 'A' + ".");
+            Position pos = new Position();
+            HashSet<Position> visited = new HashSet<Position>();
+            Stack<Position> spos = new Stack<Position>();
+            Stack<int> sdoors = new Stack<int>();
+            int doors = 0;
+            int maxDoors = 0;
+            int distantRooms = 0;
+            foreach (char c in regex)
+            {
+                if (c == '(') { spos.Push(pos); sdoors.Push(doors); }
+                else if (c == '|') { pos = spos.Peek(); doors = sdoors.Peek(); }
+                else if (c == ')') { pos = spos.Pop(); doors = sdoors.Pop(); }
+                else
+                {
+                    pos += tinyDirections[c];
+                    if (!visited.Contains(pos))
+                    {
+                        doors++;
+                        maxDoors = Math.Max(maxDoors, doors);
+                        if (doors >= 1000)
+                        {
+                            distantRooms++;
+                        }
+                        visited.Add(pos);
+                    }
+                }
+            }
+            return Tuple.Create(maxDoors, distantRooms);
         }
 
-        static void PartB()
+        static void PartAB()
         {
-            Console.WriteLine("Part B: Result is " + 'B' + ".");
+            string regex = ReadInput();
+            Map map = CreateMap(regex);
+            //PrintMap(map);
+            Tuple<int, int> answer = WalkTheMap(regex);
+            Console.WriteLine("Part A: Result is " + answer.Item1 + ".");
+            Console.WriteLine("Part B: Result is " + answer.Item2 + ".");
         }
 
         static void Main(string[] args)
         {
             Console.WriteLine("AoC 2018 - " + typeof(Day20).Namespace + ":");
-            PartA();
-            PartB();
+            PartAB();
         }
     }
 }
