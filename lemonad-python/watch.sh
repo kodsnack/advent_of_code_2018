@@ -5,6 +5,7 @@
 YEAR="${1}"
 DAY="${2}"
 INPUT="december${DAY}.py"
+WATCH_MORE="common/puzzlesolver.py"
 
 if [ ! -f $INPUT ]; then
     echo "'${INPUT}' does not exist!"
@@ -12,5 +13,5 @@ if [ ! -f $INPUT ]; then
 fi
 
 while true; do
-  fswatch ${INPUT} -o | xargs -n1 -I{} ./run.sh "${1}" "${2}"
+  fswatch ${INPUT} ${WATCH_MORE} -o | xargs -n1 -I{} ./run.sh "${1}" "${2}"
 done;

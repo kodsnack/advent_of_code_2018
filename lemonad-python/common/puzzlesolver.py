@@ -8,7 +8,7 @@ import re
 
 
 class PuzzleSolver(ABC):
-    def __init__(self, from_file=None, from_str=None):
+    def __init__(self, from_file=None, from_str=None, strip=True):
         if not (from_file or from_str):
             raise ValueError(
                 "PuzzleSolver needs to be initialized from " "either file or string."
@@ -17,9 +17,13 @@ class PuzzleSolver(ABC):
             raise ValueError("PuzzleSolver ambiguous initialization.")
         elif from_str:
             self.raw_puzzle_input = from_str.strip()
+            if strip:
+                self.raw_puzzle_input = self.raw_puzzle_input.strip()
         else:
             with open(from_file) as f:
-                self.raw_puzzle_input = f.read().strip()
+                self.raw_puzzle_input = f.read()
+                if strip:
+                    self.raw_puzzle_input = self.raw_puzzle_input.strip()
 
     @abstractmethod
     def solve(self):
@@ -33,12 +37,18 @@ class PuzzleSolver(ABC):
         for c in self.raw_puzzle_input:
             yield c
 
-    def lines(self, conversion=None):
+    def lines(self, conversion=None, strip=True):
         for line in self.raw_puzzle_input.split("\n"):
             if not conversion:
-                yield line.strip()
+                if strip:
+                    yield line.strip()
+                else:
+                    yield line
             else:
-                yield conversion(line.strip())
+                if strip:
+                    yield conversion(line.strip())
+                else:
+                    yield conversion(line)
 
     def lines_search(self, pattern):
         prog = re.compile(pattern)
