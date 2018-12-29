@@ -8,8 +8,7 @@ from decemberDayDD import Solver
 
 
 class TestDecemberDayDD(unittest.TestCase):
-
-    # def test_sum_of_natural_numbers(self):
+    # def test_example(self):
     #     self.assertEqual(Solver.code_for_row_col(5, 6), 31663883)
     #     self.assertGreaterEqual(lz, 5)
     #     self.assertTrue(Solver.is_nice_string_one('ugknbfddgicrmopn'))
