@@ -7,6 +7,8 @@ def plotPoints(pos, sec):
     x, y = zip(*pos)
     plt.plot(x, y, 'ro')
     plt.title('Elapsed time: {} seconds'.format(sec))
+    plt.xlim(min(x) - 2, max(x) + 2)
+    plt.ylim(max(y) + 2, min(y) - 2)
     plt.show()
 
 def calcNewPos(pos, vel, sec=1):
