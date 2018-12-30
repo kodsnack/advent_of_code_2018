@@ -1,1 +1,4 @@
+*.exe
+*.out
 /day[0-9]/day[0-9]
+/day11/day11

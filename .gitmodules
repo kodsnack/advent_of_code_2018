@@ -7,9 +7,6 @@
 [submodule "albert-arvidsson-elixir"]
 	path = albert-arvidsson-elixir
 	url = git@github.com:scmx/advent-of-code-2018-elixir
-[submodule "fronkan-python"]
-	path = fronkan-python
-	url = git@github.com:Fronkan/advent_of_code_2018.git
 [submodule "yxhuvud-crystal"]
 	path = yxhuvud-crystal
 	url = https://github.com/yxhuvud/aoc18
@@ -46,3 +43,12 @@
 [submodule "p1xelHer0-OCaml"]
 	path = p1xelHer0-OCaml
 	url = https://github.com/p1xelHer0/advent-of-code-2018-ocaml.git
+[submodule "LinAGKar-rust"]
+	path = LinAGKar-rust
+	url = https://github.com/LinAGKar/advent-of-code-2018-rust.git
+[submodule "toblu302-x86_64"]
+	path = toblu302-x86_64
+	url = https://github.com/toblu302/AdventOfCode
+[submodule "fronkan-python"]
+	path = fronkan-python
+	url = git@github.com:Fronkan/advent_of_code_2018.git

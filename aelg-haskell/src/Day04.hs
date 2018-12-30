@@ -25,25 +25,18 @@ parseLine = InputLine <$> parseTimeStamp <*> parseAction
 
 parseTimeStamp = do
   char '['
-  year <- P.integer
-  char '-'
-  month <- P.integer
-  char '-'
-  day <- P.integer
-  char ' '
-  hour <- P.integer
-  char ':'
-  minute <- P.integer
-  string "] "
+  year <- P.integerAnd $ char '-'
+  month <- P.integerAnd $ char '-'
+  day <- P.integerAnd $ char ' '
+  hour <- P.integerAnd $ char ':'
+  minute <- P.integerAnd $ string "] "
   return $ Timestamp year month day hour minute
 
 parseAction = parseGuard <++ parseWakes <++ parseSleeps
 
 parseGuard = do
   string "Guard #"
-  guard <- P.integer
-  string " begins shift"
-  eof
+  guard <- P.integerAnd $ string " begins shift" >> eof
   return $ GuardShift guard
 
 parseWakes = string "wakes up" >> eof >> return Wakes
@@ -52,7 +45,7 @@ parseSleeps = string "falls asleep" >> eof >> return Sleeps
 
 parse = map (P.run parseLine)
 
-igGuard ((InputLine _ (GuardShift x)):_) = x
+igGuard (InputLine _ (GuardShift x):_) = x
 
 ilMinute (InputLine ts _) = minute ts
 
@@ -81,7 +74,7 @@ minutesAsleep xs = (igGuard . head $ xs, foldl folder M.empty xs)
     go (m, sleeping, ts:ils) minute
       | ilMinute ts == minute = (upd m, not sleeping, ils)
       | otherwise = (upd m, sleeping, ts:ils)
-        where upd m = M.alter ( Just . maybe 0 (+ if sleeping then 1 else 0)) (minute - 1) m
+        where upd = M.alter ( Just . maybe 0 (+ if sleeping then 1 else 0)) (minute - 1)
 
 sumAsleep (_, m) = sum m
 
@@ -92,7 +85,7 @@ guardTimeMax (guard, m) = guard * maxMinute
       | v > max = (k, v)
       | otherwise = (maxk, max)
 
-solver sorter = show . guardTimeMax . head . reverse . sortOn sorter . map minutesAsleep . groupGuard . groupShifts . sort
+solver sorter = show . guardTimeMax . last . sortOn sorter . map minutesAsleep . groupGuard . groupShifts . sort
 
 solve1 = solver sumAsleep
 
