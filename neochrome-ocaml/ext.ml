@@ -130,6 +130,12 @@ module List = struct
     |> filter Option.is_some
     |> map Option.value
 
+  let filter_mapi f xs =
+    xs
+    |> mapi f
+    |> filter Option.is_some
+    |> map Option.value
+
 end
 
 module Map = struct
