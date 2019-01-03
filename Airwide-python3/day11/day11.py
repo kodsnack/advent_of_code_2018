@@ -41,7 +41,7 @@ print('Day 11 part 1 answer: Max power is {} at position {}'.format(power, pos))
 maxPwr, size = getMaxPwrSqrSize(grid)
 power, pos = getMaxPowerSquare(grid, size)
 result = '{},{},{}'.format(pos[0], pos[1], size)
-print('Day 11 part 2 answer: Max power is {} at position {} with a size of {} = "{}"'.format(pos, power, size, result))
+print('Day 11 part 2 answer: Max power is {} at position {} with a size of {} = "{}"'.format(power, pos, size, result))
 
 
 
