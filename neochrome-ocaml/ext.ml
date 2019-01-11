@@ -3,6 +3,9 @@ let (>>) = bind
 
 module Option = struct
 
+  let none = None
+  let some x = Some x
+
   let is_none = function None -> true | _ -> false
   let is_some = function None -> false | _ -> true
 
@@ -16,7 +19,11 @@ module Option = struct
 
   let map f = function
     | None -> None
-    | Some x -> Some (f x)
+    | Some x -> f x |> some
+
+  let orSome y = function
+    | None -> some y
+    | x -> x
 
 end
 
@@ -52,11 +59,17 @@ module String = struct
       if n = 0 then l
       else build (n - 1) (s.[n - 1] :: l)
     in
-    build (String.length s) []
-  ;;
+    build (length s) []
 
   let from_chars chars =
-    String.init (List.length chars) (fun i -> List.nth chars i)
+    init (List.length chars) (fun i -> List.nth chars i)
+
+  let fold f a s =
+    let last = length s in
+    let rec build n a =
+      if n = last then a
+      else build (n + 1) (f a s.[n])
+    in build 0 a
 
 end
 
@@ -127,6 +140,12 @@ module List = struct
   let filter_map f xs =
     xs
     |> map f
+    |> filter Option.is_some
+    |> map Option.value
+
+  let filter_mapi f xs =
+    xs
+    |> mapi f
     |> filter Option.is_some
     |> map Option.value
 
