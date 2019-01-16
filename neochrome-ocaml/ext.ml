@@ -149,6 +149,18 @@ module List = struct
     |> filter Option.is_some
     |> map Option.value
 
+  let rec skip n = function
+    | [] -> []
+    | xs when n <= 0 -> xs
+    | _ :: xs -> skip (n - 1) xs
+
+  let take n xs =
+    let rec build xs' n = function
+      | [] -> xs'
+      | _ when n <= 0 -> xs'
+      | x :: xs -> build (x :: xs') (n - 1) xs
+    in build [] n xs |> rev
+
 end
 
 module Map = struct
@@ -190,5 +202,33 @@ module Range = struct
   let rec fold b e f a =
     if b > e then a
     else fold (b + 1) e f (f a b)
+
+end
+
+module Array = struct
+  include Array
+
+  let index_of_opt arr needle =
+    let rec search i =
+      if length arr - i < length needle then None
+      else if check i 0 then Some i
+      else search (i + 1)
+    and check i j =
+      if j = length needle then true
+      else if arr.(i) <> needle.(j) then false
+      else check (i + 1) (j + 1)
+    in search 0
+
+  let rindex_of_opt arr needle =
+    let nend = length needle - 1 in
+    let rec search i =
+      if i < nend then None
+      else if check i nend then Some (i - nend)
+      else search (i - 1)
+    and check i j =
+      if j < 0 then true
+      else if arr.(i) <> needle.(j) then false
+      else check (i - 1) (j - 1)
+    in search (length arr - 1)
 
 end
