@@ -7,14 +7,10 @@ def distance(a, b):
 
 def solve(bots):
     radiest = 0
-    radiest_bot = 0
 
     for i, bot in enumerate(bots):
         if bot[3] > radiest:
             radiest = bot[3]
-            radiest_bot = i
-
-    count = 0
 
     inrange = []
 
@@ -27,14 +23,8 @@ def solve(bots):
                 c += 1
         inrange.append(c)
     
-    return inrange
+    return inrange[0]
     
-    for i, bot in enumerate(bots):
-        if distance(bot, bots[radiest_bot]) <= radiest:
-            count += 1
-
-    return count
-
 
 def read_and_solve():
     pattern = re.compile('-?\d+')
