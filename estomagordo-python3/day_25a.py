@@ -1,45 +1,35 @@
 def distance(a, b):
-    return abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2]) + abs(a[3] - b[3])
+    return sum(abs(a[x] - b[x]) for x in range(4))
 
 
-def solve(d):
-    constellations = {}
+def count_unique(constellations):
+    return len({constellation[1] for constellation in constellations})
 
-    for i, elem in enumerate(d):
-        constellations[i] = [elem]
-    
+
+def solve(points):
+    constellations = [[point, i] for i, point in enumerate(points)]
+
     while True:
-        print(len(constellations))
-        adding = [-1, -1]
+        constellation_count = count_unique(constellations)
 
-        for keya, valuea in constellations.items():
-            if adding[0] != -1:
-                break
-            for keyb, valueb in constellations.items():
-                if keya == keyb:
+        for i in range(len(constellations)):
+            for j in range(i + 1, len(constellations)):
+                if constellations[i][1] == constellations[j][1]:
                     continue
 
-                found = False
+                a = constellations[i][1]
+                b = constellations[j][1]
 
-                for itema in valuea:
-                    if found:
-                        break
-                    for itemb in valueb:
-                        if distance(itema, itemb) <= 3:
-                            found = True
-                            break
-
-                if found:
-                    adding = [keya, keyb]
+                if distance(constellations[i][0], constellations[j][0]) <= 3:
+                    for constellation in constellations:
+                        if constellation[1] == a:
+                            constellation[1] = b
                     break
 
-        if adding[0] != -1:
-            constellations[adding[0]] = constellations[adding[0]] + constellations[adding[1]]
-            del constellations[adding[1]]
-        else:
+        if constellation_count == count_unique(constellations):
             break
 
-    return len(constellations)
+    return count_unique(constellations)
 
 
 def read_and_solve():
