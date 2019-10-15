@@ -262,26 +262,21 @@ def read_and_solve():
 
         lowest = 1
         highest = 61
+        best = (62, -1)
         
-        while True:
+        while lowest < highest:
             newinfec = deepcopy(infection)
             newimmune = deepcopy(immune)
             boost = (lowest + highest) // 2
-            print(boost)
             result = solve(newinfec, newimmune, boost)
 
             if result == -1:
                 lowest = boost + 1
             else:
-                while True:
-                    prev = result
-                    boost -= 1
-                    print(boost)
-                    newinfec = deepcopy(infection)
-                    newimmune = deepcopy(immune)
-                    result = solve(newinfec, newimmune, boost)
-                    if result == -1:
-                        return prev
+                best = (boost, result)
+                highest = boost - 1
+                
+        return best[1]
 
 if __name__ == '__main__':
     print(read_and_solve())
