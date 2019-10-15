@@ -1,12 +1,5 @@
 def solve(infection, immune):
-    # while any(unit[0] for unit in infection) and any(unit[0] for unit in immune):
     while infection and immune:
-        # infection.sort(key=lambda unit: [-unit[0] * unit[2], -unit[3]])
-        # immune.sort(key=lambda unit: [-unit[0] * unit[2], -unit[3]])
-
-        # infection_targeted = [False] * len(infection)
-        # immune_targeted = [False] * len(immune)
-
         infection_targeting = []
         immune_targeting = []
 
@@ -262,8 +255,7 @@ def read_and_solve():
                 infection.append(unit)
             else:
                 immune.append(unit)
-        # print(infection)
-        # print(immune)
+                
         return solve(infection, immune)
 
 if __name__ == '__main__':

@@ -259,8 +259,6 @@ def read_and_solve():
                 infection.append(unit)
             else:
                 immune.append(unit)
-        # print(infection)
-        # print(immune)
 
         lowest = 1
         highest = 61
