@@ -1,6 +1,7 @@
 import re
 from heapq import heappop, heappush
 
+
 def reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot):
     x, y, z, r = bot
 
@@ -33,29 +34,26 @@ def solve(bots):
     zmin = min(bot[2] for bot in bots)
     zmax = max(bot[2] for bot in bots)
     
-    frontier = [(-len(bots), xmin, xmax, ymin, ymax, zmin, zmax)]
+    frontier = [(-len(bots), xmin, ymin, zmin, xmax, ymax, zmax)]
 
     while frontier:
-        negpotential, xmin, xmax, ymin, ymax, zmin, zmax = heappop(frontier)
+        _, xmin, ymin, zmin, xmax, ymax, zmax = heappop(frontier)
 
         if xmin == xmax - 1 and ymin == ymax  - 1 and zmin == zmax - 1:
             return xmin + ymin + zmin
 
-        xhalf = (xmin + xmax) // 2
-        yhalf = (ymin + ymax) // 2
-        zhalf = (zmin + zmax) // 2
+        xranges = ((xmin, xmax),) if (xmin == xmax - 1) else ((xmin, (xmin + xmax) // 2), ((xmin + xmax) // 2, xmax))
+        yranges = ((ymin, ymax),) if (ymin == ymax - 1) else ((ymin, (ymin + ymax) // 2), ((ymin + ymax) // 2, ymax))
+        zranges = ((zmin, zmax),) if (zmin == zmax - 1) else ((zmin, (zmin + zmax) // 2), ((zmin + zmax) // 2, zmax))
 
         def do(xmin, xmax, ymin, ymax, zmin, zmax):
-            return (-sum(reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot) for bot in bots), xmin, xmax, ymin, ymax, zmin, zmax)
+            return (-sum(reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot) for bot in bots), xmin, ymin, zmin, xmax, ymax, zmax)
 
-        heappush(frontier, do(xmin, xhalf, ymin, yhalf, zmin, zhalf))
-        heappush(frontier, do(xmin, xhalf, ymin, yhalf, zhalf, zmax))
-        heappush(frontier, do(xmin, xhalf, yhalf, ymax, zmin, zhalf))
-        heappush(frontier, do(xmin, xhalf, yhalf, ymax, zhalf, zmax))
-        heappush(frontier, do(xhalf, xmax, ymin, yhalf, zmin, zhalf))
-        heappush(frontier, do(xhalf, xmax, ymin, yhalf, zhalf, zmax))
-        heappush(frontier, do(xhalf, xmax, yhalf, ymax, zmin, zhalf))
-        heappush(frontier, do(xhalf, xmax, yhalf, ymax, zhalf, zmax))
+        for xr in xranges:
+            for yr in yranges:
+                for zr in zranges:
+                    heappush(frontier, do(xr[0], xr[1], yr[0], yr[1], zr[0], zr[1]))
+                    
     
 def read_and_solve():
     pattern = re.compile('-?\d+')
