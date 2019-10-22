@@ -1,5 +1,3 @@
-from heapq import heappop, heappush
-from random import randint
 import re
 
 reachseen = {}
@@ -36,11 +34,6 @@ def reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot):
 
     reachseen[tup] = ans
     return ans
-
-    # corners = ((xmin, ymin, zmin), (xmin, ymin, zmax), (xmin, ymax, zmin), (xmin, ymax, zmax), (xmax, ymin, zmin), (xmax, ymin, zmax), (xmax, ymax, zmin), (xmax, ymax, zmax))
-    # ans = any(distance(corner, bot) <= bot[-1] for corner in corners)
-    # reachseen[tup] = ans
-    # return ans
 
 
 def solve(bots):
