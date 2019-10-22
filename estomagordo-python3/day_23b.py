@@ -43,19 +43,21 @@ def solve(bots):
             return xmin + ymin + zmin
 
         def rangemaker(lil, big):
-            return ((lil, big),) if (lil == big - 1) else ((lil, (lil + big) // 2), ((lil + big) // 2, big))
+            return ((lil, big),) if lil == big - 1 else ((lil, (lil + big) // 2), ((lil + big) // 2, big))
 
         xranges = rangemaker(xmin, xmax)
         yranges = rangemaker(ymin, ymax)
         zranges = rangemaker(zmin, zmax)
 
-        def do(xmin, xmax, ymin, ymax, zmin, zmax):
-            return (-sum(reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot) for bot in bots), abs(xmin) + abs(ymin) + abs(zmin), xmin, xmax, ymin, ymax, zmin, zmax)
+        def package(xmin, xmax, ymin, ymax, zmin, zmax):
+            nearby = sum(reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot) for bot in bots)
+            dist = abs(xmin) + abs(ymin) + abs(zmin)
+            return (-nearby, dist, xmin, xmax, ymin, ymax, zmin, zmax)
 
         for xr in xranges:
             for yr in yranges:
                 for zr in zranges:
-                    heappush(frontier, do(xr[0], xr[1], yr[0], yr[1], zr[0], zr[1]))
+                    heappush(frontier, package(xr[0], xr[1], yr[0], yr[1], zr[0], zr[1]))
 
     
 def read_and_solve():
