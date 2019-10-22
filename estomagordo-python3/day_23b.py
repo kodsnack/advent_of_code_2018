@@ -34,26 +34,29 @@ def solve(bots):
     zmin = min(bot[2] for bot in bots)
     zmax = max(bot[2] for bot in bots)
     
-    frontier = [(-len(bots), xmin, ymin, zmin, xmax, ymax, zmax)]
+    frontier = [(-len(bots), 0, xmin, xmax, ymin, ymax, zmin, zmax)]
 
     while frontier:
-        _, xmin, ymin, zmin, xmax, ymax, zmax = heappop(frontier)
+        potential, distance, xmin, xmax, ymin, ymax, zmin, zmax = heappop(frontier)
 
         if xmin == xmax - 1 and ymin == ymax  - 1 and zmin == zmax - 1:
             return xmin + ymin + zmin
 
-        xranges = ((xmin, xmax),) if (xmin == xmax - 1) else ((xmin, (xmin + xmax) // 2), ((xmin + xmax) // 2, xmax))
-        yranges = ((ymin, ymax),) if (ymin == ymax - 1) else ((ymin, (ymin + ymax) // 2), ((ymin + ymax) // 2, ymax))
-        zranges = ((zmin, zmax),) if (zmin == zmax - 1) else ((zmin, (zmin + zmax) // 2), ((zmin + zmax) // 2, zmax))
+        def rangemaker(lil, big):
+            return ((lil, big),) if (lil == big - 1) else ((lil, (lil + big) // 2), ((lil + big) // 2, big))
+
+        xranges = rangemaker(xmin, xmax)
+        yranges = rangemaker(ymin, ymax)
+        zranges = rangemaker(zmin, zmax)
 
         def do(xmin, xmax, ymin, ymax, zmin, zmax):
-            return (-sum(reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot) for bot in bots), xmin, ymin, zmin, xmax, ymax, zmax)
+            return (-sum(reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot) for bot in bots), abs(xmin) + abs(ymin) + abs(zmin), xmin, xmax, ymin, ymax, zmin, zmax)
 
         for xr in xranges:
             for yr in yranges:
                 for zr in zranges:
                     heappush(frontier, do(xr[0], xr[1], yr[0], yr[1], zr[0], zr[1]))
-                    
+
     
 def read_and_solve():
     pattern = re.compile('-?\d+')
