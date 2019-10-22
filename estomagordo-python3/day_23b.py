@@ -1,17 +1,7 @@
 import re
 
-reachseen = {}
-
-
-def distance(a, b):
-    return sum(abs(a[x] - b[x]) for x in range(3))
-
 
 def reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot):
-    tup = (xmin, xmax, ymin, ymax, zmin, zmax, bot)
-    if tup in reachseen:
-        return reachseen[tup]
-
     x, y, z, r = bot
 
     ans = xmin <= x <= xmax and ymin <= y <= ymax and zmin <= z <= zmax
@@ -31,8 +21,7 @@ def reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot):
             r -= (z - zmax)
 
         ans = r >= 0
-
-    reachseen[tup] = ans
+        
     return ans
 
 
