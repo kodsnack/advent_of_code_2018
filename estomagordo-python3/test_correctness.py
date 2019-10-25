@@ -160,3 +160,165 @@ def test_11b():
 
     answer = day_11b.read_and_solve()
     assert('229,192,11' == answer)
+
+def test_12a():
+    import day_12a
+
+    answer = day_12a.read_and_solve()
+    assert(2930 == answer)
+
+def test_12b():
+    import day_12b
+
+    answer = day_12b.read_and_solve()
+    assert(3099999999491 == answer)
+
+def test_13a():
+    import day_13a
+
+    answer = day_13a.read_and_solve()
+    assert('43,111' == answer)
+
+def test_13b():
+    import day_13b
+
+    answer = day_13b.read_and_solve()
+    assert('44,56' == answer)
+
+def test_14a():
+    import day_14a
+
+    answer = day_14a.read_and_solve()
+    assert('1617111014' == answer)
+
+def test_14b():
+    import day_14b
+
+    answer = day_14b.read_and_solve()
+    assert(20321495 == answer)
+
+def test_15a():
+    import day_15a
+
+    answer = day_15a.read_and_solve()
+    assert(229950 == answer)
+
+def test_15b():
+    import day_15b
+
+    answer = day_15b.read_and_solve()
+    assert(54360 == answer)
+
+def test_16a():
+    import day_16a
+
+    answer = day_16a.read_and_solve()
+    assert(493 == answer)
+
+def test_16b():
+    import day_16b
+
+    answer = day_16b.read_and_solve()
+    assert(445 == answer)
+
+def test_17a():
+    import day_17a
+
+    answer = day_17a.read_and_solve()
+    assert(38364 == answer)
+
+def test_17b():
+    import day_17b
+
+    answer = day_17b.read_and_solve()
+    assert(30551 == answer)
+
+def test_18a():
+    import day_18a
+
+    answer = day_18a.read_and_solve()
+    assert(394420 == answer)
+
+def test_18b():
+    import day_18b
+
+    answer = day_18b.read_and_solve()
+    assert(174420 == answer)
+
+def test_19a():
+    import day_19a
+
+    answer = day_19a.read_and_solve()
+    assert(2304 == answer)
+
+def test_19b():
+    import day_19b
+
+    answer = day_19b.read_and_solve()
+    assert(28137600 == answer)
+
+def test_20a():
+    import day_20a
+
+    answer = day_20a.read_and_solve()
+    assert(3512 == answer)
+
+def test_20b():
+    import day_20b
+
+    answer = day_20b.read_and_solve()
+    assert(8660 == answer)
+
+def test_21a():
+    import day_21a
+
+    answer = day_21a.read_and_solve()
+    assert(15823996 == answer)
+
+def test_21b():
+    import day_21b
+
+    answer = day_21b.read_and_solve()
+    assert(10199686 == answer)
+
+def test_22a():
+    import day_22a
+
+    answer = day_22a.read_and_solve()
+    assert(11972 == answer)
+
+def test_22b():
+    import day_22b
+
+    answer = day_22b.read_and_solve()
+    assert(1092 == answer)
+
+def test_23a():
+    import day_23a
+
+    answer = day_23a.read_and_solve()
+    assert(326 == answer)
+
+def test_23b():
+    import day_23b
+
+    answer = day_23b.read_and_solve()
+    assert(142473501 == answer)
+
+def test_24a():
+    import day_24a
+
+    answer = day_24a.read_and_solve()
+    assert(24009 == answer)
+
+def test_24b():
+    import day_24b
+
+    answer = day_24b.read_and_solve()
+    assert(379 == answer)
+
+def test_25a():
+    import day_25a
+
+    answer = day_25a.read_and_solve()
+    assert(350 == answer)

@@ -2,7 +2,7 @@ import re
 
 
 def solve(d):
-    pattern = re.compile('\d+')
+    pattern = re.compile(r'\d+')
     y_limits = [10000, -10000]
     clay = set()
     resting = set()
@@ -69,7 +69,7 @@ def solve(d):
 
         return new_starts
 
-    while True::
+    while True:
         number = len(reached)
         new_starts = set(starts)
         for x, y in starts:

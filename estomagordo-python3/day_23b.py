@@ -1,24 +1,25 @@
 import re
+from heapq import heappop, heappush
 
 
 def reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot):
     x, y, z, r = bot
 
-    ans = xmin <= x <= xmax and ymin <= y <= ymax and zmin <= z <= zmax
+    ans = xmin <= x < xmax and ymin <= y < ymax and zmin <= z < zmax
 
     if not ans:
         if x < xmin:
             r -= (xmin - x)
-        elif x > xmax:
-            r -= (x - xmax)
+        elif x >= xmax:
+            r -= (x - xmax + 1)
         if y < ymin:
             r -= (ymin - y)
-        elif y > ymax:
-            r -= (y - ymax)
+        elif y >= ymax:
+            r -= (y - ymax + 1)
         if z < zmin:
             r -= (zmin - z)
-        elif z > zmax:
-            r -= (z - zmax)
+        elif z >= zmax:
+            r -= (z - zmax + 1)
 
         ans = r >= 0
         
@@ -33,64 +34,34 @@ def solve(bots):
     zmin = min(bot[2] for bot in bots)
     zmax = max(bot[2] for bot in bots)
     
-    lowest_diff = min(xmax - xmin, ymax - ymin, zmax - zmin)
-    
-    step = 1
-    
-    while step < lowest_diff:
-        step *= 2
-        
-    step //= 4
-    from collections import defaultdict
-    d = defaultdict(int)
-    
-    def find(xmin, xmax, ymin, ymax, zmin, zmax, step, d, highest):
-        d[step] += 1
-        if step == 1:
-            best = (0, 10**10)
-            for x in range(xmin, xmax + 1, step):
-                for y in range(ymin, ymax + 1, step):
-                    for z in range(zmin, zmax + 1, step):
-                        score = sum(reaches_box(x, x, y, y, z, z, bot) for bot in bots)
-                        dist = abs(x) + abs(y) + abs(z)
-                        if score > best[0] or (score == best[0] and dist < best[1]):
-                            best = (score, dist)
+    frontier = [(-len(bots), 0, xmin, xmax, ymin, ymax, zmin, zmax)]
 
-            highest['highest'] = max(highest['highest'], best[0])
-            return best
+    while frontier:
+        potential, distance, xmin, xmax, ymin, ymax, zmin, zmax = heappop(frontier)
 
-        candidates = []
-        best = 0
+        if xmin == xmax - 1 and ymin == ymax  - 1 and zmin == zmax - 1:
+            return xmin + ymin + zmin
 
-        for x in range(xmin, xmax + 1, step):
-            for y in range(ymin, ymax + 1, step):
-                for z in range(zmin, zmax + 1, step):
-                    score = sum(reaches_box(x, x + step, y, y + step, z, z + step, bot) for bot in bots)
-                    if score > highest['highest']:
-                        if score > best:
-                            candidates = [(x, x + step, y, y + step, z, z + step)]
-                            best = score
-                        elif score == best:
-                            candidates.append((x, x + step, y, y + step, z, z + step))
+        def rangemaker(lil, big):
+            return ((lil, big),) if lil == big - 1 else ((lil, (lil + big) // 2), ((lil + big) // 2, big))
 
-        values = [find(candidate[0], candidate[1], candidate[2], candidate[3], candidate[4], candidate[5], step // 2, d, highest) for candidate in candidates]
-        values = [v for v in values if v]
-        
-        if values:
-            best = values[0]
+        xranges = rangemaker(xmin, xmax)
+        yranges = rangemaker(ymin, ymax)
+        zranges = rangemaker(zmin, zmax)
 
-            for value in values[1:]:
-                if value[0] > best[0] or (value[0] == best[0] and value[1] < best[1]):
-                    best = value
+        def package(xmin, xmax, ymin, ymax, zmin, zmax):
+            nearby = sum(reaches_box(xmin, xmax, ymin, ymax, zmin, zmax, bot) for bot in bots)
+            dist = abs(xmin) + abs(ymin) + abs(zmin)
+            return (-nearby, dist, xmin, xmax, ymin, ymax, zmin, zmax)
 
-            return best
+        for xr in xranges:
+            for yr in yranges:
+                for zr in zranges:
+                    heappush(frontier, package(xr[0], xr[1], yr[0], yr[1], zr[0], zr[1]))
 
-    _, distance = find(xmin, xmax, ymin, ymax, zmin, zmax, step, d, {'highest': 0})
-
-    return distance
     
 def read_and_solve():
-    pattern = re.compile('-?\d+')
+    pattern = re.compile(r'-?\d+')
     with open('input_23.txt') as f:
         data = []
         for line in f:

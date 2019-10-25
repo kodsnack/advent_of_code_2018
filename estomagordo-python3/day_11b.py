@@ -1,36 +1,33 @@
 def solve(d):
-    grid = {}
+    grid = []
 
-    for x in range(1, 301):
-        for y in range(1, 301):
+    for y in range(301):
+        row = []
+        for x in range(301):
             rack_id = x + 10
             power_level = y * rack_id
             power_level += d
             power_level *= rack_id
             power_level = (power_level // 100) % 10
             power_level -= 5
-            grid[(x, y)] = power_level
-
-    rowsums = [[] for _ in range(300)]
-
-    for y in range(1, 301):
-        cum = 0
-        for x in range(1, 301):
-            cum += grid[(x, y)]
-            rowsums[y - 1].append(cum)
+            row.append(power_level)
+        grid.append(row)
     
     best = -1000
     best_coord = ''
-    
-    for size in range(1, 301):
-        for x in range(1, 302 - size):
-            for y in range(1, 302 - size):
-                score = 0
-                for dy in range(size):
-                    score += rowsums[y + dy - 1][x + size - 2] - rowsums[y + dy - 1][x - 1]
+
+    for x in range(1, 301):
+        for y in range(1, 301):
+            score = grid[y][x]            
+            for step in range(299 - max(x, y)):
+                for sx in range(step):
+                    score += grid[y + step][x + sx]
+                for sy in range(step):
+                    score += grid[y + sy][x + step]
+                score += grid[y + step][x + step]
                 if score > best:
                     best = score
-                    best_coord = ','.join(map(str, [x, y, size]))
+                    best_coord = ','.join(map(str, [x, y, step + 1]))
 
     return best_coord
 
