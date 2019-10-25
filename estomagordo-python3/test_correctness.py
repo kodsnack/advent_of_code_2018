@@ -189,7 +189,7 @@ def test_14a():
     import day_14a
 
     answer = day_14a.read_and_solve()
-    assert(1617111014 == answer)
+    assert('1617111014' == answer)
 
 def test_14b():
     import day_14b
