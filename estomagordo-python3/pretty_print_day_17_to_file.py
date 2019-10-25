@@ -33,7 +33,7 @@ def print_state(clay, resting, reached):
     print(min_x, max_x, min_y, max_y)
 
 def solve(d):
-    pattern = re.compile('\d+')
+    pattern = re.compile(r'\d+')
     y_limits = [10000, -10000]
     clay = set()
     resting = set()

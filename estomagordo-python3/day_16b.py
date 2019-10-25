@@ -107,7 +107,7 @@ def solve(examples, program):
 
 
 def read_and_solve():
-    pattern = re.compile('\d+')
+    pattern = re.compile(r'\d+')
     examples = []
     example = []
     empty_streak = 0

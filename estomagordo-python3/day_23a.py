@@ -20,7 +20,7 @@ def solve(bots):
     return inrange
 
 def read_and_solve():
-    pattern = re.compile('-?\d+')
+    pattern = re.compile(r'-?\d+')
     with open('input_23.txt') as f:
         data = []
         for line in f:

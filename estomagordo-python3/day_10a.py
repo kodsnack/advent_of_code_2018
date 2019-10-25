@@ -27,7 +27,7 @@ def move_points(points):
 
 def solve(d):
     height = 10
-    pattern = re.compile('-?\d*')
+    pattern = re.compile(r'-?\d*')
     points = [[int(val) for val in re.findall(pattern, line) if val] for line in d]
 
     while True:
