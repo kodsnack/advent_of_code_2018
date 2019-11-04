@@ -21,9 +21,6 @@
        (apply +)
        ))
 
-(defn vec-middle [v1 v2]
-  (mapv #(quot % 2) (vec-add v1 v2)))
-
 (defn is-within-range [bot pos]
   (<= (dist (:pos bot) pos) (:r bot)))
 
@@ -88,18 +85,6 @@
     [dx dy dz]
     ))
 
-(defn bisect-towards [bots next-bot pos]
-  (loop [pos pos
-         target (:pos next-bot)
-         ]
-    (if (<= (dist pos target) 3)
-      pos
-      (let [midpos (vec-middle pos target)]
-        (if (is-within-range-of-all bots midpos)
-          (recur midpos target)
-          (recur pos midpos)
-          )))))
-
 (defn step-towards [bots next-bot pos]
   (if (is-within-range next-bot pos)
     pos
@@ -151,7 +136,7 @@
      :more-bots rest-bots
      :pos (step-towards processed-bots
                         next-bot
-                        (bisect-towards processed-bots next-bot pos)
+                        pos
                         )
      }
   ))
