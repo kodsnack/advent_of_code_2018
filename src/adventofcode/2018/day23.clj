@@ -76,7 +76,7 @@
        (set)
    ))
 
-(def adjacent-steps
+(def directions
   (for [dx [-1 0 1]
         dy [-1 0 1]
         dz [-1 0 1]
@@ -89,7 +89,7 @@
   (let [curdist (dist pos target)
         stepsizes (take-while #(> % 0) (iterate #(quot % 2) curdist))
         dxyzs (mapcat (fn [stepsize]
-                        (map #(vec-mul stepsize %) adjacent-steps))
+                        (map #(vec-mul stepsize %) directions))
                       stepsizes
                       )
         step (->> dxyzs
