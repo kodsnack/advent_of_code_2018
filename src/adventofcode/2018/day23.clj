@@ -128,15 +128,21 @@
       (recur bots step)
       )))
 
-(defn pull-to-next [{:keys [processed-bots more-bots pos]}]
-  (let [next-bot (first more-bots)
-        rest-bots (next more-bots)
-        ]
-    {:processed-bots (conj processed-bots next-bot)
-     :more-bots rest-bots
-     :pos (step-into-range processed-bots next-bot pos)
-     }
-  ))
+(defn find-pos-in-range-of-all
+  ([processed-bots more-bots pos]
+   (if-let [next-bot (first more-bots)]
+     (recur (conj processed-bots next-bot)
+            (next more-bots)
+            (step-into-range processed-bots next-bot pos)
+            )
+     pos
+     ))
+  ([bots]
+   (let [sorted-bots (sort-by :r bots)]
+     (find-pos-in-range-of-all []
+                               sorted-bots
+                               (:pos (first sorted-bots))
+                               ))))
 
 (defn solve-a [lines]
   (let [bots (parse-input lines)
@@ -152,20 +158,10 @@
 (defn solve-b [lines]
   (let [bots (parse-input lines)
         best-bots (remove-bots-until-all-overlap bots)
-        sorted-bots (sort-by :r best-bots)
-        initial-state {:processed-bots []
-                       :more-bots sorted-bots
-                       :pos (:pos (first sorted-bots))
-                       }
+        initial-pos (find-pos-in-range-of-all best-bots)
+        final-pos (step-towards-origin best-bots initial-pos)
         ]
-    (->> initial-state
-         (iterate pull-to-next)
-         (drop-while #(seq (:more-bots %)))
-         (first)
-         (:pos)
-         (step-towards-origin best-bots)
-         (dist [0 0 0])
-         )))
+    (dist [0 0 0] final-pos)))
 
 (defn run [input-lines & args]
   {:A (solve-a input-lines)
