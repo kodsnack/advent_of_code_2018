@@ -70,7 +70,7 @@
   (->> bots
        (overlaps)
        (iterate remove-least-overlapping-bot)
-       (drop-while #(not (all-groups-overlap-fully %)))
+       (filter all-groups-overlap-fully)
        (first)
        (keys)
        (set)
