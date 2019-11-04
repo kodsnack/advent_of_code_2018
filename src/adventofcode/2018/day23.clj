@@ -85,31 +85,8 @@
     [dx dy dz]
     ))
 
-(defn step-into-range [bots next-bot pos]
-  (if (is-within-range next-bot pos)
-    pos
-    (let [botpos (:pos next-bot)
-          curdist (dist pos botpos)
-          stepsizes (take-while #(> % 0) (iterate #(quot % 2) curdist))
-          dxyzs (mapcat (fn [stepsize]
-                          (map #(vec-mul stepsize %) adjacent-steps))
-                        stepsizes
-                        )
-          step (->> dxyzs
-                    (map #(vec-add % pos))
-                    (filter #(< (dist % botpos) curdist))
-                    (sort-by #(dist % botpos))
-                    (filter #(is-within-range-of-all bots %))
-                    (first)
-                    )
-          ]
-      (if (nil? step)
-        nil
-        (recur bots next-bot step)
-        ))))
-
-(defn step-towards-origin [bots pos]
-  (let [curdist (dist pos [0 0 0])
+(defn find-best-step-in-range [bots pos target]
+  (let [curdist (dist pos target)
         stepsizes (take-while #(> % 0) (iterate #(quot % 2) curdist))
         dxyzs (mapcat (fn [stepsize]
                         (map #(vec-mul stepsize %) adjacent-steps))
@@ -117,16 +94,26 @@
                       )
         step (->> dxyzs
                   (map #(vec-add % pos))
-                  (filter #(< (dist % [0 0 0]) curdist))
-                  (sort-by #(dist % [0 0 0]))
+                  (filter #(< (dist % target) curdist))
+                  (sort-by #(dist % target))
                   (filter #(is-within-range-of-all bots %))
                   (first)
                   )
         ]
-    (if (nil? step)
-      pos
-      (recur bots step)
-      )))
+    step
+    ))
+
+(defn step-into-range [bots next-bot pos]
+  (if (is-within-range next-bot pos)
+    pos
+    (if-let [step (find-best-step-in-range bots pos (:pos next-bot))]
+      (recur bots next-bot step))))
+
+(defn step-towards-origin [bots pos]
+  (if-let [step (find-best-step-in-range bots pos [0 0 0])]
+    (recur bots step)
+    pos
+    ))
 
 (defn find-pos-in-range-of-all
   ([processed-bots more-bots pos]
