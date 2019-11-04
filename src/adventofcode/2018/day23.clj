@@ -85,7 +85,7 @@
     [dx dy dz]
     ))
 
-(defn step-towards [bots next-bot pos]
+(defn step-into-range [bots next-bot pos]
   (if (is-within-range next-bot pos)
     pos
     (let [botpos (:pos next-bot)
@@ -134,10 +134,7 @@
         ]
     {:processed-bots (conj processed-bots next-bot)
      :more-bots rest-bots
-     :pos (step-towards processed-bots
-                        next-bot
-                        pos
-                        )
+     :pos (step-into-range processed-bots next-bot pos)
      }
   ))
 
