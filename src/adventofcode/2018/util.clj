@@ -23,6 +23,19 @@
    (range miny-in maxy-ex)
    ))
 
+(defn min-by [f xs]
+  (if-let [[x1 & xrest] (seq xs)]
+    (second
+     (reduce (fn [[fmin _ :as min] x]
+               (let [fx (f x)]
+                 (if (< fx fmin)
+                   [fx x]
+                   min
+                   )))
+               [(f x1) x1]
+               xrest
+               ))))
+
 (defn remove-empty [m]
   (reduce dissoc m (filter #(empty? (m %)) (keys m))))
 
