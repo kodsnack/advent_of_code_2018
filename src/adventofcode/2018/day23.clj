@@ -1,6 +1,6 @@
 (ns adventofcode.2018.day23
   (:require clojure.string
-            [adventofcode.2018.util :refer [abs as->> vec-add vec-mul vec-sub]]
+            [adventofcode.2018.util :refer [abs as->> min-by vec-add vec-mul vec-sub]]
             ))
 
 (defn parse-input [lines]
@@ -49,14 +49,11 @@
           ))
 
 (defn remove-least-overlapping-bot [overlaps-map]
-  (let [[worst-bot overlap-with-worst]
-        (->> overlaps-map
-             (sort-by #(count (second %)))
-             (first)
-             )
-        ]
-    (remove-bot-from-all-groups overlaps-map worst-bot)
-    ))
+  (->> overlaps-map
+       (min-by #(count (second %)))
+       (first)
+       (remove-bot-from-all-groups overlaps-map)
+       ))
 
 (defn all-groups-overlap-fully [overlaps-map]
   (every? (fn [[bot group]]
