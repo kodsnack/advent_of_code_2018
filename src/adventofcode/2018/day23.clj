@@ -42,13 +42,11 @@
           ))
 
 (defn remove-bot-from-all-groups [overlaps-map rem-bot]
-  (-> overlaps-map
-      (dissoc rem-bot)
-      (->> (reduce (fn [result [bot group]]
-                     (assoc result bot (disj group rem-bot)))
-                   {}
-                   ))
-      ))
+  (reduce (fn [result [bot group]]
+            (assoc result bot (disj group rem-bot)))
+          {}
+          (dissoc overlaps-map rem-bot)
+          ))
 
 (defn remove-least-overlapping-bot [overlaps-map]
   (let [[worst-bot overlap-with-worst]
