@@ -1,4 +1,6 @@
-(ns adventofcode.2018.day06)
+(ns adventofcode.2018.day06
+  (:require [adventofcode.2018.util :refer [abs vec-sub]])
+  )
 
 (defn parse-input [lines]
   (mapv (fn [line]
@@ -102,7 +104,51 @@
     ((:sizes end-state) largest-zone)
     ))
 
-(defn solve-b [lines] ())
+(defn midpoint [points]
+  (->> points
+       (reduce (fn [[xx yy] [x y]]
+                 [(+ x xx) (+ y yy)])
+               [0 0])
+       (map #(quot % (count points)))
+       ))
+
+(defn dist [p1 p2]
+  (->> (vec-sub p1 p2)
+       (map abs)
+       (apply +)
+       ))
+
+(defn sumdist [points point]
+  (->> points
+       (map #(dist % point))
+       (reduce +)
+       ))
+
+(defn grow-safe-region [[points region heads]]
+  (let [steps (set (mapcat adjacent heads))
+        new-heads (->> steps
+                        (remove region)
+                        (filter (fn [step]
+                                  (< (sumdist points step) 10000)))
+                        )
+        new-region (apply conj region new-heads)
+        ]
+    [points new-region new-heads]
+    )
+  )
+
+(defn solve-b [lines]
+  (let [points (parse-input lines)
+        start-point (midpoint points)
+        end-region (->> (iterate grow-safe-region [points #{start-point} [start-point]])
+                        (filter (fn [[points region heads]]
+                                  (empty? heads)))
+                        (first)
+                        (second)
+                        )
+        ]
+    (count end-region)
+    ))
 
 (defn run [input-lines & args]
   { :A (solve-a input-lines)
