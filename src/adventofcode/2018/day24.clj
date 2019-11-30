@@ -140,6 +140,9 @@
        (cleanup-phase)
        ))
 
+(defn victory? [state]
+  (> 2 (count (group-by :team (vals (:units state))))))
+
 (defn break-stalemate [states]
   (->> states
        (partition 2 1)
@@ -150,9 +153,6 @@
                 :else state1
                 )))
        ))
-
-(defn victory? [state]
-  (> 2 (count (group-by :team (vals (:units state))))))
 
 (defn unitsum [state]
   (->> state
