@@ -4,7 +4,7 @@
   :license {:name "Unlicense"
             :url "http://unlicense.org"
             :distribution :repo}
-  :dependencies [[org.clojure/clojure "1.8.0"]]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha17"]]
   :main ^:skip-aot adventofcode.2018.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

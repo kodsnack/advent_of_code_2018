@@ -1,5 +1,7 @@
 (ns adventofcode.2018.core
-  (:require clojure.string))
+  (:require clojure.string
+            [adventofcode.2018.util :refer [as->>]]
+            ))
 
 (defn pad
   ([day] (pad day "0"))
@@ -51,18 +53,22 @@
 (defn -main
   "Run the solver for the given day (or all) with lines from file as argument. If file is -, use standard input; if not given, use default."
   ([]
-    (->> (iterate inc 1)
-      (take 25)
-      (map run-day-with-file)
-      (filter #(not (nil? %)))
-      (map (fn [result]
-        (clojure.string/join "\n\n" [
-          (day-header (:day result))
-          (format-day-results result)
-        ])
-      ))
-      (clojure.string/join "\n\n\n")
-      println))
+   (->> (iterate inc 1)
+        (take 25)
+        (map run-day-with-file)
+        (filter #(not (nil? %)))
+        (map (fn [result]
+               (clojure.string/join "\n\n" [
+                                            (day-header (:day result))
+                                            (format-day-results result)
+                                            ])
+               ))
+        (as->> $ (doseq [output $]
+                   (println output)
+                   (println)
+                   (println)
+                   ))
+        ))
 
   ([day] (-main day (day-file day)))
   ([day file & args]
